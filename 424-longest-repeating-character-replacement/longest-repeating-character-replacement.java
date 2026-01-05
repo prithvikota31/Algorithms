@@ -15,8 +15,7 @@ class Solution {
             {
                 maxLen = Math.max(maxLen, length);
             }
-
-            if(length - maxFreq > k)
+else
             {
                 freq[s.charAt(l) - 'A']--;
                 l++;
