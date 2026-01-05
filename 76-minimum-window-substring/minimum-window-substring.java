@@ -10,19 +10,19 @@ class Solution {
             tfreq.put(c, tfreq.getOrDefault(c, 0) + 1);
         }
 
-        int l = 0, r = t.length() - 1, minLength = Integer.MAX_VALUE;
+        int l = 0, r = 0, minLength = Integer.MAX_VALUE;
 
-        for(int i = 0; i <= r; i++)
-        {
-            sfreq.put(s.charAt(i), sfreq.getOrDefault(s.charAt(i), 0) + 1);
-        }
-        if(checkIfValid(sfreq, tfreq))
-        {
-            minLength = Math.min(minLength, r - l + 1);
-            return s.substring(0, r + 1);
-        }
+        // for(int i = 0; i <= r; i++)
+        // {
+        //     sfreq.put(s.charAt(i), sfreq.getOrDefault(s.charAt(i), 0) + 1);
+        // }
+        // if(checkIfValid(sfreq, tfreq))
+        // {
+        //     minLength = Math.min(minLength, r - l + 1);
+        //     return s.substring(0, r + 1);
+        // }
 
-        r++;
+        // r++;
 
         // s = "A X B C T U J" t = "A C"
         //l = 0
