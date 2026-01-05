@@ -1,66 +1,39 @@
 class Solution {
-    public String minWindow(String s, String t) 
-    {
-        if(s.length() < t.length())   return "";
-        Map<Character, Integer> sfreq = new HashMap<>();
-        Map<Character, Integer> tfreq = new HashMap<>();
+    public String minWindow(String s, String t) {
+        int[] hash = new int[256];
 
-        for(char c : t.toCharArray())
+        for(char c: t.toCharArray())
         {
-            tfreq.put(c, tfreq.getOrDefault(c, 0) + 1);
+            hash[c]++;
         }
 
-        int l = 0, r = 0, minLength = Integer.MAX_VALUE;
-        int required = tfreq.size();
-        int found = 0;
-
-        // for(int i = 0; i <= r; i++)
-        // {
-        //     sfreq.put(s.charAt(i), sfreq.getOrDefault(s.charAt(i), 0) + 1);
-        // }
-        // if(checkIfValid(sfreq, tfreq))
-        // {
-        //     minLength = Math.min(minLength, r - l + 1);
-        //     return s.substring(0, r + 1);
-        // }
-
-        // r++;
-
-        // s = "A X B C T U J" t = "A C"
-        //l = 0
-        //r = 1
-        int finalL = 0;
-        int finalR = 0;
-
+        int r = 0, l = 0, minLen = Integer.MAX_VALUE, startIndex = -1;
+        int count = 0;
+        int required = t.length();
         while(r < s.length())
         {
-            sfreq.put(s.charAt(r), sfreq.getOrDefault(s.charAt(r), 0) + 1);
-            if(tfreq.containsKey(s.charAt(r)) && sfreq.get(s.charAt(r)).intValue() == tfreq.get(s.charAt(r)).intValue())
+            char rc = s.charAt(r);
+            if(hash[rc] > 0)
             {
-                found++;
+                count++;
             }
-            while(found == required)
-            {
-                if(minLength > r - l + 1)
-                {
-                    minLength = r - l + 1;
-                    finalL = l;
-                    finalR = r;
-                }
-                // minLength = Math.min(minLength, r - l + 1);
-                sfreq.put(s.charAt(l), sfreq.get(s.charAt(l)) - 1);
-                if(tfreq.containsKey(s.charAt(l)) && sfreq.get(s.charAt(l)) < tfreq.get(s.charAt(l)))
-                {
-                    found--;
-                }
-                l++;
-            }
+            hash[s.charAt(r)]--;
 
+            while(count == required){
+                if(r - l + 1 < minLen)
+                {
+                    minLen = r - l + 1;
+                    startIndex = l;
+                }
+                char lc = s.charAt(l);
+                hash[lc]++;
+                l++;
+                if(hash[lc] > 0)   count--;
+            }
 
             r++;
         }
 
-        return  minLength == Integer.MAX_VALUE? "" : s.substring(finalL, finalR + 1);  
+        return startIndex == -1? "" : s.substring(startIndex, startIndex + minLen);
     }
-
 }
