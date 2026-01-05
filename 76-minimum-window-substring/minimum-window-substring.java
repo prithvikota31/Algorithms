@@ -11,6 +11,8 @@ class Solution {
         }
 
         int l = 0, r = 0, minLength = Integer.MAX_VALUE;
+        int required = tfreq.size();
+        int found = 0;
 
         // for(int i = 0; i <= r; i++)
         // {
@@ -33,7 +35,11 @@ class Solution {
         while(r < s.length())
         {
             sfreq.put(s.charAt(r), sfreq.getOrDefault(s.charAt(r), 0) + 1);
-            while(checkIfValid(sfreq, tfreq))
+            if(tfreq.containsKey(s.charAt(r)) && sfreq.get(s.charAt(r)).intValue() == tfreq.get(s.charAt(r)).intValue())
+            {
+                found++;
+            }
+            while(found == required)
             {
                 if(minLength > r - l + 1)
                 {
@@ -43,6 +49,10 @@ class Solution {
                 }
                 // minLength = Math.min(minLength, r - l + 1);
                 sfreq.put(s.charAt(l), sfreq.get(s.charAt(l)) - 1);
+                if(tfreq.containsKey(s.charAt(l)) && sfreq.get(s.charAt(l)) < tfreq.get(s.charAt(l)))
+                {
+                    found--;
+                }
                 l++;
             }
 
@@ -53,16 +63,4 @@ class Solution {
         return  minLength == Integer.MAX_VALUE? "" : s.substring(finalL, finalR + 1);  
     }
 
-    //checks if the t window freq matches with s
-    public boolean checkIfValid(Map<Character, Integer> sfreq, Map<Character, Integer> tfreq)
-    {
-        for (char c : tfreq.keySet()) 
-        {
-            if (sfreq.getOrDefault(c, 0) < tfreq.get(c))
-            {
-                return false; 
-            }
-        }
-        return true;
-    }
 }
