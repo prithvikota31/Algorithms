@@ -29,12 +29,11 @@ class Solution {
         Arrays.fill(hash, -1);
         while(r < s.length())
         {
-            // if(hash[s.charAt(r)] != -1) //if index is already presen
-            // {
-            //     if(hash[s.charAt(r)] >= l)
-            //         l = hash[s.charAt(r)] + 1;
-            // }
-            l = Math.max(hash[s.charAt(r)] + 1, l);
+            if(hash[s.charAt(r)] != -1) //if index is already presen
+            {
+                if(hash[s.charAt(r)] >= l)
+                    l = hash[s.charAt(r)] + 1;
+            }
             hash[s.charAt(r)] = r;
             maxLen = Math.max(maxLen, r - l + 1);
             r++;
