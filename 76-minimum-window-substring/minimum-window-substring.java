@@ -26,9 +26,10 @@ class Solution {
                     startIndex = l;
                 }
                 char lc = s.charAt(l);
+                if(hash[lc] >= 0)   count--;
                 hash[lc]++;
                 l++;
-                if(hash[lc] > 0)   count--;
+
             }
 
             r++;
