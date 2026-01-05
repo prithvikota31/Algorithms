@@ -9,9 +9,8 @@ class Solution {
 
         while (r < s.length()) {
             // Expand window to the right and update frequency
-            int idx = s.charAt(r) - 'A';
-            freq[idx]++;
-            maxFreq = Math.max(maxFreq, freq[idx]);
+            freq[s.charAt(r) - 'A']++;
+            maxFreq = Math.max(maxFreq, freq[s.charAt(r) - 'A']);
 
             int windowLen = r - l + 1;
 
