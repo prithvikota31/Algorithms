@@ -20,29 +20,15 @@ class Solution {
             {
                 if(stack.isEmpty())  return false;
 
-                if(s.charAt(i) == ')')
+                if((s.charAt(i) == ')' && stack.peek() != '(') ||
+                    (s.charAt(i) == '}' && stack.peek() != '{') ||
+                    (s.charAt(i) == ']' && stack.peek() != '['))
                 {
-                    if(stack.peek() != '(')
-                        return false;
-                    else
-                        stack.pop();
-                }
-
-                else if(s.charAt(i) == '}')
-                {
-                    if(stack.peek() != '{')
-                        return false;
-                    else
-
-                        stack.pop();
+                    return false;
                 }
                 else
                 {
-                    if(stack.peek() != '[')
-                        return false;
-                    else
-
-                        stack.pop();
+                    stack.pop();
                 }
             }
         }
@@ -50,6 +36,5 @@ class Solution {
 
         if(!stack.isEmpty())    return false;
         return true;
-
     }
 }
