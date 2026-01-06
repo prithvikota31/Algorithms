@@ -1,41 +1,22 @@
 class Solution {
-    public boolean isValid(String s) {
-       //()
-       //({{})}
+public boolean isValid(String s) {
+    Deque<Character> st = new ArrayDeque<>();
 
-        //({
-       //open =  1
-       //openC = 2
-
-       Deque<Character> stack = new ArrayDeque<>();
-
-       //stack will have only open brackets ({
-        //()}
-        for(int i = 0; i < s.length(); i++)
-        {
-            
-            if(s.charAt(i) == '(' || s.charAt(i) == '{' || s.charAt(i) == '[')
-                stack.push(s.charAt(i));
-            else
-            {
-                if(stack.isEmpty())  return false;
-
-                if((s.charAt(i) == ')' && stack.peek() != '(') ||
-                    (s.charAt(i) == '}' && stack.peek() != '{') ||
-                    (s.charAt(i) == ']' && stack.peek() != '['))
-                {
-                    return false;
-                }
-                else
-                {
-                    stack.pop();
-                }
+    for (char c : s.toCharArray()) {
+        if (c == '(' || c == '{' || c == '[') {
+            st.push(c);
+        } else {
+            if (st.isEmpty()) return false;
+            char open = st.pop();
+            if ((c == ')' && open != '(') ||
+                (c == '}' && open != '{') ||
+                (c == ']' && open != '[')) {
+                return false;
             }
         }
-        //(((())
-
-        if(!stack.isEmpty())    return false;
-        return true;
     }
+    return st.isEmpty();
+}
+
 
 }
