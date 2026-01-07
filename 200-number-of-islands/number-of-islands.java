@@ -26,7 +26,7 @@ class Solution {
 
     public void bfs(char[][] grid, int[][] visited, int[] delRow, int[] delCol, int i, int j)
     {
-        Queue<Pair> q = new ArrayDeque<>();
+        Queue<Pair> q = new LinkedList<>();
         visited[i][j] = 1;
         q.add(new Pair(i, j));
         int m = visited.length;
