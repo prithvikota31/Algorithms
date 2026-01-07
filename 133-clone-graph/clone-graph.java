@@ -39,8 +39,7 @@ class Solution {
         {
             if(!visitedMap.containsKey(n))
             {
-                Node cloneNeighbor = new Node(n.val);
-                visitedMap.put(n, cloneNeighbor);
+                visitedMap.put(n, new Node(n.val));
                 dfs(n, visitedMap);
             }
             visitedMap.get(node).neighbors.add(visitedMap.get(n));
