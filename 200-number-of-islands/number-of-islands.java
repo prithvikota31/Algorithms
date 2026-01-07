@@ -9,8 +9,6 @@ class Solution {
         int[] delRow = {0, 1, 0, -1};
         int[] delCol = {1, 0, -1, 0};
 
-        Queue<Pair> q = new LinkedList<>();
-
         int count = 0;
         for(int i = 0; i < m; i++)
         {
@@ -18,7 +16,7 @@ class Solution {
             {
                 if(visited[i][j] == 0 && grid[i][j] == '1')
                 {
-                    bfs(grid, visited, delRow, delCol, q, i , j);
+                    bfs(grid, visited, delRow, delCol, i , j);
                     count++;
                 }
             }
@@ -26,8 +24,9 @@ class Solution {
         return count;
     }
 
-    public void bfs(char[][] grid, int[][] visited, int[] delRow, int[] delCol, Queue<Pair> q, int i, int j)
+    public void bfs(char[][] grid, int[][] visited, int[] delRow, int[] delCol, int i, int j)
     {
+        Queue<Pair> q = new LinkedList<>();
         visited[i][j] = 1;
         q.add(new Pair(i, j));
         int m = visited.length;
