@@ -56,7 +56,7 @@ class Solution {
                 default -> st.push(Integer.parseInt(t));
             }
         }
-        return st.peek();
+        return st.pop();
     }
 
 }
