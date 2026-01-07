@@ -27,23 +27,35 @@ class Solution {
 
         Node clone = new Node(node.val);
         Map<Node, Node> visitedMap = new HashMap<>();
-        visitedMap.put(node, clone);
-        dfs(node, visitedMap);
+        // visitedMap.put(node, clone);
+        dfs(node, clone, visitedMap);
         return clone;
     }
     
 
-    public void dfs(Node node, Map<Node, Node> visitedMap)
-    {
-        for(Node n: node.neighbors) //1, 3, 4
-        {
-            if(!visitedMap.containsKey(n))
-            {
-                visitedMap.put(n, new Node(n.val));
-                dfs(n, visitedMap);
-            }
-            visitedMap.get(node).neighbors.add(visitedMap.get(n));
-        }
+    // public void dfs(Node node, Map<Node, Node> visitedMap)
+    // {
+    //     for(Node n: node.neighbors) //1, 3, 4
+    //     {
+    //         if(!visitedMap.containsKey(n))
+    //         {
+    //             visitedMap.put(n, new Node(n.val));
+    //             dfs(n, visitedMap);
+    //         }
+    //         visitedMap.get(node).neighbors.add(visitedMap.get(n));
+    //     }
         
+    // }
+    public void dfs(Node node, Node clone, Map<Node, Node> visitedMap) {
+        visitedMap.put(node, clone); 
+
+        for (Node n : node.neighbors) {
+            if (!visitedMap.containsKey(n)) {
+                Node cloneNeighbor = new Node(n.val);
+                dfs(n, cloneNeighbor, visitedMap);
+            }
+            clone.neighbors.add(visitedMap.get(n));
+        }
     }
+
 }
