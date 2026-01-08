@@ -23,7 +23,7 @@ class Solution {
 
     public void inOrder(TreeNode root, int k)
     {
-        if(root == null)    return;
+        if(root == null || count >= k)    return;
 
 
         inOrder(root.left, k);
