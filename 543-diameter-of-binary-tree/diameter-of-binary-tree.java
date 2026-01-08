@@ -1,5 +1,5 @@
 class Solution {
-    int maxValue = 0;
+    private int maxValue = 0;
 
     public int diameterOfBinaryTree(TreeNode root) {
         height(root);          // fills maxValue
