@@ -1,7 +1,6 @@
 class Solution {
     public int orangesRotting(int[][] grid) {
         int time = bfs(grid);
-
         return time;
     }
 
@@ -17,7 +16,7 @@ class Solution {
             {
                 if(grid[i][j] == 2)
                     q.offer(new Pair(i, j));
-                if(grid[i][j] == 1)
+                else if(grid[i][j] == 1)
                     fresh++;
 
             }
