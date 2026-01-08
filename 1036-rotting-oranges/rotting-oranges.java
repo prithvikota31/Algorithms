@@ -1,14 +1,6 @@
 class Solution {
     public int orangesRotting(int[][] grid) {
         int time = bfs(grid);
-        for(int i = 0; i < grid.length; i++)
-        {
-            for(int j = 0; j < grid[0].length; j++)
-            {
-                if(grid[i][j] == 1)
-                    return -1;
-            }
-        }
 
         return time;
     }
@@ -16,7 +8,8 @@ class Solution {
     public int bfs(int[][] grid)
     {
         Deque<Pair> q = new ArrayDeque<>();
-        int count = 0;
+        int time = 0;
+        int fresh = 0;
         //add all rotten oranges into queue
         for(int i = 0; i < grid.length; i++)
         {
@@ -24,18 +17,18 @@ class Solution {
             {
                 if(grid[i][j] == 2)
                     q.offer(new Pair(i, j));
+                if(grid[i][j] == 1)
+                    fresh++;
+
             }
         }
 
         int[] delRow = {-1, 0, 1, 0};
         int[] delCol = {0, 1, 0, -1};
-        if(q.isEmpty())   return 0;
-
 
         while(!q.isEmpty())
         {
             int qSize = q.size();
-            count++;
             for(int c = 0; c < qSize; c++)
             {
                 Pair cNode = q.poll();
@@ -52,11 +45,14 @@ class Solution {
                     {
                         grid[nRow][nCol] = 2;
                         q.offer(new Pair(nRow, nCol));
+                        fresh--;
                     }
                 }           
             }
+
+            if(!q.isEmpty())  time++;
         }
-        return count - 1;
+        return fresh == 0? time: -1;
     }
 
 }
