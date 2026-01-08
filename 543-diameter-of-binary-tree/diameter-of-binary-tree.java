@@ -3,7 +3,7 @@ class Solution {
 
     public int diameterOfBinaryTree(TreeNode root) {
         height(root);          // fills maxValue
-        return maxValue;       // ✅ return diameter
+        return maxValue;       
     }
 
     private int height(TreeNode root) {
