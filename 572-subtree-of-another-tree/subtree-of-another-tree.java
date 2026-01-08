@@ -15,27 +15,12 @@
  */
 class Solution {
     public boolean isSubtree(TreeNode root, TreeNode subRoot) {
-        List<TreeNode> matching = new ArrayList<>();
-        preOrderTraversal(root, matching, subRoot.val);
-        boolean result = false;
-        for(int i = 0; i < matching.size(); i++)
-        {
-            result = result || isSameTree(matching.get(i), subRoot);
-            if(result == true)  return true;
-        }
+        if(root == null)    return false;
+        if(isSameTree(root, subRoot))   return true;
 
-        return false;
-
+        return (isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot));
     }
 
-    private void preOrderTraversal(TreeNode root, List<TreeNode> matching, int val)
-    {
-        if(root == null)    return;
-        if(root.val == val) matching.add(root);
-
-        if(root.left != null)   preOrderTraversal(root.left, matching, val);
-        if(root.right != null)   preOrderTraversal(root.right, matching, val);
-    }
 
     private boolean isSameTree(TreeNode root1, TreeNode root2)
     {
