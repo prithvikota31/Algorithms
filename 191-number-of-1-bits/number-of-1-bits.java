@@ -4,7 +4,7 @@ class Solution {
         while(n > 0)
         {
             n = n & (n - 1);
-            count++;
+            count++; // removes lowest set bit
         }
 
         return count;
