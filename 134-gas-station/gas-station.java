@@ -1,32 +1,21 @@
 class Solution {
     public int canCompleteCircuit(int[] gas, int[] cost) {
-        //brute
-        //Input: gas =  [1, 2, 3, 4, 5]
-        //        cost = 3  4  5  1  2
-         // i=            0  1  2  3  4   
+        int totalDiff = 0;
+        int currentTank = 0;
+        int start = 0;
 
-        // i = 3 -> 0 + 4 - 1 =  
-        int n = gas.length;
-        // try for all indexes as it start
-        int i = 0;
-        while(i < n)
+        for(int i = 0; i < gas.length; i++)
         {
-            int start = i;
-            int fuelLeft = 0;
-            int stationCount = 0;
-            while(fuelLeft + gas[start] - cost[start] >= 0)  //it can go to next
-            {
-                fuelLeft = fuelLeft + gas[start] - cost[start];
-                start = (start + 1) % n;
-                stationCount++;
-                if(stationCount == n)  return i;
-            }
+            totalDiff += gas[i] - cost[i];
+            currentTank += gas[i] - cost[i];
 
-            i = (i + stationCount + 1);
+            if(currentTank < 0) //reset the start position and ignore all the previous pos
+            {
+                start = i + 1;
+                currentTank = 0;
+            }
         }
 
-        return -1;
-
-
+        return totalDiff >= 0? start : -1;
     }
 }
