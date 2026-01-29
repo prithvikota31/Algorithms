@@ -6,7 +6,8 @@ class Solution {
 
         for (char c : s.toCharArray()) freq[c - 'a']++;
         for (char c : t.toCharArray()) {
-            if (--freq[c - 'a'] < 0) return false;
+            freq[c - 'a']--;
+            if (freq[c - 'a'] < 0) return false;
         }
         return true;
     }
