@@ -35,9 +35,9 @@ class Solution {
             carry = sum / 10;
             sum = sum % 10;
             
-            current.next = new ListNode(sum);  
+            current.next = new ListNode();  
             current= current.next;
-            // current.val = sum;
+            current.val = sum;
                           
         }
 
