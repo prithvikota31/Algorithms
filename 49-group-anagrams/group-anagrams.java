@@ -14,12 +14,6 @@ class Solution {
 
             String sortedKey = new String(ch);
 
-            // if(!map.containsKey(sortedKey))
-            // {
-            //     map.put(sortedKey, new ArrayList<>());
-            // }
-            // map.get(sortedKey).add(str);
-
             map.computeIfAbsent(sortedKey, k -> new ArrayList<>()).add(str);
         }
 
