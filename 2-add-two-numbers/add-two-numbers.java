@@ -37,14 +37,9 @@ class Solution {
             carry = sum / 10;
             sum = sum % 10;
             
-            // if(sum == 0 && carry == 0)
-            //     break;
-            // else
-            {
-                current.next = new ListNode();  
-                current= current.next;
-                current.val = sum;
-            }
+            current.next = new ListNode();  
+            current= current.next;
+            current.val = sum;
                           
         }
 
