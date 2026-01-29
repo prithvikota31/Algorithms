@@ -1,21 +1,31 @@
 class Solution {
     public List<List<String>> groupAnagrams(String[] strs) {
-        //key uniqe pattern of anagram, corresponding list 
-        Map<String, List<String>> map = new HashMap<>();
-
-        for(String s: strs)
+        if(strs.length == 0)
         {
-            int[] frequency = new int[26];
-            for(char c: s.toCharArray())
-            {
-                frequency[c - 'a']++;
-            }
-
-            String key = Arrays.toString(frequency);
-
-            map.computeIfAbsent(key, k -> new ArrayList<>()).add(s);
+            return new ArrayList<>();
         }
 
-        return new ArrayList<>(map.values());
+        HashMap<String, List<String>> map = new HashMap<>();
+
+        for(String str : strs) 
+        {
+            char[] ch = str.toCharArray();
+            Arrays.sort(ch);
+
+            String sortedKey = new String(ch);
+
+            // if(!map.containsKey(sortedKey))
+            // {
+            //     map.put(sortedKey, new ArrayList<>());
+            // }
+            // map.get(sortedKey).add(str);
+
+            map.computeIfAbsent(sortedKey, k -> new ArrayList<>()).add(str);
+        }
+
+        List<List<String>> ans = new ArrayList<>(map.values());
+
+        return ans;
+        
     }
 }
