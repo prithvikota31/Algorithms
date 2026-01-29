@@ -12,8 +12,8 @@ class Solution {
         
         for(int i = 0; i < s.length(); i++)
         {
-            frequency[t.charAt(i) - 'a']--;
-            if( frequency[t.charAt(i) - 'a'] < 0)   return false;
+            // frequency[t.charAt(i) - 'a']--;
+            if( --frequency[t.charAt(i) - 'a'] < 0)   return false;
         }
 
 
