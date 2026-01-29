@@ -1,22 +1,32 @@
 class Solution {
     public int[] topKFrequent(int[] nums, int k) {
         Map<Integer, Integer> freq = new HashMap<>();
-        for (int n : nums) {
-            freq.put(n, freq.getOrDefault(n, 0) + 1);
+
+        for(int num: nums)
+        {
+            freq.put(num, freq.getOrDefault(num, 0) + 1);
         }
 
-        PriorityQueue<Integer> heap =
-            new PriorityQueue<>((a, b) -> freq.get(a) - freq.get(b));
+        PriorityQueue<Map.Entry<Integer, Integer>> minHeap = 
+                            new PriorityQueue<>(k, (a,b) -> a.getValue() - b.getValue());
 
-        for (int n : freq.keySet()) {
-            heap.offer(n);
-            if (heap.size() > k) heap.poll();
+        for(Map.Entry<Integer, Integer> entry: freq.entrySet())
+        {
+            minHeap.offer(entry);
+
+            if(minHeap.size() > k)
+            {
+                minHeap.poll();
+            }
         }
 
-        int[] res = new int[k];
-        for (int i = k - 1; i >= 0; i--) {
-            res[i] = heap.poll();
+        int[] ans = new int[k];
+
+        for(int i = 0; i < k; i++)
+        {
+            ans[i] = minHeap.poll().getKey();
         }
-        return res;
+
+        return ans;
     }
 }
