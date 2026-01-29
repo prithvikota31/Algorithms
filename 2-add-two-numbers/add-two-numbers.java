@@ -19,8 +19,6 @@ class Solution {
         int carry = 0;
         ListNode head = current;
 
-
-
         while(l1 != null || l2 != null || carry != 0)
         {
             int sum = carry;
@@ -37,9 +35,9 @@ class Solution {
             carry = sum / 10;
             sum = sum % 10;
             
-            current.next = new ListNode();  
+            current.next = new ListNode(sum);  
             current= current.next;
-            current.val = sum;
+            // current.val = sum;
                           
         }
 
