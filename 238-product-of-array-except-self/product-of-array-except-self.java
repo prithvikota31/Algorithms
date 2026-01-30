@@ -1,26 +1,27 @@
 class Solution {
     public int[] productExceptSelf(int[] nums) {
+        
+        //1, 2, 3, 4
+        //leftproduct = product exisiting on left of number
         int n = nums.length;
-        int[] forwardProduct = new int[n];
+        int[] leftProduct = new int[n];
 
-        forwardProduct[0] = nums[0];
-        //1 2 3 4
-        //fp = 1 2 6 24
+        leftProduct[0] = 1; //since none to left og 0th index
+
         for(int i = 1; i < n; i++)
         {
-            forwardProduct[i] = forwardProduct[i - 1] * nums[i];
+            leftProduct[i] = leftProduct[i - 1] * nums[i - 1];
         }
 
-        int[] ans = new int[n];
-        int backwardproduct = nums[n - 1]; //4
-        ans[n - 1] = forwardProduct[n - 2]; //     ,6
-        for(int i = n - 2; i > 0; i--)
+        int rightProduct = 1;
+
+        int[] result = new int[n];
+        for(int i = n - 1; i >= 0; i--)
         {
-            ans[i] = forwardProduct[i - 1] * backwardproduct;
-            backwardproduct =  backwardproduct * nums[i];
+            result[i] = rightProduct * leftProduct[i];
+            rightProduct *= nums[i];
         }
-        ans[0] = backwardproduct;
 
-        return ans;
+        return result;
     }
 }
