@@ -22,8 +22,8 @@ public class Codec {
         {
             int j = i;
             while(s.charAt(j) != '#')   j++;
-            //after above while nw j is t #
-            //so length [i, j)
+            //after above while now j is at #
+            //so length [i, j) exclude j
             int len = Integer.parseInt(s.substring(i, j));
             j++;
             result.add(s.substring(j, j + len)); //eg, j = 0 and len 1, [0, 1] only 0th
