@@ -12,11 +12,7 @@ class Solution {
 
         for(int val: set)
         {
-            if(set.contains(val - 1))
-            {
-                continue;
-            }
-            else //start point
+            if(!set.contains(val - 1))
             {
                 int cur = val;
                 int len = 1;
