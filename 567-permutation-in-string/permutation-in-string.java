@@ -33,11 +33,12 @@ class Solution {
                 //if the letter doesn't exist at all, it would have become -ve when right traversed
                 //which implies, if its freq is zero or >0, since it moves out of the window increased the needed
                 //also, this implies when that freq is incrmented it goes to positive which means needed increases
-                if (freq[lc - 'a'] >= 0)  
+
+                freq[lc - 'a']++;
+                if (freq[lc - 'a'] > 0)  
                 { 
                     needed++; //track the needed when moving left and right
                 }
-                freq[lc - 'a']++;
                 left++;
             }
 
