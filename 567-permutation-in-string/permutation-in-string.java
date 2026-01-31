@@ -22,6 +22,8 @@ class Solution {
                 needed--;
             }
             freq[rc - 'a']--;
+            //freq if its -3 we have 3 extra char in the fixed window
+            //freq = 3 we still need 3 char to have our premutation
             
 
             // Step 3: if window size > s1, shrink from left
