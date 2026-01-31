@@ -1,31 +1,44 @@
-public class Solution {
+
+class Solution {
     public boolean checkInclusion(String s1, String s2) {
-        if (s1.length() > s2.length())
-            return false;
-        int[] s1arr = new int[26];
-        int[] s2arr = new int[26];
-        for (int i = 0; i < s1.length(); i++) {
-            s1arr[s1.charAt(i) - 'a']++;
-            s2arr[s2.charAt(i) - 'a']++;
+        if (s1.length() > s2.length()) return false;
+
+        int[] freq = new int[26];
+
+        // Step 1: build frequency map for s1
+        for (char c : s1.toCharArray()) {
+            freq[c - 'a']++;
         }
-        for (int i = 0; i <= s2.length() - s1.length(); i++) {
-            if (matches(s1arr, s2arr))
-                return true;
-            if(i < s2.length() - s1.length())
-            {
-                s2arr[s2.charAt(i + s1.length()) - 'a']++;
-                s2arr[s2.charAt(i) - 'a']--;
+
+        int left = 0;
+        int right = 0;
+        int needed = s1.length();
+
+        // Step 2: sliding window over s2
+        while (right < s2.length()) {
+            char rc = s2.charAt(right);
+
+            if (freq[rc - 'a'] > 0) {
+                needed--;
+            }
+            freq[rc - 'a']--;
+            
+
+            // Step 3: if window size > s1, shrink from left
+            if (right - left >= s1.length()) {
+                char lc = s2.charAt(left);
+                if (freq[lc - 'a'] >= 0) {
+                    needed++;
+                }
+                freq[lc - 'a']++;
+                left++;
             }
 
+            // Step 4: check match
+            if (needed == 0) return true;
+            right++;
         }
-        return false;
-    }
 
-    public boolean matches(int[] s1arr, int[] s2arr) {
-        for (int i = 0; i < 26; i++) {
-            if (s1arr[i] != s2arr[i])
-                return false;
-        }
-        return true;
+        return false;
     }
 }
