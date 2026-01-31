@@ -27,8 +27,13 @@ class Solution {
             // Step 3: if window size > s1, shrink from left
             if (right - left >= s1.length()) {
                 char lc = s2.charAt(left);
+
+                //why >= 0
+                //right has already traversed this
+                //if the letter doesn't exist at all, it would have become -ve when right traversed
+                //which implies, if its freq is zero or >0, since it moves out of the window increased the needed
                 if (freq[lc - 'a'] >= 0) {
-                    needed++;
+                    needed++; //track the needed when moving left and right
                 }
                 freq[lc - 'a']++;
                 left++;
