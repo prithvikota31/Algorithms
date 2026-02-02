@@ -1,38 +1,32 @@
+import java.util.*;
+
 class Solution {
     public int carFleet(int target, int[] position, int[] speed) {
+        int n = position.length;
+        int[][] cars = new int[n][2];
 
-        List<Car> cars = new ArrayList<>();
-        for(int i = 0; i < position.length; i++)
-        {
-            cars.add(new Car());
+        for (int i = 0; i < n; i++) {
+            cars[i][0] = position[i];
+            cars[i][1] = speed[i];
         }
 
-        for(int i = 0; i < position.length; i++)
-        {
-            
-            cars.get(i).position = position[i];
-            cars.get(i).time = (double)(target - position[i]) / speed[i];      
-        }
+        // Sort by position descending (closest to target first)
+        Arrays.sort(cars, (a, b) -> b[0] - a[0]);
 
-        Collections.sort(cars, (a, b)->(b.position - a.position));
+        Deque<Double> stack = new ArrayDeque<>();
 
-        int count = 0;
-        double prevtime = 0;
+        for (int i = 0; i < n; i++) {
+            double time = (double)(target - cars[i][0]) / cars[i][1];
 
-        for(int i = 0; i < cars.size(); i++)
-        {
-            if(cars.get(i).time >  prevtime)
-            {
-                count++;
-                prevtime = cars.get(i).time;
+            // If this car catches the fleet ahead, merge (discard it)
+            if (!stack.isEmpty() && time <= stack.peek()) {
+                continue;
             }
-        } 
 
-        return count;      
+            // Otherwise, start a new fleet
+            stack.push(time);
+        }
+
+        return stack.size();
     }
-}
-
-class Car {
-    int position;
-    double time;
 }
