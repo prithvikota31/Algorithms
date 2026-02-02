@@ -30,10 +30,9 @@ class Solution {
 
         return count;      
     }
-    class Car {
+}
+
+class Car {
     int position;
     double time;
 }
-    
-}
-
