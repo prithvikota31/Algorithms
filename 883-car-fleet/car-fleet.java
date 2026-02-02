@@ -8,8 +8,7 @@ class Solution {
         }
 
         for(int i = 0; i < position.length; i++)
-        {
-            
+        {   
             cars.get(i).position = position[i];
             cars.get(i).time = (double)(target - position[i]) / speed[i];      
         }
