@@ -11,12 +11,13 @@ class Solution {
      int sum, int target, List<Integer> trackingList)
     {
         if(sum > target)    return;
+        if(sum == target)
+        {
+            result.add(new ArrayList<>(trackingList));
+            return;
+        }
         if(index == n)
         {
-            if(sum == target)
-            {
-                result.add(new ArrayList<>(trackingList));
-            }
             return;
         }
 
