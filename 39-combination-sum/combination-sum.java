@@ -1,22 +1,32 @@
 class Solution {
-    private void findCombinations(int ind, int[] arr, int target, List < List < Integer >> ans, List < Integer > ds) {
-        if (ind == arr.length) {
-            if (target == 0) {
-                ans.add(new ArrayList < > (ds));
-            }
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> trackingList = new ArrayList<>();
+
+        combinationSum(candidates, result, 0, candidates.length, 0, target, trackingList);        
+        return result;
+    }
+
+    public void combinationSum(int[] candidates, List<List<Integer>> result, int index, int n,
+     int sum, int target, List<Integer> trackingList)
+    {
+        if(sum > target)    return;
+        if(sum == target)
+        {
+            result.add(new ArrayList<>(trackingList));
+            return;
+        }
+        if(index == n)
+        {
             return;
         }
 
-        if (arr[ind] <= target) {
-            ds.add(arr[ind]);
-            findCombinations(ind, arr, target - arr[ind], ans, ds);
-            ds.remove(ds.size() - 1);
-        }
-        findCombinations(ind + 1, arr, target, ans, ds);
-    }
-    public List < List < Integer >> combinationSum(int[] candidates, int target) {
-        List < List < Integer >> ans = new ArrayList < > ();
-        findCombinations(0, candidates, target, ans, new ArrayList < > ());
-        return ans;
+        trackingList.add(candidates[index]);
+        combinationSum(candidates, result, index, candidates.length,
+                     sum + candidates[index], target, trackingList);  
+              
+        trackingList.remove(trackingList.size() - 1);
+        combinationSum(candidates, result, index + 1, candidates.length,
+                     sum, target, trackingList); 
     }
 }
