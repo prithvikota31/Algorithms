@@ -12,12 +12,9 @@ class Solution {
         {
             for(int j = 0; j < n; j++)
             {
-                if(board[i][j] == word.charAt(0))
+                if(dfs(board, visited, i, j, word, 0))
                 {
-                    if(dfs(board, visited, i, j, word, 1))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
@@ -25,12 +22,24 @@ class Solution {
         return false;
     }
 
-    public boolean dfs(char[][] board, boolean[][] visited, int row, int col, String word, int nextIndex)
+    public boolean dfs(char[][] board, boolean[][] visited, int row, int col, String word, int index)
     {
-        if(nextIndex == word.length())
+        if(index == word.length())
         {
             return true;
         }
+
+        if(word.charAt(index) != board[row][col])
+        {
+            return false;
+        }
+
+        if(index == word.length() - 1)
+        {
+            return true;
+        }
+
+
         visited[row][col] = true;
 
         for(int i = 0; i < 4; i++)
@@ -39,22 +48,16 @@ class Solution {
             int nc = col + delCol[i];
 
             if(nr >= 0 && nr < board.length && nc >= 0 &&
-            nc < board[0].length && !visited[nr][nc] && word.charAt(nextIndex) == board[nr][nc])
+            nc < board[0].length && !visited[nr][nc])
             {
-                if(dfs(board, visited, nr, nc, word, nextIndex + 1))
+                if(dfs(board, visited, nr, nc, word, index + 1))
                 {
                     return true;
                 }
             }
         }
-
         visited[row][col] = false;
-
         return false;
-
-
     }
-
-
 
 }
