@@ -24,10 +24,7 @@ class Solution {
 
     public boolean dfs(char[][] board, boolean[][] visited, int row, int col, String word, int index)
     {
-        if(index == word.length())
-        {
-            return true;
-        }
+
 
         if(word.charAt(index) != board[row][col])
         {
