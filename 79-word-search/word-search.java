@@ -5,16 +5,16 @@ class Solution {
 
         int[][] vis = new int[board.length][board[0].length];
 
-        // if(board.length == 1 && board[0].length == 1)
-        // {
-        //     if(word.length() == 1)
-        //     {
-        //         if(word.charAt(0) == board[0][0])
-        //             return true;
-        //     }
+        if(board.length == 1 && board[0].length == 1)
+        {
+            if(word.length() == 1)
+            {
+                if(word.charAt(0) == board[0][0])
+                    return true;
+            }
 
-        //     return false;
-        // }
+            return false;
+        }
     
 
         int[] delRow = {-1, 1, 0, 0};
