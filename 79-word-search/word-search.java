@@ -25,9 +25,9 @@ class Solution {
         return false;
     }
 
-    public boolean dfs(char[][] board, boolean[][] visited, int row, int col, String word, int index)
+    public boolean dfs(char[][] board, boolean[][] visited, int row, int col, String word, int nextIndex)
     {
-        if(index == word.length())
+        if(nextIndex == word.length())
         {
             return true;
         }
@@ -39,9 +39,9 @@ class Solution {
             int nc = col + delCol[i];
 
             if(nr >= 0 && nr < board.length && nc >= 0 &&
-            nc < board[0].length && !visited[nr][nc] && word.charAt(index) == board[nr][nc])
+            nc < board[0].length && !visited[nr][nc] && word.charAt(nextIndex) == board[nr][nc])
             {
-                if(dfs(board, visited, nr, nc, word, index + 1))
+                if(dfs(board, visited, nr, nc, word, nextIndex + 1))
                 {
                     return true;
                 }
