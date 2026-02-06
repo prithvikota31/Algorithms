@@ -19,7 +19,7 @@ class Solution {
             {
                 if(!maxHeap.isEmpty())  
                 {
-                    temp.add(maxHeap.poll() - 1);
+                    temp.add(maxHeap.poll() - 1); // 0s can go into it
                 }
             }
 
@@ -28,7 +28,7 @@ class Solution {
                 if(temp.get(i) != 0)
                     maxHeap.offer(temp.get(i));
             }
-            time +=  (maxHeap.isEmpty())? temp.size() : n + 1; // n + 1 or maxheap is empty then temp.size()
+            time +=  (maxHeap.isEmpty())? temp.size() : n + 1; // n + 1 or if maxheap is empty then temp.size()
         }
 
 
