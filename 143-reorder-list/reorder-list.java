@@ -15,7 +15,7 @@ class Solution {
         midNode.next = null;
 
 
-        // 3️Merge alternately (IN-PLACE)
+        // Merge alternately (IN-PLACE)
         ListNode first = head;
         while (second != null && first != null) {
             ListNode t1 = first.next; //temp1
