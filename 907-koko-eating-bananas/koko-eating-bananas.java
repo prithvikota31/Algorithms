@@ -15,7 +15,7 @@ class Solution {
         while(low <= high)
         {
             int mid = low + (high - low) / 2;
-            if(calculateTime(piles, mid) <= h)
+            if(calculateTime(piles, mid) <= (long)h)
             {
                 ans = mid;
                 high = mid - 1;
@@ -31,16 +31,13 @@ class Solution {
     }
 
 
-    private int calculateTime(int[] piles, int tempK)
-    {
-        int totalTime = 0;
-        for(int pile: piles)
-        {
-            totalTime += Math.ceil((double)pile/tempK);
+    private long calculateTime(int[] piles, int k) {
+        long total = 0;
+        for (int pile : piles) {
+            total += (pile + (long)k - 1) / k;  // integer ceil, no double
         }
-        return totalTime;
+        return total;
     }
-
 
 
 
