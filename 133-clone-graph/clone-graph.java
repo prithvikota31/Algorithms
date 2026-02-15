@@ -20,42 +20,29 @@ class Node {
 
 class Solution {
     public Node cloneGraph(Node node) {
-        //will do DFS
-        //since number of nodes not yet defined, define a set
-        //hash is better, since we need to find node and extract neighbours
         if(node == null)    return null;
+        Map<Node, Node> map = new HashMap<>();
 
-        Node clone = new Node(node.val);
-        Map<Node, Node> visitedMap = new HashMap<>();
-        // visitedMap.put(node, clone);
-        dfs(node, clone, visitedMap);
-        return clone;
-    }
-    
+        //bfs
+        Deque<Node> q = new ArrayDeque<>();
+        q.offer(node);
+        map.put(node, new Node(node.val));
 
-    // public void dfs(Node node, Map<Node, Node> visitedMap)
-    // {
-    //     for(Node n: node.neighbors) //1, 3, 4
-    //     {
-    //         if(!visitedMap.containsKey(n))
-    //         {
-    //             visitedMap.put(n, new Node(n.val));
-    //             dfs(n, visitedMap);
-    //         }
-    //         visitedMap.get(node).neighbors.add(visitedMap.get(n));
-    //     }
-        
-    // }
-    public void dfs(Node node, Node clone, Map<Node, Node> visitedMap) {
-        visitedMap.put(node, clone); 
+        while(!q.isEmpty())
+        {
+            Node curr = q.poll();
 
-        for (Node n : node.neighbors) {
-            if (!visitedMap.containsKey(n)) {
-                Node cloneNeighbor = new Node(n.val);
-                dfs(n, cloneNeighbor, visitedMap);
+            for(Node n: curr.neighbors)
+            {   
+                if(!map.containsKey(n))
+                {
+                    q.offer(n);
+                    map.put(n, new Node(n.val));
+                }
+                map.get(curr).neighbors.add(map.get(n));
             }
-            clone.neighbors.add(visitedMap.get(n));
         }
-    }
 
+        return map.get(node);
+    }
 }
