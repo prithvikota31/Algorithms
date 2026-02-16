@@ -3,7 +3,7 @@ class Solution {
     {
         // the problem is to find a topological sort if it exists or not
         //first create a graph
-        List<List<Integer>> graph = new LinkedList<>();
+        List<List<Integer>> graph = new ArrayList<>();
         int v = numCourses;
         //create an empty graph
         for(int i = 0; i < numCourses; i++)
