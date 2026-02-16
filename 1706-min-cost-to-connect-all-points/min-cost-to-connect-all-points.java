@@ -1,47 +1,61 @@
+import java.util.*;
+
+class Pair {
+    int node;
+    int distance;
+
+    Pair(int distance, int node) {
+        this.distance = distance;
+        this.node = node;
+    }
+}
+
 class Solution {
 
     public int minCostConnectPoints(int[][] points) {
 
-        int n = points.length;
+        int V = points.length;
 
-        boolean[] visited = new boolean[n];
+        PriorityQueue<Pair> pq =
+            new PriorityQueue<>((x, y) -> x.distance - y.distance);
 
-        PriorityQueue<int[]> minHeap =
-            new PriorityQueue<>((a,b) -> a[0] - b[0]);
+        int[] vis = new int[V];
 
-        minHeap.add(new int[]{0, 0}); // cost, node
+        // start from node 0
+        pq.add(new Pair(0, 0));
 
-        int totalCost = 0;
+        int sum = 0;
         int nodesUsed = 0;
 
-        while(nodesUsed < n) {
+        while (nodesUsed < V) {
 
-            int[] curr = minHeap.poll();
+            Pair cur = pq.poll();
 
-            int cost = curr[0];
-            int node = curr[1];
+            int node = cur.node;
+            int wt = cur.distance;
 
-            if(visited[node])
+            if (vis[node] == 1)
                 continue;
 
-            visited[node] = true;
-
-            totalCost += cost;
+            vis[node] = 1;
             nodesUsed++;
 
-            for(int i = 0; i < n; i++) {
+            sum += wt;
 
-                if(!visited[i]) {
+            // add all neighbors
+            for (int adjNode = 0; adjNode < V; adjNode++) {
+
+                if (vis[adjNode] == 0) {
 
                     int dist =
-                        Math.abs(points[node][0] - points[i][0]) +
-                        Math.abs(points[node][1] - points[i][1]);
+                        Math.abs(points[node][0] - points[adjNode][0]) +
+                        Math.abs(points[node][1] - points[adjNode][1]);
 
-                    minHeap.add(new int[]{dist, i});
+                    pq.add(new Pair(dist, adjNode));
                 }
             }
         }
 
-        return totalCost;
+        return sum;
     }
 }
