@@ -31,7 +31,7 @@ class Solution {
 
     public int[] topoSort(List<List<Integer>> graph, int v, int[] inDegree)
     {
-        Queue<Integer> q = new LinkedList<>();
+        Deque<Integer> q = new ArrayDeque<>();
 
         //add all nodes with 0 indegree
         for(int i = 0; i < inDegree.length; i++)
