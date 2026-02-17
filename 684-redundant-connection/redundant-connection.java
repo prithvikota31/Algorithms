@@ -40,6 +40,14 @@ class Solution {
 
         parent[uParentU] = uParentV;
     }
+    
+    public void unionByRank(int u, int v) //union by rank 
+    {
+        int uParentU = findUParent(u);
+        int uParentV = findUParent(v);
+
+        parent[uParentU] = uParentV;
+    }
 
 
 }
