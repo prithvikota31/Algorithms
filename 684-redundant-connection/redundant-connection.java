@@ -1,15 +1,18 @@
 class Solution {
     int[] parent;
     int[] rank;
+    int[] size;
     public int[] findRedundantConnection(int[][] edges) {
         int n = edges.length;
         parent = new int[n + 1];
         rank = new int[n + 1];
+        size = new int[n + 1];
         
         for(int i = 1; i <= n; i++)
         {
             parent[i] = i;
             rank[i] = 0;
+            size[i] = 1;
         }
 
         for(int i = 0; i < n; i++)
@@ -21,7 +24,8 @@ class Solution {
 
             if(uParentU == uParentV)    return edges[i];
 
-            unionByRank(u, v, rank);
+            // unionByRank(u, v, rank);
+            unionBySize(u, v);
         }
 
         return new int[0];
@@ -60,6 +64,22 @@ class Solution {
         {
             parent[uParentV] = uParentU;
             rank[uParentU] = rank[uParentU] + 1;
+        }
+    }
+
+    private void unionBySize(int u, int v)
+    {
+        int ulParentU = findUParent(u);
+        int ulParentV = findUParent(v);
+
+        if(ulParentU == ulParentV)  return;
+
+        if(size[ulParentU] < size[ulParentV])   parent[ulParentU] = ulParentV;
+        else if(size[ulParentU] > size[ulParentV]) parent[ulParentV] = ulParentU;
+        else
+        {
+            parent[ulParentV] = ulParentU;
+            size[ulParentU] =  size[ulParentU] +  size[ulParentV]; 
         }
     }
 
