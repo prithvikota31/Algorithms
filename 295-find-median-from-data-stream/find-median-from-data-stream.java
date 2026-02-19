@@ -6,7 +6,7 @@ class MedianFinder {
     //always maintain size(leftMaxHeap - rightMinHeap) <= 1
 
     public MedianFinder() {
-        leftMaxHeap = new PriorityQueue<>((a, b) -> (b - a));
+        leftMaxHeap = new PriorityQueue<>((a, b) -> Integer.compare(b, a));
         rightMinHeap = new PriorityQueue<>();
     }
     
