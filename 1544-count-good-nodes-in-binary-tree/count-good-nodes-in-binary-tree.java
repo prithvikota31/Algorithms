@@ -14,7 +14,6 @@
  * }
  */
 class Solution {
-    private int count = 0;
     public int goodNodes(TreeNode root) {
         return  countGoodNodes(root, Integer.MIN_VALUE);
     }
