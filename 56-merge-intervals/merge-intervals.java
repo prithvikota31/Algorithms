@@ -9,6 +9,7 @@ class Solution {
             if(result.isEmpty() || result.get(result.size() - 1)[1] < intervals[i][0])
             {
                 result.add(new int[]{intervals[i][0], intervals[i][1]});
+                continue;
             }
             else
             {
