@@ -20,7 +20,7 @@ import java.lang.reflect.Array;class Solution {
         int cur = 0;
         int res = 0;
 
-        while(i < n && j < n)
+        while(i < n)
         {
             if(start[i] < end[j])
             {
