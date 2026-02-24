@@ -16,17 +16,18 @@
 class Solution {
     private int count = 0;
     public int goodNodes(TreeNode root) {
-        
-        countGoodNodes(root, Integer.MIN_VALUE);
-        return count;
+        return  countGoodNodes(root, Integer.MIN_VALUE);
     }
 
-    private void countGoodNodes(TreeNode node, int pathMax)
+    private int countGoodNodes(TreeNode node, int pathMax)
     {
-        if(node == null)    return;
-        if(node.val >= pathMax)  count++;
-        countGoodNodes(node.left, Math.max(pathMax, node.val));
-        countGoodNodes(node.right, Math.max(pathMax, node.val));
+        if(node == null)    return 0;
+        int count = 0;
+        if(node.val >= pathMax)  count = 1;
+        count += countGoodNodes(node.left, Math.max(pathMax, node.val));
+        count += countGoodNodes(node.right, Math.max(pathMax, node.val));
+
+        return count;
 
     }
 }
