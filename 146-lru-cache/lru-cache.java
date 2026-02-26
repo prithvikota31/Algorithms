@@ -44,21 +44,17 @@ class LRUCache {
             Node newNode = new Node(key, value);
             map.put(key, newNode);
             insert(newNode);
-        }
-        
-        
-
-        
+        }       
     }
 
-    private void remove(Node node) {
+    private void remove(Node node) { // just remove
         Node prev = node.prev;
         Node next = node.next;
         prev.next = next;
         next.prev = prev;
     }
 
-    private void insert(Node node) {
+    private void insert(Node node) { // insert at beginning
         Node headCurNext = head.next;
         head.next = node;
         node.prev = head;
