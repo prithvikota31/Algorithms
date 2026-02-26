@@ -32,12 +32,8 @@ class LRUCache {
         if(map.containsKey(key)) // true
         {
             remove(key);
-            addToCache(key, value);
         }
-        else
-        {
-            addToCache(key, value);
-        }
+        addToCache(key, value);
     }
 
     private void addToCache(int key, int val)
