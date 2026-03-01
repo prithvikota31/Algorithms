@@ -16,10 +16,7 @@ class Solution {
         int[][] dp = new int[n + 1][newTarget + 1];
 
         // Base case: One way to form sum 0 (by taking no elements)
-        for (int i = 0; i <= n; i++) {
-            dp[i][0] = 1;
-        }
-
+        dp[0][0] = 1;
         // Fill DP table iteratively
         for (int i = 1; i <= n; i++) {
             for (int j = 0; j <= newTarget; j++) {
