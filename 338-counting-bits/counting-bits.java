@@ -1,25 +1,11 @@
 class Solution {
     public int[] countBits(int n) {
         int[] result = new int[n + 1];
-
-        for(int i = 0; i <= n; i++)
+        for(int i = 1; i <= n; i++)
         {
-            result[i] = singleCount(i);
+            result[i] = result[i >> 1] + (i & 1);
         }
 
         return result;
-    }
-
-    public int singleCount(int n)
-    {
-
-        int count = 0;
-        while(n != 0 )
-        {
-            if((n & 1) != 0)
-                count++;
-            n = n >> 1;
-        }
-        return count;
     }
 }
