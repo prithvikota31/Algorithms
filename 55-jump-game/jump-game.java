@@ -1,18 +1,14 @@
 class Solution {
     public boolean canJump(int[] nums) {
-        //[2,3,1,1,4]
-        // 0 1 2 3 4
-        //    At any position, it can reach uptil i + nums[i],
-        //     so it is guaranteed that it will cover till that point 
-        //carry a maxLimit to update at every index
+        int maxJump = 0;
 
-        int maxLimit = 0;
+        //each 
         for(int i = 0; i < nums.length; i++)
         {
-            if(i > maxLimit)    return false;
-            maxLimit = Math.max(maxLimit, i + nums[i]);
+            if(i > maxJump) return false;
+            maxJump = Math.max(i + nums[i], maxJump);
         }
 
-        return true;
+        return maxJump >= nums.length - 1? true: false;
     }
 }
