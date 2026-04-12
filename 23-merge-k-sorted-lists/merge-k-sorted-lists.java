@@ -1,0 +1,47 @@
+class Solution {
+    public ListNode mergeKLists(ListNode[] lists) {
+        if (lists == null || lists.length == 0) return null;
+        return mergeLists(lists, 0, lists.length - 1);
+    }
+
+    // Recursive function to divide the array of lists
+    private ListNode mergeLists(ListNode[] lists, int start, int end) {
+        if (start == end) return lists[start];
+        if (start < end) {
+            int mid = start + (end - start) / 2;
+            ListNode left = mergeLists(lists, start, mid);
+            ListNode right = mergeLists(lists, mid + 1, end);
+            return mergeTwoLists(left, right);
+        }
+        return null;
+    }
+
+    // Function to merge two linked lists
+    private ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(0);
+        ListNode tail = dummy;
+
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                tail.next = l1;
+                l1 = l1.next;
+            } else {
+                tail.next = l2;
+                l2 = l2.next;
+            }
+            tail = tail.next;
+        }
+
+        // Append the remaining parts of l1 or l2
+        if (l1 != null) {
+            tail.next = l1;
+        } else if (l2 != null) {
+            tail.next = l2;
+        }
+
+        return dummy.next;
+    }
+}
+
+
+
