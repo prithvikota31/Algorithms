@@ -1,47 +1,49 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
 class Solution {
     public ListNode mergeKLists(ListNode[] lists) {
-        if (lists == null || lists.length == 0) return null;
-        return mergeLists(lists, 0, lists.length - 1);
-    }
-
-    // Recursive function to divide the array of lists
-    private ListNode mergeLists(ListNode[] lists, int start, int end) {
-        if (start == end) return lists[start];
-        if (start < end) {
-            int mid = start + (end - start) / 2;
-            ListNode left = mergeLists(lists, start, mid);
-            ListNode right = mergeLists(lists, mid + 1, end);
-            return mergeTwoLists(left, right);
+        int k = lists.length;
+        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> a.val - b.val);
+        for(int i = 0; i < k; i++)
+        {
+            if(lists[i] != null)
+                pq.offer(new Pair(lists[i].val, lists[i]));
         }
-        return null;
-    }
 
-    // Function to merge two linked lists
-    private ListNode mergeTwoLists(ListNode l1, ListNode l2) {
-        ListNode dummy = new ListNode(0);
-        ListNode tail = dummy;
+        ListNode dummy = new ListNode();
+        ListNode curr = dummy;
+        while(!pq.isEmpty())
+        {
+            Pair temp = pq.poll();
+            curr.next = temp.node;
+            ListNode nextNode = temp.node.next;
+            curr = curr.next;
+            if(nextNode != null)
+            {
 
-        while (l1 != null && l2 != null) {
-            if (l1.val < l2.val) {
-                tail.next = l1;
-                l1 = l1.next;
-            } else {
-                tail.next = l2;
-                l2 = l2.next;
+                pq.offer(new Pair(nextNode.val, nextNode));
             }
-            tail = tail.next;
-        }
 
-        // Append the remaining parts of l1 or l2
-        if (l1 != null) {
-            tail.next = l1;
-        } else if (l2 != null) {
-            tail.next = l2;
         }
 
         return dummy.next;
     }
 }
 
-
-
+class Pair{
+    int val;
+    ListNode node;
+    public Pair(int val, ListNode node)
+    {
+        this.val = val;
+        this.node = node;
+    }
+}
