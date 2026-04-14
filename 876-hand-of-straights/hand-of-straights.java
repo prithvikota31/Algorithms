@@ -1,14 +1,33 @@
 class Solution {
     public boolean isNStraightHand(int[] hand, int groupSize) {
-        TreeMap<Integer, Integer> sortedMap = new TreeMap<>();
+        Map<Integer, Integer> map = new HashMap<>();
 
         int n = hand.length;
         if(n % groupSize != 0)  return false;
 
         for(int i = 0; i < n; i++)
         {
-            sortedMap.put(hand[i], sortedMap.getOrDefault(hand[i], 0) + 1);
+            map.put(hand[i], map.getOrDefault(hand[i], 0) + 1);
         }
+
+        Arrays.sort(hand);
+
+        for(int num: hand)
+        {
+            int curFreq= map.get(num);
+            if(curFreq == 0)  continue;
+
+            for(int i = 0; i < groupSize; i++)
+            {
+                int cur = num + i;
+                if(map.getOrDefault(cur, 0) == 0)  return false;
+
+                map.put(cur, map.get(cur) - 1);
+            }
+
+        }
+
+        return true;
 
 
         // while(!sortedMap.isEmpty())
@@ -43,21 +62,21 @@ class Solution {
         //     {
         //         sortedMap.put(cur, sortedMap.get(cur) - 1);
         //     }
-        while (!sortedMap.isEmpty()) {
-            int start = sortedMap.firstKey();
+        // while (!sortedMap.isEmpty()) {
+        //     int start = sortedMap.firstKey();
 
-            for (int i = 0; i < groupSize; i++) {
-                int curr = start + i;
+        //     for (int i = 0; i < groupSize; i++) {
+        //         int curr = start + i;
 
-                if (!sortedMap.containsKey(curr)) return false;
+        //         if (!sortedMap.containsKey(curr)) return false;
 
-                int count = sortedMap.get(curr);
-                if (count == 1) sortedMap.remove(curr);
-                else sortedMap.put(curr, count - 1);
-            }
-        }
+        //         int count = sortedMap.get(curr);
+        //         if (count == 1) sortedMap.remove(curr);
+        //         else sortedMap.put(curr, count - 1);
+        //     }
+        // }
 
 
-        return true;
+        // return true;
     }
 }
