@@ -1,49 +1,51 @@
 class Solution {
     public boolean isNStraightHand(int[] hand, int groupSize) {
-        if(hand.length % groupSize != 0)    return false;
-        //use treemap
-        TreeMap<Integer, Integer>   map = new TreeMap<>();
+        TreeMap<Integer, Integer> sortedMap = new TreeMap<>();
 
-        for(int i : hand)
+        int n = hand.length;
+        if(n % groupSize != 0)  return false;
+
+        for(int i = 0; i < n; i++)
         {
-            //put(k, v)
-            map.put(i, map.getOrDefault(i, 0) + 1);
+            sortedMap.put(hand[i], sortedMap.getOrDefault(hand[i], 0) + 1);
         }
-        // map is ready
-        //eg: 1, 2, 3, 6, 2, 3,4, 7, 8
-        // 1 1
-        // 2 2
-        // 3 2
-        // 4 1
-        // 6 1 
-        // 7 1 
-        // 8 1
 
 
-
-        while(!map.isEmpty())
+        while(!sortedMap.isEmpty())
         {
-            int start = map.firstKey();
-
-            for(int i = start; i < start + groupSize; i++)
+            int cur = sortedMap.firstKey();
+            for(int i = 0; i < groupSize - 1; i++)
             {
-                Integer iFreq = map.get(i);
-                if(iFreq == null) return false; //not present
+                int curValue = sortedMap.get(cur);
+                if(curValue == 1)
+                {
+                   sortedMap.remove(cur); 
+                }
                 else
                 {
-                    if(iFreq == 1) map.remove(i);
-                    else
-                        map.put(i, iFreq - 1);
+                    sortedMap.put(cur, curValue - 1);
                 }
+
+                if(sortedMap.containsKey(cur + 1))
+                {
+                    cur += 1;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            if(sortedMap.get(cur) == 1)
+            {
+                sortedMap.remove(cur); 
+            }
+            else
+            {
+                sortedMap.put(cur, sortedMap.get(cur) - 1);
             }
 
         }
 
         return true;
-
-
-        
-
-
     }
 }
