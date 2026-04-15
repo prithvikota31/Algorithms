@@ -15,18 +15,42 @@
  */
 class Solution {
     public int goodNodes(TreeNode root) {
-        return  countGoodNodes(root, Integer.MIN_VALUE);
+        int[] result = new int[1];
+        result[0]++;
+        dfs(root, result, root.val);
+        return result[0];
     }
 
-    private int countGoodNodes(TreeNode node, int pathMax)
+    private void dfs(TreeNode root, int[] result, int maxSoFar)
     {
-        if(node == null)    return 0;
-        int count = 0;
-        if(node.val >= pathMax)  count = 1;
-        count += countGoodNodes(node.left, Math.max(pathMax, node.val));
-        count += countGoodNodes(node.right, Math.max(pathMax, node.val));
+        if(root == null)    return;
 
-        return count;
+        if(root.left != null)
+        {
+            if(root.left.val >=  maxSoFar)
+            {
+                result[0]++;
+                dfs(root.left, result, root.left.val);
+            }
+            else
+            {
+                dfs(root.left, result, maxSoFar);
+            }    
+        }
+
+        if(root.right != null)
+        {
+            if(root.right.val >=  maxSoFar)
+            {
+                result[0]++;
+                dfs(root.right, result, root.right.val);
+            }
+            else
+            {
+                dfs(root.right, result, maxSoFar);
+            }    
+        }
+
 
     }
 }
