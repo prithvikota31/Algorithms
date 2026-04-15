@@ -1,53 +1,33 @@
 class Solution {
     public boolean checkValidString(String s) {
-        int l = s.length();
+        //capture open brackets
+        int minOpen = 0;
+        int maxOpen = 0;
 
-        if(s.charAt(0) == ')' || s.charAt(l-1) == '(')
+        for(int i = 0; i < s.length(); i++)
         {
-            return false;
+            if(s.charAt(i) == '(')
+            {
+                minOpen++;
+                maxOpen++;
+            }
+            else if(s.charAt(i) == ')')
+            {
+                minOpen--;
+                maxOpen--;
+                if(maxOpen < 0) return false;
+            }
+            else // *
+            {
+                minOpen--;
+                maxOpen++;
+            }
+
+           
+            minOpen = Math.max(minOpen, 0);
         }
-
-        int min = 0;
-        int max = 0;
-
-        for(char c : s.toCharArray())
-        {
-            if(c == '(')
-            {
-                max++;
-                min++;
-            }
-            if(c == ')')
-            {
-                max--;
-                min--;
-            }
-            if(c == '*')
-            {
-                max++;
-                min--;
-            }
-
-            if(max < 0)
-            {
-                return false;
-            }
-
-            if(min < 0)
-            {
-                min = 0;
-            }
-
-        }
-
-        if(min != 0)
-        {
-            return false;
-        }
-
-        return true;
-
-
         
+        if(minOpen != 0)    return false;
+        else    return true;
     }
 }
