@@ -1,63 +1,47 @@
 class Solution {
     public int[] findOrder(int numCourses, int[][] prerequisites) 
     {
-        // the problem is to find a topological sort if it exists or not
-        //first create a graph
         List<List<Integer>> graph = new ArrayList<>();
-        int v = numCourses;
-        //create an empty graph
+
         for(int i = 0; i < numCourses; i++)
         {
-            graph.add(new LinkedList<>());
+            graph.add(new ArrayList<>());
         }
 
-        for(int i = 0; i < prerequisites.length; i++)
+        int[] inDegree = new int[numCourses];
+        for(int i = 0;i < prerequisites.length; i++)
         {
             graph.get(prerequisites[i][1]).add(prerequisites[i][0]);
-        }
-        // till now graph is created
-        int[] inDegree = new int[v];
-        for(int i = 0; i < v; i++)
-        {
-            for(int it: graph.get(i))
-            {
-                inDegree[it]++;
-            }
+            inDegree[prerequisites[i][0]]++;
         }
 
-        return topoSort(graph, v, inDegree);
-    }
-
-
-    public int[] topoSort(List<List<Integer>> graph, int v, int[] inDegree)
-    {
         Deque<Integer> q = new ArrayDeque<>();
-
-        //add all nodes with 0 indegree
-        for(int i = 0; i < inDegree.length; i++)
+        for(int i = 0; i < numCourses; i++)
         {
             if(inDegree[i] == 0)
-                q.add(i);
+                q.offer(i);
         }
-        int[] topoSort = new int[v];
-        int ind = 0;
 
+        // int count = 0;
+        int ind = 0;
+        int[] topoSort = new int[numCourses];
         while(!q.isEmpty())
         {
-            int curNode = q.poll();
-            topoSort[ind++] = curNode;
+            int node = q.poll();
+            topoSort[ind++] = node;
 
-            for(Integer it : graph.get(curNode))
+            for(int nei: graph.get(node))
             {
-                inDegree[it]--;
-                if(inDegree[it] == 0)
+                inDegree[nei]--;
+                if(inDegree[nei] == 0)
                 {
-                    q.add(it);
+                    q.offer(nei);
                 }
             }
         }
 
-        if(ind == v)    return topoSort;
-        else return new int[0];
-    }
+        if(ind == numCourses) return topoSort;
+        else
+            return new int[0];
+}
 }
