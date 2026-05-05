@@ -1,62 +1,42 @@
 class Solution {
     public boolean canFinish(int numCourses, int[][] prerequisites) {
         List<List<Integer>> graph = new ArrayList<>();
-        //[0, 1] => 1 -> 0
-        // number of graph nodes = numCourses
+
         for(int i = 0; i < numCourses; i++)
         {
             graph.add(new ArrayList<>());
         }
 
-        for(int i = 0; i < prerequisites.length; i++)
+        int[] inDegree = new int[numCourses];
+        for(int i = 0;i < prerequisites.length; i++)
         {
             graph.get(prerequisites[i][1]).add(prerequisites[i][0]);
+            inDegree[prerequisites[i][0]]++;
         }
 
-        //lets use detecting a cycle in directed graph to confirm 
-        //If cycle detected - false;
-        //else - true
-
-        int[] visited = new int[graph.size()];
-        int[] pathVis = new int[graph.size()]; 
-
+        Deque<Integer> q = new ArrayDeque<>();
         for(int i = 0; i < numCourses; i++)
         {
-            if(visited[i] == 0)
-            {
-                if(dfsIsCycle(graph, i, visited, pathVis))
-                {
-                    return false;
-                }
-            }
+            if(inDegree[i] == 0)
+                q.offer(i);
         }
 
-        return true;
-
-        
-    }
-
-
-    public boolean dfsIsCycle(List<List<Integer>> graph, int node, int[] visited, int[] pathVis)
-    {
-        visited[node] = 1;
-        pathVis[node] = 1;
-        for(int nei: graph.get(node))
+        int count = 0;
+        while(!q.isEmpty())
         {
-            if(visited[nei] == 0)
+            int node = q.poll();
+            count++;
+
+            for(int nei: graph.get(node))
             {
-                if(dfsIsCycle(graph, nei, visited, pathVis))
+                inDegree[nei]--;
+                if(inDegree[nei] == 0)
                 {
-                    return true;
+                    q.offer(nei);
                 }
             }
-
-            else if(pathVis[nei] == 1)
-            {
-                return true;
-            }
         }
-        pathVis[node] = 0;
-        return false;
+
+        return count == numCourses;
     }
 }
