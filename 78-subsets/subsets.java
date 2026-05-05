@@ -10,10 +10,6 @@ class Solution {
                                     List<List<Integer>> result, int ind)
     {
         result.add(new ArrayList<>(temp));
-        if(ind == nums.length)
-        {   
-            return;
-        }
 
         for(int i = ind; i < nums.length; i++)
         {
