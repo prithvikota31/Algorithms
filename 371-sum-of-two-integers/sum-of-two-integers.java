@@ -1,11 +1,11 @@
 class Solution {
     public int getSum(int a, int b) {
-        
-        while(b != 0) // b is converted as carry, update a with sum(xor)
+
+        while(b != 0)
         {
-            int carry = (a & b) << 1;
-            a = a ^ b;
-            b = carry;
+            int sumWithoutCarry = a ^ b;
+            b = (a & b) << 1; //carry
+            a = sumWithoutCarry;
         }
 
         return a;
