@@ -1,14 +1,16 @@
 class Solution {
     public int reverseBits(int n) {
-        int result = 0;
+        int ans = 0;
 
         for(int i = 0; i < 32; i++)
         {
-            result = result << 1; //shift left
-            result = result | (n & 1);
+            int lastbit = n & 1;
             n = n >> 1;
+            ans = ans << 1;  
+            ans = ans | lastbit;
+            
         }
 
-        return result;
+        return ans;
     }
 }
