@@ -10,55 +10,55 @@
  */
 class Solution {
     public void reorderList(ListNode head) {
-        ListNode midNode = middleNode(head);
-        ListNode second = reverseList(midNode.next);
-        midNode.next = null;
+        ListNode ans = head;
+        ListNode middle = middleOfLL(head);
+        ListNode head2 = reverseLL(middle.next);
+        middle.next = null;
+        ListNode head1 = head;
 
+        while(head1 != null && head2 != null)
+        {
+            ListNode t1 = head1.next;
+            ListNode t2 = head2.next;
 
-        // Merge alternately (IN-PLACE)
-        ListNode first = head;
-        while (second != null && first != null) {
-            ListNode t1 = first.next; //temp1
-            ListNode t2 = second.next; //temp2
+            head1.next = head2;
+            head2.next = t1;
 
-            first.next = second;
-            second.next = t1;
+            head1 = t1;
+            head2 = t2;
 
-            first = t1;
-            second = t2;
-        }
-
+        } 
+        
     }
 
-
-    public ListNode middleNode(ListNode head)
+    public ListNode middleOfLL(ListNode head)
     {
         ListNode slow = head;
         ListNode fast = head;
 
-        while(fast.next != null && fast.next.next != null) // this give first node if even number
+        while(fast != null && fast.next != null)
         {
             slow = slow.next;
             fast = fast.next.next;
         }
 
         return slow;
+
     }
 
-
-    public ListNode reverseList(ListNode head)
+     public ListNode reverseLL(ListNode head)
     {
-        ListNode prevNode = null;
-        ListNode curNode = head;
-
-        while(curNode != null)
+        ListNode prev = null;
+        ListNode curr = head;
+        while(curr != null)
         {
-            ListNode nextNode = curNode.next;
-            curNode.next = prevNode;
-            prevNode = curNode;
-            curNode = nextNode;
+            ListNode next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
         }
 
-        return prevNode;
+        return prev;
+
     }
 }
