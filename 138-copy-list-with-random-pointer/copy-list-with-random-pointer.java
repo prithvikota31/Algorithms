@@ -12,43 +12,47 @@ class Node {
     }
 }
 */
-//1 -> 2 -> 3-> null
+
 class Solution {
     public Node copyRandomList(Node head) {
         if(head == null)    return null;
-        //first bring the copied next to original copy, interleave the nodes
+        //interleave
+
         Node cur = head;
         while(cur != null)
         {
             Node curNext = cur.next;
-            cur.next = new Node(cur.val);
-            cur.next.next = curNext;
-            cur = cur.next.next;
+            Node copy = new Node(cur.val);
+            cur.next = copy;
+            copy.next = curNext;
+            cur = curNext;
         }
 
-
-        //random 
+        //set random for copy
         cur = head;
         while(cur != null)
         {
             Node curRandom = cur.random;
-            Node copyNode = cur.next;
+            Node copy = cur.next;
             if(curRandom != null)
-                copyNode.random = curRandom.next;
+            {
+                copy.random = curRandom.next;
+            }
 
             cur = cur.next.next;
         }
 
-        //remove the interleave
+        // remove interleave
         Node copyHead = head.next;
-        cur = head;
+
         Node result = copyHead;
+        cur = head;
 
         while(cur != null)
         {
-            cur.next = cur.next.next;
+            cur.next = copyHead.next;
             if(copyHead.next != null)
-                copyHead.next = copyHead.next.next;
+                copyHead.next = cur.next.next;
 
             cur = cur.next;
             copyHead = copyHead.next;
