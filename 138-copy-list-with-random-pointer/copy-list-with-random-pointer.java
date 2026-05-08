@@ -12,61 +12,48 @@ class Node {
     }
 }
 */
-
+//1 -> 2 -> 3-> null
 class Solution {
     public Node copyRandomList(Node head) {
-
-        if(head == null)
+        if(head == null)    return null;
+        //first bring the copied next to original copy, interleave the nodes
+        Node cur = head;
+        while(cur != null)
         {
-            return null;
-        }
-
-        Node dummy = head;
-
-        while(dummy != null)
-        {
-            dummy.next = new Node(dummy.val, dummy.next);
-            dummy = dummy.next.next;
-
-        }
-
-        dummy = head;
-
-        while(dummy != null)
-        {
-            if(dummy.random != null)
-            {
-                dummy.next.random = dummy.random.next;
-            }
-
-            if(dummy.next != null)
-            {
-                dummy = dummy.next.next;
-            } 
-        }
-
-       
-        dummy = head;
-        Node newList = new Node(0);
-        Node temp = newList;
-
-        while(dummy != null)
-        {
-            Node copy = dummy.next;
-            dummy.next = dummy.next.next;
-
-            temp.next = copy;
-            temp = temp.next;
-
-            dummy = dummy.next;
+            Node curNext = cur.next;
+            cur.next = new Node(cur.val);
+            cur.next.next = curNext;
+            cur = cur.next.next;
         }
 
 
-        return newList.next;
+        //random 
+        cur = head;
+        while(cur != null)
+        {
+            Node curRandom = cur.random;
+            Node copyNode = cur.next;
+            if(curRandom != null)
+                copyNode.random = curRandom.next;
 
+            cur = cur.next.next;
+        }
 
+        //remove the interleave
+        Node copyHead = head.next;
+        cur = head;
+        Node result = copyHead;
 
-        
-        
+        while(cur != null)
+        {
+            cur.next = cur.next.next;
+            if(copyHead.next != null)
+                copyHead.next = copyHead.next.next;
+
+            cur = cur.next;
+            copyHead = copyHead.next;
+        }
+
+        return result;
     }
 }
