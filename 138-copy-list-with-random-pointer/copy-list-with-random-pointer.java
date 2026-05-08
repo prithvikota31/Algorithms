@@ -15,49 +15,58 @@ class Node {
 
 class Solution {
     public Node copyRandomList(Node head) {
-        Map<Node, Node> map = new HashMap<>();
 
-        Node cur = head;
-        while(cur != null)
+        if(head == null)
         {
-            if(!map.containsKey(cur))
-            {
-                map.put(cur, new Node(cur.val)); //created a copy of cur node if not present
-            }
-            //now mark cur.next and cur.random pointers in copies too
-            Node curNext = cur.next;
-            Node curRandom = cur.random;
-            Node copy = map.get(cur);
-            if(curNext == null)
-            {
-                copy.next = null;
-            }
-            else
-            {
-                if(!map.containsKey(curNext))
-                {
-                    map.put(curNext, new Node(curNext.val));
-                }
-                copy.next = map.get(curNext);
-                
-            }
-
-            if(curRandom == null)
-            {
-                copy.random = null;
-            }
-            else
-            {
-                if(!map.containsKey(curRandom))
-                {
-                    map.put(curRandom, new Node(curRandom.val));
-                }
-
-                copy.random = map.get(curRandom);
-            }
-            cur = cur.next;
+            return null;
         }
 
-        return map.get(head);
+        Node dummy = head;
+
+        while(dummy != null)
+        {
+            dummy.next = new Node(dummy.val, dummy.next);
+            dummy = dummy.next.next;
+
+        }
+
+        dummy = head;
+
+        while(dummy != null)
+        {
+            if(dummy.random != null)
+            {
+                dummy.next.random = dummy.random.next;
+            }
+
+            if(dummy.next != null)
+            {
+                dummy = dummy.next.next;
+            } 
+        }
+
+       
+        dummy = head;
+        Node newList = new Node(0);
+        Node temp = newList;
+
+        while(dummy != null)
+        {
+            Node copy = dummy.next;
+            dummy.next = dummy.next.next;
+
+            temp.next = copy;
+            temp = temp.next;
+
+            dummy = dummy.next;
+        }
+
+
+        return newList.next;
+
+
+
+        
+        
     }
 }
