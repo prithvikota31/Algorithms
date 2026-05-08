@@ -3,7 +3,7 @@ class Solution {
         int[] lastIndex = new int[26];
         for(int i = 0; i < s.length(); i++)
         {
-            lastIndex[s.charAt(i) - 'a'] = Math.max(lastIndex[s.charAt(i) - 'a'], i);
+            lastIndex[s.charAt(i) - 'a'] = i;
         }
 
         List<Integer> result = new ArrayList<>();
