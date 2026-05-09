@@ -1,37 +1,33 @@
 class Solution {
     public List<List<Integer>> combinationSum2(int[] candidates, int target) {
-        List<List<Integer>> result = new ArrayList<>();
-        List<Integer> trackingList = new ArrayList<>();
         Arrays.sort(candidates);
-        dfsCombinations(candidates, target, result, 0, trackingList);
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> tracingList = new ArrayList<>();
 
+        findC(result, tracingList, target, candidates, 0);
         return result;
+
     }
 
-    public void dfsCombinations(int[] candidates, int target, List<List<Integer>> result, 
-    int index, List<Integer> trackingList)
+    public void findC( List<List<Integer>> result, List<Integer> tracingList, int target,
+                        int[] candidates, int ind)
     {
         if(target == 0)
         {
-            result.add(new ArrayList<>(trackingList));
+            result.add(new ArrayList<>(tracingList));
+        }
+        if(target < 0)
+        {
             return;
         }
-
-        for(int i = index; i < candidates.length; i++)
+        for(int i = ind; i < candidates.length; i++)
         {
-            if(i != index && candidates[i] == candidates[i - 1])
-            {
-                continue;
-            }
-
-            if(candidates[i] > target)
-            {
-                break;
-            }
-
-            trackingList.add(candidates[i]);
-            dfsCombinations(candidates, target - candidates[i], result, i + 1, trackingList);
-            trackingList.remove(trackingList.size() - 1);
+            // 1, 1, 1, 1, 2, 2, 2
+            if(i > ind && candidates[i] == candidates[i - 1])    continue;
+            tracingList.add(candidates[i]);
+            findC(result, tracingList, target - candidates[i], candidates, i + 1);
+            tracingList.remove(tracingList.size() - 1);
         }
     }
+    
 }
