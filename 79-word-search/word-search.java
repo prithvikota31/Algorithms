@@ -1,20 +1,18 @@
 class Solution {
-    int[] delRow = {1, 0, -1, 0};
-    int[] delCol = {0, 1, 0, -1};
-
     public boolean exist(char[][] board, String word) {
         int m = board.length;
         int n = board[0].length;
 
-        boolean[][] visited = new boolean[m][n];
-
+        int[] delRow = {0, 1, 0, -1};
+        int[] delCol = {1, 0, -1, 0};    
+        int[][] visited = new int[m][n];
         for(int i = 0; i < m; i++)
         {
-            for(int j = 0; j < n; j++)
+            for(int j = 0; j < n; j ++)
             {
-                if(dfs(board, visited, i, j, word, 0))
+                if(board[i][j] == word.charAt(0))
                 {
-                    return true;
+                    if(dfs(1, board, delRow, delCol, word, i, j, visited))   return true;
                 }
             }
         }
@@ -22,39 +20,33 @@ class Solution {
         return false;
     }
 
-    public boolean dfs(char[][] board, boolean[][] visited, int row, int col, String word, int index)
+    //"s e e"
+    public boolean dfs(int ind, char[][] board, int[] delRow, int[] delCol, String word, int row, int col,
+    int[][] visited)
     {
-
-
-        if(word.charAt(index) != board[row][col])
+        visited[row][col] = 1;
+        if(ind == word.length())
         {
-            return false;
-        }
-
-        if(index == word.length() - 1)
-        {
+            visited[row][col] = 0;
             return true;
         }
-
-
-        visited[row][col] = true;
-
+        //match ind before travsersing further
         for(int i = 0; i < 4; i++)
         {
-            int nr = row + delRow[i];
-            int nc = col + delCol[i];
+            int nRow = row + delRow[i];
+            int nCol = col + delCol[i];
 
-            if(nr >= 0 && nr < board.length && nc >= 0 &&
-            nc < board[0].length && !visited[nr][nc])
+            if(nRow >= 0 && nRow < board.length && nCol >= 0 && nCol < board[0].length &&
+            board[nRow][nCol] == word.charAt(ind) && visited[nRow][nCol] == 0)
             {
-                if(dfs(board, visited, nr, nc, word, index + 1))
+                if(dfs(ind + 1, board, delRow, delCol, word, nRow, nCol, visited))  
                 {
+                    visited[row][col] = 0;
                     return true;
-                }
+                } 
             }
         }
-        visited[row][col] = false;
+        visited[row][col] = 0;
         return false;
     }
-
 }
