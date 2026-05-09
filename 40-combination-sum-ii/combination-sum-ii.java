@@ -15,6 +15,7 @@ class Solution {
         if(target == 0)
         {
             result.add(new ArrayList<>(tracingList));
+            return;
         }
         if(target < 0)
         {
