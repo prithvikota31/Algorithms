@@ -8,7 +8,7 @@ class Solution {
 
     public void findPermutations(int[] nums, List<List<Integer>> result, int ind)
     {
-        if(ind == nums.length)
+        if(ind == nums.length - 1)
         {
             List<Integer> perm = new ArrayList<>();
             for(int i = 0; i < nums.length; i++)
