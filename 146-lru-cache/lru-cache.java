@@ -11,9 +11,8 @@ class LRUCache {
         tail = new Node(-1, -1);
         map = new HashMap<>();
         head.next = tail;
-        head.prev = null;
         tail.prev = head;
-        tail.next = null;
+
     }
     
     public int get(int key) {
