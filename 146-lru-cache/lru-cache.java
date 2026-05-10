@@ -37,8 +37,6 @@ class LRUCache {
 
         prev.next = next;
         next.prev = prev;
-        node.prev = null;
-        node.next = null;
         if(permanent)
         {
             map.remove(key);
