@@ -8,7 +8,7 @@ class Solution {
         //check overlap for each meeting with previous one, if yes, return false
         for(int i = 1; i < intervals.length; i++)
         {
-            if(lastMeeting[0] < intervals[i][1] && 
+            if(lastMeeting[0] <= intervals[i][1] && 
                 lastMeeting[1] > intervals[i][0])
             {
                 return false;     
