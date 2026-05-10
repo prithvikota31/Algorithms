@@ -1,35 +1,26 @@
 class Solution {
     public double myPow(double x, int n) {
-        int power = n;
-        if(n < 0)
+        long N = n;
+        if(N < 0)
         {
-            x = 1/x;
-            power = -n;
+            N = -N;
+            x = 1.0 / x;
         }
 
-        return solve(x, power);
-        
+        return powPositiveN(x, N);
     }
 
-    public double solve(double x, int n)
+    public double powPositiveN(double x, long n)
     {
-        double ans = 1;
-        if(n == 0)
+        if(n == 1)  return x;
+        if(n == 0)  return 1;
+        if(n % 2 == 0)
         {
-            return 1;
-        }
-        double half = solve(x, n/2);
-
-        if(n%2 == 0)
-        {
-            ans = half * half;
+            return powPositiveN(x * x, n / 2);
         }
         else
         {
-            ans = x * half * half;
+            return x * powPositiveN(x * x, (n - 1)/ 2);
         }
-
-        return ans;
-
     }
 }
