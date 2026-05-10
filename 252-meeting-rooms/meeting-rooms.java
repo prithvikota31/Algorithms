@@ -1,15 +1,20 @@
 class Solution {
     public boolean canAttendMeetings(int[][] intervals) {
-        if (intervals.length <= 1) return true;
+        Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
+        if(intervals.length <= 1)   return true;
+        //minimum intervals length = 2
+        int[] lastMeeting = intervals[0];
 
-        // Sort by start time
-        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
-
-        for (int i = 1; i < intervals.length; i++) {
-            // If current start is before previous end → overlap
-            if (intervals[i][0] < intervals[i - 1][1]) {
-                return false;
+        //check overlap for each meeting with previous one, if yes, return false
+        for(int i = 1; i < intervals.length; i++)
+        {
+            if(lastMeeting[0] < intervals[i][1] && 
+                lastMeeting[1] > intervals[i][0])
+            {
+                return false;     
             }
+            lastMeeting = intervals[i];
+
         }
 
         return true;
