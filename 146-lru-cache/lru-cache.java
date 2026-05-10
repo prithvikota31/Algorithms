@@ -72,7 +72,7 @@ class LRUCache {
 
         map.put(key, node);        
         count++;
-        add(map.get(key));
+        add(node);
         if(count > capacity)
         {
             remove(tail.prev.key, true);
