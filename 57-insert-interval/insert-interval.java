@@ -1,34 +1,44 @@
 class Solution {
     public int[][] insert(int[][] intervals, int[] newInterval) {
-        List<int[]> result = new ArrayList<>();
+        //check overlap, if overlap, remove that from list and merge again
+
+        List<int[]> ans = new ArrayList<>();
+
+        //completely before overlap
+        //during overlap
+        //completely after overlap
         int n = intervals.length;
-        //first part non overlapping intervals[end] < newInterval[start]
-        int idx = 0;
-        while(idx < n && intervals[idx][1] < newInterval[0])
-        {
-            result.add(intervals[idx]);
-            idx++;
-        }
-        //so intervals[end] >= newInterval[start]
-        //second part overlapping newInterval[end] > intervals[start]
-        //eg [4, 6], [4, 7] => [6, 9]
-        while(idx < n && intervals[idx][0] <= newInterval[1])
-        {
-            newInterval[0] = Math.min(intervals[idx][0], newInterval[0]);
-            newInterval[1] = Math.max(intervals[idx][1], newInterval[1]);
-            idx++;
-        }
-        result.add(newInterval);
+        int ind = 0;
 
-
-        while(idx < n && intervals[idx][0] > newInterval[1])
+        //nonoverlap front
+        while(ind < n && intervals[ind][1] < newInterval[0])
         {
-            result.add(intervals[idx]);
-            idx++;
+            ans.add(intervals[ind]);
+            ind++;
         }
 
+        //during overlap
+        //but already [ind][1] > newInterval[0]; covered above
+        //(interval.end, new.start) condition for overlap
+        //newInterval[0] <= intervals[ind][1] is already satisfied above
+        while(ind < n && newInterval[1] >= intervals[ind][0] && 
+                newInterval[0] <= intervals[ind][1])
+        {
+            newInterval[0] = Math.min(newInterval[0], intervals[ind][0]);
+            newInterval[1] = Math.max(newInterval[1], intervals[ind][1]);
+            ind++;
+        }
 
+        ans.add(newInterval);
 
-        return result.toArray(new int[result.size()][]);
+        //after overlap
+        while(ind < n)
+        {
+            ans.add(intervals[ind]);
+            ind++;
+        }
+
+        return ans.toArray(new int[0][]);
+
     }
 }
