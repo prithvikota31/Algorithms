@@ -1,6 +1,5 @@
 class Solution {
     public boolean checkValidString(String s) {
-        //capture open brackets
         int minOpen = 0;
         int maxOpen = 0;
 
@@ -15,19 +14,22 @@ class Solution {
             {
                 minOpen--;
                 maxOpen--;
-                if(maxOpen < 0) return false;
             }
-            else // *
+            else
             {
-                minOpen--;
-                maxOpen++;
-            }
+                minOpen -= 1;
+                maxOpen += 1;
 
-           
-            minOpen = Math.max(minOpen, 0);
+            }
+            
+            if(maxOpen < 0) return false;
+            if(minOpen < 0)
+            {
+                minOpen = 0;
+            }
         }
-        
-        if(minOpen != 0)    return false;
-        else    return true;
+
+        return (minOpen == 0)? true: false;
+
     }
 }
