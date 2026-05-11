@@ -7,10 +7,11 @@ class Solution {
         for(int i = 0; i <= n - 1; i++)
         {
             checkPalindrome(s, i, i);
-            if(i != n - 1 && s.charAt(i) == s.charAt(i + 1))
-            {
-                checkPalindrome(s, i, i + 1);
-            }
+            // if(i != n - 1 && s.charAt(i) == s.charAt(i + 1))
+            // {
+            //     checkPalindrome(s, i, i + 1);
+            // }
+            checkPalindrome(s, i, i + 1);
         }
 
 
@@ -34,8 +35,6 @@ class Solution {
                 }
                 i--;
                 j++;
-
-
             }
             else
             {
