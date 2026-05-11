@@ -16,6 +16,7 @@ class Solution {
                 continue;
             }
 
+            count = 0;
             while(set.contains(num))
             {
                 count++;
@@ -23,7 +24,7 @@ class Solution {
             }
 
             ans = Math.max(count, ans);
-            count = 0;
+
         }
 
         return ans;
