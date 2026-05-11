@@ -2,29 +2,24 @@ class Solution {
     public int numDecodings(String s) {
         int n = s.length();
         int[] dp = new int[n + 1];
-        dp[n] = 1; //it implies emoty String
-        //dp[i] represents total possibilities from i to end
+
+        dp[0] = 1;//empty string
         
-        for(int i = n - 1; i >= 0; i--)
+        for(int i = 1; i <= n; i++)
         {
-            if(s.charAt(i) == '0') //this implies first letter from i is zero
+            int singleDigit = s.charAt(i - 1) - '0';
+            if(singleDigit != 0)    dp[i] += dp[i - 1];
+
+            if(i >= 2)
             {
-                dp[i] = 0;
-                continue;
-            }
-            dp[i] = dp[i + 1]; //taking i as 1 digit
-            if(i + 1 < n)
-            {
-                //taking i to i + 1 as two digit
-                int twoDigit = Integer.parseInt(s.substring(i, i + 2));
-                if(twoDigit >= 10 && twoDigit <= 26)
+                int doubleDigit = (s.charAt(i - 2) - '0') * 10 + (s.charAt(i - 1) - '0');
+                if(doubleDigit >= 10 && doubleDigit <= 26)
                 {
-                    dp[i] += dp[i + 2];
-                }   
+                    dp[i] += dp[i - 2];
+                }
             }
         }
 
-        return dp[0];
-
+        return dp[n];
     }
 }
