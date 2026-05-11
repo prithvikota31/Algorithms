@@ -21,14 +21,10 @@ class Solution {
     public void getDigits(int num, List<Integer> result )
     {
         List<Integer> temp = new ArrayList<>();
-        while(num != 0)
+        for(char c: String.valueOf(num).toCharArray())
         {
-            temp.add(num % 10);
-            num = num / 10;
+            result.add(c - '0');
         }
-
-       Collections.reverse(temp);
-        result.addAll(temp);
 
     }
 }
