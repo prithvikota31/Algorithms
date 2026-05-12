@@ -1,43 +1,32 @@
 class Solution {
-
     public int coinChange(int[] coins, int amount) {
 
-        Integer[][] dp = new Integer[coins.length][amount + 1];
+        int[] dp = new int[amount + 1];
 
-        int ans = countCoins(coins, amount, 0, dp);
+        // Fill with impossible large value
+        Arrays.fill(dp, amount + 1);
 
-        return ans == Integer.MAX_VALUE ? -1 : ans;
-    }
+        // Base case
+        dp[0] = 0;
 
-    private int countCoins(int[] coins, int amount,
-                           int ind, Integer[][] dp) {
+        // Build answers from 1 -> amount
+        for (int i = 1; i <= amount; i++) {
 
-        if(amount == 0) {
-            return 0;
+            // Try every coin
+            for (int coin : coins) {
+
+                // Coin can participate
+                if (coin <= i) {
+
+                    dp[i] = Math.min(
+                        dp[i],
+                        1 + dp[i - coin]
+                    );
+                }
+            }
         }
 
-        if(amount < 0 || ind == coins.length) {
-            return Integer.MAX_VALUE;
-        }
-
-        if(dp[ind][amount] != null) {
-            return dp[ind][amount];
-        }
-
-        int take = countCoins(coins,
-                              amount - coins[ind],
-                              ind,
-                              dp);
-
-        if(take != Integer.MAX_VALUE) {
-            take = 1 + take;
-        }
-
-        int notTake = countCoins(coins,
-                                 amount,
-                                 ind + 1,
-                                 dp);
-
-        return dp[ind][amount] = Math.min(take, notTake);
+        // Impossible case
+        return dp[amount] > amount ? -1 : dp[amount];
     }
 }
