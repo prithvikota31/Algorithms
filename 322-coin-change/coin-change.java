@@ -1,39 +1,24 @@
 class Solution {
     public int coinChange(int[] coins, int amount) {
-        //dp[i][j] => till ith index of coins, minimum coins to make amount j;
+        int[] dp = new int[amount + 1];
+        //dp[i] denotes minium coins to reach amount i;
+        Arrays.fill(dp, (int)1e9);
 
-        int[][] dp = new int[coins.length][amount + 1];
+        dp[0] = 0;
 
-        for(int i = 0; i < coins.length; i++)
+        for(int curAmount = 1; curAmount <= amount; curAmount++)
         {
-            Arrays.fill(dp[i], (int)1e9);
-        }
-
-        //base condition if i = 0, only 1st coin, check if remainder is zero
-
-        for(int j = 0; j <= amount; j++)
-        {
-            if(j % coins[0] == 0)
+            for(int coinIndex = 0; coinIndex < coins.length; coinIndex++)
             {
-                dp[0][j] = j / coins[0];
-            }
-        }
-
-        for(int i = 1; i < coins.length; i++)
-        {
-            for(int j = 0; j <= amount; j++)
-            {
-                int take = (int)1e9;
-                if(coins[i] <= j)
+                if(coins[coinIndex] <= curAmount)
                 {
-                    take = 1 + dp[i][j - coins[i]];
+                    dp[curAmount] = Math.min(dp[curAmount],1 + dp[curAmount - coins[coinIndex]]);
                 }
-                int notTake = dp[i - 1][j];
-                dp[i][j] = Math.min(take, notTake);
             }
         }
 
-        if(dp[coins.length - 1][amount] >= (int)1e9)    return -1;
-        return dp[coins.length - 1][amount];
+        if(dp[amount] >= 1e9)   return -1;
+        else
+            return dp[amount];
     }
 }
