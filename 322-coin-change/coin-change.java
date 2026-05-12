@@ -2,61 +2,42 @@ class Solution {
 
     public int coinChange(int[] coins, int amount) {
 
-        if(amount == 0) return 0;
-
-        int[] result = new int[]{Integer.MAX_VALUE};
-
         Integer[][] dp = new Integer[coins.length][amount + 1];
 
-        countCoins(coins, amount, 0, result, 0, dp);
+        int ans = countCoins(coins, amount, 0, dp);
 
-        return result[0] == Integer.MAX_VALUE ? -1 : result[0];
+        return ans == Integer.MAX_VALUE ? -1 : ans;
     }
 
-    private void countCoins(int[] coins,
-                            int amount,
-                            int ind,
-                            int[] result,
-                            int count,
-                            Integer[][] dp) {
-
-        if(amount < 0) {
-            return;
-        }
+    private int countCoins(int[] coins, int amount,
+                           int ind, Integer[][] dp) {
 
         if(amount == 0) {
-            result[0] = Math.min(result[0], count);
-            return;
+            return 0;
         }
 
-        if(ind == coins.length) {
-            return;
+        if(amount < 0 || ind == coins.length) {
+            return Integer.MAX_VALUE;
         }
 
-        // already visited with better/same count
-        if(dp[ind][amount] != null &&
-           dp[ind][amount] <= count) {
-            return;
+        if(dp[ind][amount] != null) {
+            return dp[ind][amount];
         }
 
-        dp[ind][amount] = count;
+        int take = countCoins(coins,
+                              amount - coins[ind],
+                              ind,
+                              dp);
 
-        int curCoin = coins[ind];
+        if(take != Integer.MAX_VALUE) {
+            take = 1 + take;
+        }
 
-        // take
-        countCoins(coins,
-                   amount - curCoin,
-                   ind,
-                   result,
-                   count + 1,
-                   dp);
+        int notTake = countCoins(coins,
+                                 amount,
+                                 ind + 1,
+                                 dp);
 
-        // not take
-        countCoins(coins,
-                   amount,
-                   ind + 1,
-                   result,
-                   count,
-                   dp);
+        return dp[ind][amount] = Math.min(take, notTake);
     }
 }
