@@ -1,39 +1,62 @@
 class Solution {
+
     public int coinChange(int[] coins, int amount) {
-        //recursion idea
-        //f(ind, amount) 
-        // when last index is taken => f(ind, amount - coins[index])
-        //not taken => f(ind - 1, amount)
-        // base: if(ind == 0) => either amount/arr[0] or Integer.MAX_VALUE;
-        //dp[i][j]
-        int m = coins.length;
-        int n = amount + 1;
 
-        int[][] dp = new int[m][n];
+        if(amount == 0) return 0;
 
-        //fill row with first index (i.e using only first value in coins)
-        for(int j = 0; j <= amount; j++)
-        {
-            if(j % coins[0] == 0)   dp[0][j] = j / coins[0];
-            else
-                dp[0][j] = (int)1e9;
+        int[] result = new int[]{Integer.MAX_VALUE};
+
+        Integer[][] dp = new Integer[coins.length][amount + 1];
+
+        countCoins(coins, amount, 0, result, 0, dp);
+
+        return result[0] == Integer.MAX_VALUE ? -1 : result[0];
+    }
+
+    private void countCoins(int[] coins,
+                            int amount,
+                            int ind,
+                            int[] result,
+                            int count,
+                            Integer[][] dp) {
+
+        if(amount < 0) {
+            return;
         }
 
-        for(int i = 0; i < coins.length; i++)
-        {
-            dp[i][0] = 0;
+        if(amount == 0) {
+            result[0] = Math.min(result[0], count);
+            return;
         }
 
-        for(int i = 1; i < coins.length; i++)
-        {
-            for(int j = 1; j <= amount; j++)
-            {
-                int notTake = dp[i - 1][j];
-                int take = (int)1e9;
-                if(j - coins[i] >= 0) take = 1 + dp[i][j - coins[i]];
-                dp[i][j] = Math.min(notTake, take);
-            }
+        if(ind == coins.length) {
+            return;
         }
-        return dp[m - 1][n - 1] >= 1e9? -1 : dp[m - 1][n - 1];
+
+        // already visited with better/same count
+        if(dp[ind][amount] != null &&
+           dp[ind][amount] <= count) {
+            return;
+        }
+
+        dp[ind][amount] = count;
+
+        int curCoin = coins[ind];
+
+        // take
+        countCoins(coins,
+                   amount - curCoin,
+                   ind,
+                   result,
+                   count + 1,
+                   dp);
+
+        // not take
+        countCoins(coins,
+                   amount,
+                   ind + 1,
+                   result,
+                   count,
+                   dp);
     }
 }
