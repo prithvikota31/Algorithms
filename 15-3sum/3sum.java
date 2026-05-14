@@ -1,35 +1,56 @@
-import java.util.*;
-
 class Solution {
     public List<List<Integer>> threeSum(int[] nums) {
-        List<List<Integer>> res = new ArrayList<>();
+
         Arrays.sort(nums);
 
-        for (int i = 0; i < nums.length - 2; i++) {
-            // skip duplicate fixed numbers
-            if (i > 0 && nums[i] == nums[i - 1]) continue;
+        List<List<Integer>> result = new ArrayList<>();
 
-            int l = i + 1, r = nums.length - 1;
+        int n = nums.length;
 
-            while (l < r) {
-                int sum = nums[i] + nums[l] + nums[r];
+        for(int i = 0; i < n - 2; i++) {
 
-                if (sum == 0) {
-                    res.add(Arrays.asList(nums[i], nums[l], nums[r]));
+            // skip duplicate first elements
+            if(i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
 
-                    // skip duplicates for l and r
-                    while (l < r && nums[l] == nums[l + 1]) l++;
-                    while (l < r && nums[r] == nums[r - 1]) r--;
+            int j = i + 1;
+            int k = n - 1;
 
-                    l++;
-                    r--;
-                } else if (sum < 0) {
-                    l++; // need bigger sum
-                } else {
-                    r--; // need smaller sum
+            while(j < k) {
+
+                int sum = nums[i] + nums[j] + nums[k];
+
+                if(sum == 0) {
+
+                    result.add(
+                        Arrays.asList(nums[i], nums[j], nums[k])
+                    );
+
+                    j++;
+                    k--;
+
+                    // skip duplicate j
+                    while(j < k && nums[j] == nums[j - 1]) {
+                        j++;
+                    }
+
+                    // skip duplicate k
+                    while(j < k && nums[k] == nums[k + 1]) {
+                        k--;
+                    }
+                }
+
+                else if(sum < 0) {
+                    j++;
+                }
+
+                else {
+                    k--;
                 }
             }
         }
-        return res;
+
+        return result;
     }
 }
