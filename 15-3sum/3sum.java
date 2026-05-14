@@ -35,10 +35,6 @@ class Solution {
                         j++;
                     }
 
-                    // skip duplicate k
-                    while(j < k && nums[k] == nums[k + 1]) {
-                        k--;
-                    }
                 }
 
                 else if(sum < 0) {
