@@ -12,10 +12,6 @@ class Solution {
             }
             int replaceIndex = firstNoGreater(target, 0, ind, nums[i]);
             target[replaceIndex] = nums[i];
-            if(replaceIndex > ind)
-            {
-                ind = replaceIndex;
-            }
         }
 
         return ind + 1;
