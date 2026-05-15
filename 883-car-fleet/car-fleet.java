@@ -1,19 +1,18 @@
 class Solution {
     public int carFleet(int target, int[] position, int[] speed) {
-        int ans = 0;
-        int l = position.length;
+        //calculate pos and times
         List<Car> cars = new ArrayList<>();
-
-        for(int i = 0; i < l; i++)
+        for(int i = 0; i < position.length; i++)
         {
             cars.add(new Car(position[i], (double)(target - position[i])/speed[i]));
         }
+        Collections.sort(cars, (a, b) -> b.pos - a.pos);
 
-        Collections.sort(cars, (a,b) -> b.pos - a.pos);
         double prevTime = 0;
-
-        for(int i = 0; i < l; i++)
+        int ans = 0;
+        for(int i = 0; i < cars.size(); i++)
         {
+            //not prev car time, previous fleet time
             if(cars.get(i).time > prevTime)
             {
                 ans++;
@@ -21,19 +20,17 @@ class Solution {
             }
         }
 
-
         return ans;
-        
+
     }
+}
+class Car{
+    int pos;
+    double time;
 
-    class Car{
-        int pos;
-        double time;
-
-        public Car(int pos, double time)
-        {
-            this.pos = pos;
-            this.time = time;
-        }
+    public Car(int pos, double time)
+    {
+        this.pos = pos;
+        this.time = time;
     }
 }
