@@ -1,30 +1,26 @@
 class Solution {
     public boolean wordBreak(String s, List<String> wordDict) {
+
         int n = s.length();
-        boolean[] dp = new boolean[n];
+
         Set<String> set = new HashSet<>(wordDict);
 
-        dp[0] = set.contains(s.substring(0, 1));
+        boolean[] dp = new boolean[n + 1];
+        dp[0] = true;
 
-        for(int i = 1; i < n; i++)
-        {
-            for(int j = 0; j <= i; j++)
-            {
-                //dp[j] represents validdty of space sepration till j
-                if(j == 0)
-                {
-                    dp[i] = set.contains(s.substring(j, i + 1));
-                }
-                else
-                {
-                    dp[i] = dp[j - 1] && set.contains(s.substring(j, i + 1));
-                } 
-                if(dp[i]){
+        for(int i = 1; i <= n; i++) {
+
+            for(int j = 0; j < i; j++) {
+
+                if(dp[j] &&
+                   set.contains(s.substring(j, i))) {
+
+                    dp[i] = true;
                     break;
                 }
             }
         }
 
-        return dp[n - 1];
+        return dp[n];
     }
 }
