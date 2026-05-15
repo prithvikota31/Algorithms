@@ -5,7 +5,6 @@ class Solution {
         Set<String> set = new HashSet<>(wordDict);
 
         dp[0] = set.contains(s.substring(0, 1));
-        System.out.println(set.size());
 
         for(int i = 1; i < n; i++)
         {
