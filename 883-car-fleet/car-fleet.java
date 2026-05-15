@@ -1,37 +1,39 @@
 class Solution {
     public int carFleet(int target, int[] position, int[] speed) {
-
+        int ans = 0;
+        int l = position.length;
         List<Car> cars = new ArrayList<>();
-        for(int i = 0; i < position.length; i++)
+
+        for(int i = 0; i < l; i++)
         {
-            cars.add(new Car());
+            cars.add(new Car(position[i], (double)(target - position[i])/speed[i]));
         }
 
-        for(int i = 0; i < position.length; i++)
-        {   
-            cars.get(i).position = position[i];
-            cars.get(i).time = (double)(target - position[i]) / speed[i];      
-        }
+        Collections.sort(cars, (a,b) -> b.pos - a.pos);
+        double prevTime = 0;
 
-        Collections.sort(cars, (a, b)->(b.position - a.position));
-
-        int count = 0;
-        double prevtime = 0;
-
-        for(int i = 0; i < cars.size(); i++)
+        for(int i = 0; i < l; i++)
         {
-            if(cars.get(i).time >  prevtime)
+            if(cars.get(i).time > prevTime)
             {
-                count++;
-                prevtime = cars.get(i).time;
+                ans++;
+                prevTime = cars.get(i).time;
             }
-        } 
+        }
 
-        return count;      
+
+        return ans;
+        
     }
-}
 
-class Car {
-    int position;
-    double time;
+    class Car{
+        int pos;
+        double time;
+
+        public Car(int pos, double time)
+        {
+            this.pos = pos;
+            this.time = time;
+        }
+    }
 }
