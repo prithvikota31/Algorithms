@@ -1,77 +1,42 @@
-// class MinStack {
-//     Deque<Pair> stack ;
-//     int minimum;
-//     public MinStack() {
-//        stack = new ArrayDeque<>();
-//        minimum = Integer.MAX_VALUE;
-//     }
-    
-//     public void push(int val) {
-//         minimum = Math.min(minimum, val);
-//         stack.push(new Pair(val, minimum));
-//     }
-    
-//     public void pop() {
-//         stack.pop();
-//         if (stack.isEmpty()) minimum = Integer.MAX_VALUE;
-//         else minimum = stack.peek().min;
-//     }
-    
-//     public int top() {
-//         return stack.peek().value;
-//     }
-    
-//     public int getMin() {
-//         return minimum;
-//     }
-// }
-
-class Pair
-{
-    int value;
-    int min;
-
-    public Pair(int v, int m)
-    {
-        value = v;
-        min = m;
-    }
-}
-
 class MinStack {
+    
     Deque<Long> stack;
-    long min;
-
+    long min; 
     public MinStack() {
-        stack = new ArrayDeque<>();
+        stack = new ArrayDeque<Long>();
     }
-
+    
     public void push(int val) {
-        if (stack.isEmpty()) {
-            stack.push((long) val);
+        if(stack.isEmpty())
+        {
+            stack.offerLast((long)val);
             min = val;
-        } else if (val < min) {
-            stack.push(2L * val - min); // encode
+        }
+        else if(val < min){
+            stack.offerLast(2L*val - min);
             min = val;
-        } else {
-            stack.push((long) val);
+        }
+        else{
+            stack.offerLast((long)val);
         }
     }
-
+    
     public void pop() {
-        long top = stack.pop();
-        if (top < min) {
-            min = 2 * min - top; // restore previous min
+        long top = stack.pollLast();
+        if(top < min)
+        {
+            min = 2L*min - top;
         }
     }
-
+    
     public int top() {
-        long top = stack.peek();
-        return top < min ? (int) min : (int) top;
+        long top = stack.peekLast();
+        if(top < min)   return (int)min;
+        else    return (int)top;
     }
-
+    
     public int getMin() {
-        return (int) min;
+        return (int)min;
     }
 }
 
