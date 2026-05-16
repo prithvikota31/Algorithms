@@ -1,5 +1,5 @@
 class Solution {
-    private int maxArea = 0;
+    
     public int maxAreaOfIsland(int[][] grid) {
         int m = grid.length;
         int n = grid[0].length;
@@ -7,6 +7,7 @@ class Solution {
         int[] delRow = {-1, 0, 1, 0};
         int[] delCol = {0, -1, 0, 1};
         int[] count = new int[1];
+        int maxArea = 0;
         for(int i = 0; i < m; i++)
         {
             for(int j = 0; j < n; j++)
