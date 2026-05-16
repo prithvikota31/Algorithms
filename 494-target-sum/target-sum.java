@@ -1,35 +1,45 @@
 class Solution {
-   public int findTargetSumWays(int[] nums, int target) {
-        int n = nums.length;
+    public int findTargetSumWays(int[] nums, int target) {
+        //sum
+        //s1 - s2 = target
+        //s1 + s2 = sum
 
-        // First calculate total sum of all numbers
-        int totalSum = 0;
-        for (int num : nums) totalSum += num;
+        //s1 = target + sum / 2
+        int sum = 0;
+        for(int num: nums)
+        {
+            sum += num;
+        }
 
-        // If (target + totalSum) is odd or target > totalSum, no valid partition exists
-        if ((totalSum + target) % 2 != 0 || Math.abs(target) > totalSum) return 0;
+        if((target + sum) % 2 !=  0 || sum < Math.abs(target))
+        {
+            return 0;
+        }
+        int newTarget = (target + sum) / 2;
+        int m = nums.length;
+        int n = newTarget;
 
-        // We now need to count subsets with sum = (target + totalSum) / 2
-        int newTarget = (totalSum + target) / 2;
+        int[][] dp = new int[m + 1][n + 1];
 
-        // Create DP table: dp[i][j] = number of ways to make sum j using first i numbers
-        int[][] dp = new int[n + 1][newTarget + 1];
+        //0th row implies no elements;
+        dp[0][0] = 1; //no elemeents target 0
 
-        // Base case: One way to form sum 0 (by taking no elements)
-        dp[0][0] = 1;
-        // Fill DP table iteratively
-        for (int i = 1; i <= n; i++) {
-            for (int j = 0; j <= newTarget; j++) {
-                // Exclude current element
-                dp[i][j] = dp[i - 1][j];
-
-                // Include current element if it does not exceed current target j
-                if (nums[i - 1] <= j) {
-                    dp[i][j] += dp[i - 1][j - nums[i - 1]];
-                }
+        for(int i = 1; i < dp.length; i++)
+        {
+            for(int j = 0; j < dp[0].length; j++)
+            {
+                //dont use current element
+                //notInclude
+                dp[i][j]  += dp[i - 1][j];
+                //include
+                if(j >= nums[i - 1])
+                    dp[i][j] += dp[i - 1][j - nums[i - 1]]; 
             }
         }
 
-        return dp[n][newTarget];
+        return dp[m][n];
+
+
+
     }
 }
