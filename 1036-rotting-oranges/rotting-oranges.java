@@ -1,68 +1,72 @@
 class Solution {
     public int orangesRotting(int[][] grid) {
-        int time = bfs(grid);
-        return time;
-    }
+        int[] delRow = {-1, 0, 1, 0};
+        int[] delCol = {0, -1, 0, 1};
 
-    public int bfs(int[][] grid)
-    {
-        Deque<Pair> q = new ArrayDeque<>();
-        int time = 0;
+        int m = grid.length;
+        int n = grid[0].length;
+        
         int fresh = 0;
-        //add all rotten oranges into queue
-        for(int i = 0; i < grid.length; i++)
+        Deque<Pair> q= new ArrayDeque<>();
+        for(int i = 0; i < m; i++)
         {
-            for(int j = 0; j < grid[0].length; j++)
+            for(int j = 0; j < n; j++)
             {
-                if(grid[i][j] == 2)
-                    q.offer(new Pair(i, j));
-                else if(grid[i][j] == 1)
+                if(grid[i][j] == 1)
+                {
                     fresh++;
-
+                }
+                if(grid[i][j] == 2)
+                {
+                    q.offer(new Pair(i, j));
+                }
             }
         }
 
-        int[] delRow = {-1, 0, 1, 0};
-        int[] delCol = {0, 1, 0, -1};
+        int time = 0;
+        int rotten = 0;
 
         while(!q.isEmpty())
         {
-            int qSize = q.size();
-            for(int c = 0; c < qSize; c++)
+            int size = q.size();
+            for(int i = 0; i < size; i++)
             {
-                Pair cNode = q.poll();
-                int cRow = cNode.x;
-                int cCol = cNode.y;
+                Pair cur = q.poll();
+                int cRow = cur.row;
+                int cCol = cur.col;
 
-                for(int i = 0; i < 4; i++)
+                for(int j = 0; j < 4; j++)
                 {
-                    int nRow = cRow + delRow[i];
-                    int nCol = cCol + delCol[i];
-
-                    if(nRow >= 0 && nRow < grid.length && nCol >= 0 && nCol < grid[0].length &&
-                        grid[nRow][nCol] == 1)
+                    int nRow = cRow + delRow[j];
+                    int nCol = cCol + delCol[j];
+                    if(nRow >= 0 && nRow < m && nCol >= 0 && nCol < n && grid[nRow][nCol] == 1)
                     {
                         grid[nRow][nCol] = 2;
                         q.offer(new Pair(nRow, nCol));
-                        fresh--;
+                        rotten++;
                     }
-                }           
+                }
             }
 
-            if(!q.isEmpty())  time++;
+            if(!q.isEmpty())
+            {
+                time++;
+            }
         }
-        return fresh == 0? time: -1;
+
+        if(fresh != rotten) return -1;
+        else return time;
     }
 
 }
 
-class Pair
-{
-    int x;
-    int y;
-    public Pair(int x, int y)
+class Pair{
+    int row;
+    int col;
+
+    public Pair(int row, int col)
     {
-        this.x = x;
-        this.y = y;
+        this.row = row;
+        this.col = col;
     }
 }
