@@ -39,6 +39,8 @@ class Solution {
                     q.offer(nei);
                     map.put(nei, new Node(nei.val));
                 }
+                //add to the current node clone
+                // neighbor node clone
                 map.get(cur).neighbors.add(map.get(nei));
             }
         }
