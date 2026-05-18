@@ -1,48 +1,66 @@
 class Solution {
-    private int[] parent;
-    private int[] size;
-
-
     public boolean validTree(int n, int[][] edges) {
-        if (edges.length != n - 1) return false;
-        parent = new int[n];
-        size = new int[n];
+        
+        List<List<Integer>> graph = new ArrayList<>();
+
         for(int i = 0; i < n; i++)
         {
-            parent[i] = i;
-            size[i] = 1;
+            graph.add(new ArrayList<>());
         }
 
         for(int i = 0; i < edges.length; i++)
         {
             int a = edges[i][0];
             int b = edges[i][1];
-
-            int uParentA = findUParent(a);
-            int uParentB = findUParent(b);
-
-            if(uParentA == uParentB)    return false;
-            unionBySize(uParentA, uParentB);
-
+            graph.get(a).add(b);
+            graph.get(b).add(a);
         }
 
+        //now detect a cycle
+        Deque<Pair> q = new ArrayDeque<>();
+        int[] visited = new int[n];
+        q.offer(new Pair(0, - 1));
+        visited[0] = 1;
+        while(!q.isEmpty())
+        {
+            Pair cur = q.poll();
+            int cNode = cur.node;
+            int parent = cur.parent;
+
+            for(int i = 0; i < graph.get(cNode).size(); i++)
+            {
+                int nei = graph.get(cNode).get(i);
+                if(visited[nei] == 0)
+                {
+                    visited[nei] = 1;
+                    q.offer(new Pair(nei, cNode));
+                }
+                else if(nei != parent)
+                {
+                    return false;
+                }
+            }
+        }
+
+        for(int i = 0; i < n; i++)
+        {
+            if(visited[i] == 0)
+            {
+                return false;
+            }
+        }
         return true;
+
     }
+}
 
-    
-    private int findUParent(int node)
+class Pair{
+    int node;
+    int parent;
+
+    public Pair(int node, int parent)
     {
-        if(parent[node] == node)    return node;
-
-        return parent[node] = findUParent(parent[node]);
-    }
-
-    private void unionBySize(int u, int v)
-    {
-        int uParentU = findUParent(u);
-        int uParentV = findUParent(v);
-
-        if(uParentU == uParentV)    return;
-        parent[uParentU] = uParentV;
+        this.node = node;
+        this.parent = parent;
     }
 }
