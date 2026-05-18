@@ -1,87 +1,65 @@
 class Solution {
-    int[] parent;
-    int[] rank;
-    int[] size;
+    List<Integer> parent = new ArrayList<>();
+    List<Integer> size = new ArrayList<>();
+
+    //findParent and union functions are crucial
+    //size always number of nodes connected to the node
     public int[] findRedundantConnection(int[][] edges) {
-        int n = edges.length;
-        parent = new int[n + 1];
-        rank = new int[n + 1];
-        size = new int[n + 1];
-        
-        for(int i = 1; i <= n; i++)
+        int n = edges.length; //number of nodes
+        for(int i = 0; i <= n; i++)
         {
-            parent[i] = i;
-            rank[i] = 0;
-            size[i] = 1;
+            size.add(1);
+            parent.add(i);
         }
 
-        for(int i = 0; i < n; i++)
+
+        int lastIndex = -1;
+        for(int i = 0; i < edges.length; i++)
         {
-            int u = edges[i][0];
-            int v = edges[i][1];
-            int uParentU = findUParent(u);
-            int uParentV = findUParent(v);
-
-            if(uParentU == uParentV)    return edges[i];
-
-            // unionByRank(u, v, rank);
-            unionBySize(u, v);
+            if(!union(edges[i][0], edges[i][1]))
+            {
+                lastIndex = i;
+            }
         }
 
-        return new int[0];
+        return edges[lastIndex];
+
     }
 
 
-    public int findUParent(int node)
+    private boolean union(int u, int v)
     {
-        if(parent[node] == node)    return node;
-
-        return parent[node] = findUParent(parent[node]);
-    }
-
-    public void union(int u, int v) //simple union not by rank or size
-    {
-        int uParentU = findUParent(u);
-        int uParentV = findUParent(v);
-
-        parent[uParentU] = uParentV;
-    }
-    
-    public void unionByRank(int u, int v, int[] rank) //union by rank 
-    {
-        int uParentU = findUParent(u);
-        int uParentV = findUParent(v);
-        if(uParentU == uParentV)    return;
-        if(rank[uParentU] < rank[uParentV])
+        int ulu = findUparent(u);
+        int ulv = findUparent(v);
+        if(ulu == ulv)
         {
-            parent[uParentU] = uParentV;
+            return false;
         }
-        else if(rank[uParentU] > rank[uParentV])
+        if(size.get(ulu) <= size.get(ulv))
         {
-            parent[uParentV] = uParentU;
+            //connect u to v
+            parent.set(ulu, ulv);
+            size.set(ulv, size.get(ulv) + size.get(ulv));
         }
         else
         {
-            parent[uParentV] = uParentU;
-            rank[uParentU] = rank[uParentU] + 1;
+            //connect v to u
+            parent.set(ulv, ulu);
+            size.set(ulu, size.get(ulv) + size.get(ulv));
         }
+        return true;
     }
 
-    private void unionBySize(int u, int v)
+    private int findUparent(int node)
     {
-        int ulParentU = findUParent(u);
-        int ulParentV = findUParent(v);
-
-        if(ulParentU == ulParentV)  return;
-
-        if(size[ulParentU] < size[ulParentV])   parent[ulParentU] = ulParentV;
-        else if(size[ulParentU] > size[ulParentV]) parent[ulParentV] = ulParentU;
-        else
+        if(parent.get(node) == node)
         {
-            parent[ulParentV] = ulParentU;
-            size[ulParentU] =  size[ulParentU] +  size[ulParentV]; 
+            return node;
         }
+
+        int ulp = findUparent(parent.get(node));
+        //path compression
+        parent.set(node, ulp);
+        return parent.get(node);
     }
-
-
 }
