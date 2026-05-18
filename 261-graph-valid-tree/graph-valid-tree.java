@@ -1,66 +1,58 @@
 class Solution {
+
     public boolean validTree(int n, int[][] edges) {
-        
+
+        // tree must have exactly n-1 edges
+        if (edges.length != n - 1) {
+            return false;
+        }
+
         List<List<Integer>> graph = new ArrayList<>();
 
-        for(int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             graph.add(new ArrayList<>());
         }
 
-        for(int i = 0; i < edges.length; i++)
-        {
-            int a = edges[i][0];
-            int b = edges[i][1];
+        for (int[] edge : edges) {
+
+            int a = edge[0];
+            int b = edge[1];
+
             graph.get(a).add(b);
             graph.get(b).add(a);
         }
 
-        //now detect a cycle
-        Deque<Pair> q = new ArrayDeque<>();
-        int[] visited = new int[n];
-        q.offer(new Pair(0, - 1));
-        visited[0] = 1;
-        while(!q.isEmpty())
-        {
-            Pair cur = q.poll();
-            int cNode = cur.node;
-            int parent = cur.parent;
+        Queue<Integer> q = new LinkedList<>();
 
-            for(int i = 0; i < graph.get(cNode).size(); i++)
-            {
-                int nei = graph.get(cNode).get(i);
-                if(visited[nei] == 0)
-                {
-                    visited[nei] = 1;
-                    q.offer(new Pair(nei, cNode));
-                }
-                else if(nei != parent)
-                {
-                    return false;
+        boolean[] visited = new boolean[n];
+
+        q.offer(0);
+
+        visited[0] = true;
+
+        while (!q.isEmpty()) {
+
+            int node = q.poll();
+
+            for (int nei : graph.get(node)) {
+
+                if (!visited[nei]) {
+
+                    visited[nei] = true;
+
+                    q.offer(nei);
                 }
             }
         }
 
-        for(int i = 0; i < n; i++)
-        {
-            if(visited[i] == 0)
-            {
+        // all nodes must be connected
+        for (boolean v : visited) {
+
+            if (!v) {
                 return false;
             }
         }
+
         return true;
-
-    }
-}
-
-class Pair{
-    int node;
-    int parent;
-
-    public Pair(int node, int parent)
-    {
-        this.node = node;
-        this.parent = parent;
     }
 }
