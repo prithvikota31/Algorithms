@@ -45,7 +45,7 @@ class Solution {
         {
             //connect v to u
             parent.set(ulv, ulu);
-            size.set(ulu, size.get(ulv) + size.get(ulv));
+            size.set(ulu, size.get(ulu) + size.get(ulv));
         }
         return true;
     }
