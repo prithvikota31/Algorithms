@@ -1,44 +1,39 @@
 class Solution {
     public int minEatingSpeed(int[] piles, int h) {
-        //oiles.length <= h
-        //find upperLimit k
-
-        int upperK = Integer.MIN_VALUE;
-        for(int pile: piles)
-        {
-            upperK = Math.max(upperK, pile);
-        }
-        //do binary search to find min K
+        //piles.length <= h, so always possible
+        //max hours is piles.length
+        //we need to find proper k between range, 1 to max
         int low = 1;
-        int high = upperK;
-        int ans = Integer.MAX_VALUE;
+        int high = 0;
+
+        for(int p: piles)
+        {
+            high = Math.max(high, p);
+        }
+
+        int k = high;
         while(low <= high)
         {
             int mid = low + (high - low) / 2;
-            if(calculateTime(piles, mid) <= (long)h)
+
+            //calculate hours using mid speed
+            long hrs = 0;
+            for(int pile : piles)
             {
-                ans = mid;
-                high = mid - 1;
+                hrs += (pile + mid - 1) / mid;
             }
-            else
+
+            if(hrs > h)
             {
                 low = mid + 1;
             }
+            else
+            {
+                k = Math.min(k, mid);
+                high = mid - 1;
+            }
         }
-
-        return ans;
+        return k;
 
     }
-
-
-    private long calculateTime(int[] piles, int k) {
-        long total = 0;
-        for (int pile : piles) {
-            total += (pile + (long)k - 1) / k;  // integer ceil, no double
-        }
-        return total;
-    }
-
-
-
 }
