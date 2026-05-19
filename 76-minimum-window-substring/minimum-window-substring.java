@@ -1,39 +1,51 @@
 class Solution {
     public String minWindow(String s, String t) {
-        int[] hash = new int[256];
+        //expand window outard and then shrink
 
+        int m = s.length();
+        int n = t.length();
+
+        if(n > m)   return "";
+
+        
+        int[] freq = new int[128];
         for(char c: t.toCharArray())
         {
-            hash[c]++;
+            freq[c]++;
         }
+        int checksNeeded = t.length();
 
-        int r = 0, l = 0, minLen = Integer.MAX_VALUE, startIndex = -1;
-        int count = 0;
-        int required = t.length();
-        while(r < s.length())
+        int start = 0;
+        int minLength = Integer.MAX_VALUE;
+        int startIndex = 0;
+        for(int end = 0; end < s.length(); end++)
         {
-            char rc = s.charAt(r);
-            if(hash[rc] > 0)
+            if(freq[s.charAt(end)] > 0) //we still need them
             {
-                count++;
+                checksNeeded--;
             }
-            hash[s.charAt(r)]--;
+            freq[s.charAt(end)]--;
 
-            while(count == required){
-                if(r - l + 1 < minLen)
+            while(checksNeeded == 0)
+            {
+                if(end - start + 1 < minLength)
                 {
-                    minLen = r - l + 1;
-                    startIndex = l;
+                    minLength = end - start + 1;
+                    startIndex = start;
                 }
-                char lc = s.charAt(l);
-                hash[lc]++;
-                l++;
-                if(hash[lc] > 0)   count--;
-            }
 
-            r++;
+                //try to reduce from forward
+                if(freq[s.charAt(start)] >= 0)
+                {
+                    checksNeeded++;
+                }
+
+                freq[s.charAt(start)]++;
+                start++;
+            }
         }
 
-        return startIndex == -1? "" : s.substring(startIndex, startIndex + minLen);
+        if(minLength == Integer.MAX_VALUE)  return "";
+        else return s.substring(startIndex, startIndex + minLength);
     }
 }
