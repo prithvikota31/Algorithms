@@ -1,76 +1,49 @@
-/**
- * Definition for singly-linked list.
- * public class ListNode {
- *     int val;
- *     ListNode next;
- *     ListNode() {}
- *     ListNode(int val) { this.val = val; }
- *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
- * }
- */
 class Solution {
     public ListNode reverseKGroup(ListNode head, int k) {
-        Tuple curTuple = reverse(head, k);
-        ListNode result = curTuple.head;
-        while(curTuple.nextNode != null)
-        {
-            Tuple tempTuple = reverse(curTuple.nextNode, k);
-            curTuple.tail.next = tempTuple.head;
-            curTuple = tempTuple;
+
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+
+        ListNode groupPrev = dummy;
+
+        ListNode kth = getKth(groupPrev, k);
+
+        while (kth != null) {
+
+            ListNode groupNext = kth.next;
+
+            // Reverse current k-group
+            ListNode prev = groupNext;
+            ListNode curr = groupPrev.next;
+
+            while (curr != groupNext) {
+                ListNode temp = curr.next;
+                curr.next = prev;
+                prev = curr;
+                curr = temp;
+            }
+
+            // Reconnect
+            ListNode oldGroupHead = groupPrev.next;
+
+            groupPrev.next = kth;
+
+            groupPrev = oldGroupHead;
+
+            // Move to next group
+            kth = getKth(groupPrev, k);
         }
 
-        return result;
+        return dummy.next;
     }
 
-    public Tuple reverse(ListNode head, int k)
-    {
-        ListNode originalHead = head;
-        ListNode prev = null;
-        ListNode cur = head;
+    private ListNode getKth(ListNode curr, int k) {
 
-        for(int i = 0; i < k; i++)
-        {
-            if(cur != null)
-            {
-                cur = cur.next;
-            }
-            else
-            {
-                return new Tuple(head, null, null);
-            }
-        }
-        cur = head;
-
-        int i = 0;
-        while(cur != null && i < k)
-        {
-            ListNode temp = cur.next;
-            cur.next = prev;
-            prev = cur;
-            cur = temp;
-            i++;
+        while (curr != null && k > 0) {
+            curr = curr.next;
+            k--;
         }
 
-        if(i == k)
-        {
-            return new Tuple(prev, originalHead, cur);
-        }
-        else
-        {
-            return new Tuple(head, null, null);
-        }
-    }
-}
-
-class Tuple{
-    ListNode head;
-    ListNode tail;
-    ListNode nextNode;
-
-    public Tuple(ListNode head, ListNode tail, ListNode nextNode)
-    {
-        this.head = head;
-        this.tail = tail;
-        this.nextNode = nextNode;
+        return curr;
     }
 }
