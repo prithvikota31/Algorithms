@@ -17,9 +17,7 @@ class Solution {
 
         for(int i = 0; i < k; i++)
         {
-            result[i][0] = pq.peek()[0];
-            result[i][1] = pq.peek()[1];
-            pq.poll();
+            result[i] = pq.poll();
         }
 
         return result;
