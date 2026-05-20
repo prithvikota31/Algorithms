@@ -1,40 +1,28 @@
 class Solution {
     public int[][] kClosest(int[][] points, int k) {
-        PriorityQueue<int[]> maxHeap = new PriorityQueue<>((a, b)->Integer.compare(
-                                                                        b[0]*b[0] + b[1]*b[1],
-                                                                        a[0]*a[0] + a[1]*a[1]
-                                                                    ));
+        int[][] result = new int[k][2];
+
+        // use minheap to keep k size and k closest points
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) 
+                                    -> ((b[1] * b[1] + b[0] * b[0]) - (a[1] * a[1] + a[0] * a[0])));
+        
         for(int[] point: points)
         {
-            maxHeap.offer(new int[]{point[0], point[1]});
-            if(maxHeap.size() > k)
+            pq.offer(point);
+            if(pq.size() > k)
             {
-                maxHeap.remove();
+                pq.poll();
             }
         }
 
-        int[][] result = new int[k][2];
-
-        //k <= points.length
-        for(int i = 0;  i < k; i++)
+        for(int i = 0; i < k; i++)
         {
-            result[i] = maxHeap.poll();
+            result[i][0] = pq.peek()[0];
+            result[i][1] = pq.peek()[1];
+            pq.poll();
         }
 
         return result;
-        
 
-    }
-
-
-}
-
-class Pair{
-    int x;
-    int y;
-    public Pair(int x, int y)
-    {
-        this.x = x;
-        this.y = y;
     }
 }
