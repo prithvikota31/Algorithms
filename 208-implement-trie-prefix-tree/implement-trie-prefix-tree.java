@@ -35,7 +35,7 @@ class Trie {
         }
         
 
-        return node.isFlagSet();
+        return node.isEnd();
 
     }
     
@@ -86,7 +86,7 @@ class Node{
     {
         flag = true;
     }
-    public boolean isFlagSet()
+    public boolean isEnd()
     {
         return flag;
     }
