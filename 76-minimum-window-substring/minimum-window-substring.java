@@ -1,51 +1,54 @@
 class Solution {
     public String minWindow(String s, String t) {
-        //expand window outard and then shrink
-
         int m = s.length();
         int n = t.length();
 
         if(n > m)   return "";
 
-        
         int[] freq = new int[128];
+
         for(char c: t.toCharArray())
         {
-            freq[c]++;
+            freq[c]++; 
         }
-        int checksNeeded = t.length();
 
         int start = 0;
         int minLength = Integer.MAX_VALUE;
-        int startIndex = 0;
-        for(int end = 0; end < s.length(); end++)
+        int checksNeeded = n;
+        int finalStartIndex = 0;
+        for(int end = 0; end < m; end++)
         {
-            if(freq[s.charAt(end)] > 0) //we still need them
+            char ch = s.charAt(end);
+            if(freq[ch] > 0)
             {
                 checksNeeded--;
             }
-            freq[s.charAt(end)]--;
+            freq[ch]--;
 
             while(checksNeeded == 0)
             {
                 if(end - start + 1 < minLength)
                 {
                     minLength = end - start + 1;
-                    startIndex = start;
+                    finalStartIndex = start;
                 }
-
-                //try to reduce from forward
-                if(freq[s.charAt(start)] >= 0)
+                int startChar = s.charAt(start);
+                if(freq[startChar] >= 0)
                 {
                     checksNeeded++;
                 }
-
-                freq[s.charAt(start)]++;
+                freq[startChar]++;
                 start++;
             }
         }
 
-        if(minLength == Integer.MAX_VALUE)  return "";
-        else return s.substring(startIndex, startIndex + minLength);
+        if(minLength == Integer.MAX_VALUE)
+        {
+            return "";
+        }
+
+        return s.substring(finalStartIndex, finalStartIndex + minLength);
+
+        
     }
 }
