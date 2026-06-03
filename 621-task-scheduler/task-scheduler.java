@@ -1,38 +1,46 @@
 class Solution {
     public int leastInterval(char[] tasks, int n) {
-        Map<Character, Integer> map = new HashMap<>();
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a,b)-> b - a);
 
-        for(char t: tasks)
+        int[] freqArray = new int[26];
+
+        for(char c : tasks)
         {
-            map.put(t, map.getOrDefault(t, 0) + 1);
+            freqArray[c - 'A']++;
         }
-        PriorityQueue<Integer> maxHeap =
-            new PriorityQueue<>(Collections.reverseOrder());
-        maxHeap.addAll(map.values());
 
-        
-        int time = 0;
-        while(!maxHeap.isEmpty())
+        for(int freq : freqArray)
         {
-            List<Integer> temp = new ArrayList<>();
-            for(int i = 0; i <= n; i++) //n + 1 values
+            if(freq > 0)
             {
-                if(!maxHeap.isEmpty())  
+                maxHeap.offer(freq);
+            }
+        }
+
+        Queue<int[]> cooldown = new LinkedList<>();
+        int time = 0;
+
+        while(!maxHeap.isEmpty() || !cooldown.isEmpty())
+        {
+            time++;
+            if(!maxHeap.isEmpty())
+            {
+                int cnt = maxHeap.poll();
+                cnt--;
+                if(cnt > 0)
                 {
-                    temp.add(maxHeap.poll() - 1); // 0s can go into it
+                    cooldown.offer(new int[]{cnt, time + n});
                 }
             }
 
-            for(int i = 0; i < temp.size(); i++)
+            if(!cooldown.isEmpty() && cooldown.peek()[1] == time)
             {
-                if(temp.get(i) != 0)
-                    maxHeap.offer(temp.get(i));
+                maxHeap.offer(cooldown.poll()[0]);
             }
-            time +=  (maxHeap.isEmpty())? temp.size() : n + 1; // n + 1 or if maxheap is empty then temp.size()
+
         }
 
-
         return time;
-
+        
     }
 }
