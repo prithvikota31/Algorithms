@@ -1,22 +1,25 @@
 class Solution {
     public String minWindow(String s, String t) {
-        int m = s.length();
-        int n = t.length();
-
-        if(n > m)   return "";
-
         int[] freq = new int[128];
 
-        for(char c: t.toCharArray())
+        int sl = s.length();
+        int tl = t.length();
+
+        if(tl > sl) return "";
+
+        int checksNeeded = 0;
+        for(char ch: t.toCharArray())
         {
-            freq[c]++; 
+            freq[ch]++;
+            checksNeeded++;
         }
+
+        //now sweep through s
 
         int start = 0;
         int minLength = Integer.MAX_VALUE;
-        int checksNeeded = n;
-        int finalStartIndex = 0;
-        for(int end = 0; end < m; end++)
+        int startIndex = 0;
+        for(int end = 0; end < sl; end++)
         {
             char ch = s.charAt(end);
             if(freq[ch] > 0)
@@ -30,14 +33,16 @@ class Solution {
                 if(end - start + 1 < minLength)
                 {
                     minLength = end - start + 1;
-                    finalStartIndex = start;
+                    startIndex = start;
                 }
-                int startChar = s.charAt(start);
-                if(freq[startChar] >= 0)
+
+                //try to reduce from forward
+                if(freq[s.charAt(start)] >= 0)
                 {
                     checksNeeded++;
                 }
-                freq[startChar]++;
+
+                freq[s.charAt(start)]++;
                 start++;
             }
         }
@@ -47,8 +52,6 @@ class Solution {
             return "";
         }
 
-        return s.substring(finalStartIndex, finalStartIndex + minLength);
-
-        
+        return s.substring(startIndex, startIndex + minLength);
     }
 }
