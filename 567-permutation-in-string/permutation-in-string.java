@@ -1,44 +1,39 @@
 class Solution {
     public boolean checkInclusion(String s1, String s2) {
+        int m = s1.length();
+        int n = s2.length();
 
-        // Impossible case
-        if (s1.length() > s2.length()) {
-            return false;
+        if(m > n)   return false;
+
+        int[] freq = new int[26];
+        int checksNeeded = 0;
+        for(char ch: s1.toCharArray())
+        {
+            freq[ch - 'a']++;
+            checksNeeded++;
         }
 
-        int[] s1Freq = new int[26];
-        int[] windowFreq = new int[26];
-
-        // Build frequency for s1
-        for (char c : s1.toCharArray()) {
-            s1Freq[c - 'a']++;
-        }
-
-        int windowSize = s1.length();
-
-        // Build first window
-        for (int i = 0; i < windowSize; i++) {
-            windowFreq[s2.charAt(i) - 'a']++;
-        }
-
-        // Check first window
-        if (Arrays.equals(s1Freq, windowFreq)) {
-            return true;
-        }
-
-        // Slide the window
-        for (int right = windowSize; right < s2.length(); right++) {
-
-            // Add new character
-            windowFreq[s2.charAt(right) - 'a']++;
-
-            // Remove left character
-            windowFreq[s2.charAt(right - windowSize) - 'a']--;
-
-            // Compare frequencies
-            if (Arrays.equals(s1Freq, windowFreq)) {
-                return true;
+        int start = 0;
+        for(int end = 0; end < n; end++)
+        {
+            if(freq[s2.charAt(end) - 'a'] > 0)
+            {
+                checksNeeded--;
             }
+            freq[s2.charAt(end) - 'a']--;
+
+            if(end - start + 1 > m) //substring length - make it m
+            {
+                if(freq[s2.charAt(start) - 'a'] >= 0)
+                {
+                    checksNeeded++;
+                }
+                freq[s2.charAt(start) - 'a']++;
+                start++;
+            }
+
+            if(checksNeeded == 0)   return true;
+
         }
 
         return false;
