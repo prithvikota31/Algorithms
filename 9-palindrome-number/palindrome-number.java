@@ -1,20 +1,18 @@
 class Solution {
     public boolean isPalindrome(int x) {
-        if(x < 0)   return false;
-        long result = 0;
-        long current = (long)x;
+        // Negative numbers cannot be palindromes because of the '-' sign.
+        if (x < 0) return false;
 
-        while(current != 0)
-        {
-            result = result * 10 + (current % 10);
-            current = current / 10;
+        long reversed = 0;
+        long current = x;
+
+        // Reverse the digits of x.
+        while (current != 0) {
+            reversed = reversed * 10 + current % 10;
+            current /= 10;
         }
 
-        if(result == (long)x)
-        {
-            return true;
-        }
-        else
-            return false;
+        // Palindrome if reversed number equals original number.
+        return reversed == x;
     }
 }
