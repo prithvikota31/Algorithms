@@ -13,9 +13,11 @@ class Trie {
             {
                 node.setKey(ch, new Node());
             }
-            node = node.get(ch); //next node this current char link points to
+
+            node = node.getKey(ch);
         }
 
+        //now last node (n + 1), flag should be set, so far 'n' length path is traversed
         node.setFlag();
     }
     
@@ -24,19 +26,14 @@ class Trie {
         for(int i = 0; i < word.length(); i++)
         {
             char ch = word.charAt(i);
-            if(node.containsKey(ch)){
-                node = node.get(ch);
-            }
-            else
+            if(!node.containsKey(ch))
             {
                 return false;
             }
-
+            node = node.getKey(ch);
         }
-        
 
         return node.isEnd();
-
     }
     
     public boolean startsWith(String prefix) {
@@ -44,14 +41,11 @@ class Trie {
         for(int i = 0; i < prefix.length(); i++)
         {
             char ch = prefix.charAt(i);
-            if(node.containsKey(ch))
-            {
-                node = node.get(ch);
-            }
-            else
+            if(!node.containsKey(ch))
             {
                 return false;
             }
+            node = node.getKey(ch);
         }
 
         return true;
@@ -60,24 +54,22 @@ class Trie {
 
 class Node{
     Node[] links = new Node[26];
-    boolean flag = false;
+    boolean flag;
 
-    public Node()
-    {
-
+    public Node(){
     }
 
     public boolean containsKey(char ch)
     {
-        return (links[ch - 'a'] != null);
+        return links[ch - 'a'] != null;
     }
 
     public void setKey(char ch, Node node)
     {
-        links[ch- 'a'] = node;
+        links[ch - 'a'] = node;
     }
 
-    public Node get(char ch)
+    public Node getKey(char ch)
     {
         return links[ch - 'a'];
     }
@@ -90,8 +82,6 @@ class Node{
     {
         return flag;
     }
-
-
 }
 
 /**
