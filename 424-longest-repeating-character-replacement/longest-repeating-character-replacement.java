@@ -18,9 +18,11 @@ class Solution {
                 //move start
                 freq[s.charAt(start) - 'A']--;
                 start++;
-                continue;
             }
-            maxLength = Math.max(maxLength, len);
+            else
+            {
+                maxLength = Math.max(maxLength, len);
+            }
         }
         return maxLength;
     }
