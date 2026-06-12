@@ -13,44 +13,46 @@ class WordDictionary {
             {
                 node.setKey(ch, new Node());
             }
-            node = node.get(ch);
+
+            node = node.getKey(ch);
         }
 
         node.setEnd();
     }
     
     public boolean search(String word) {
-        return dfsSearch(root, word, 0);
+        return dfs(0, word, root);
     }
 
-    public boolean dfsSearch(Node node, String word, int ind)
+    private boolean dfs(int index, String word, Node node)
     {
-        if(ind == word.length())
+        if(index == word.length())
         {
             return node.isEnd();
         }
 
-        char ch = word.charAt(ind);
-        if(ch != '.')
+        char currentChar = word.charAt(index);
+        if(currentChar != '.') 
         {
-            if(!node.containsKey(ch))
+            if(node.containsKey(currentChar))
             {
-                return false;
+                return dfs(index + 1, word, node.getKey(currentChar));
             }
             else
             {
-                return dfsSearch(node.get(ch), word, ind + 1);
+                return false;
             }
         }
-        else
+        else //loop all possibilites
         {
-            for(int i = 0; i < node.links.length; i++)
+            for(Node nextNode: node.links)
             {
-                char c = (char)(i + 'a');
-                if(node.containsKey(c))
+                if(nextNode != null)
                 {
-                    if(dfsSearch(node.get(c), word, ind + 1))
+                    if(dfs(index + 1, word, nextNode))
+                    {
                         return true;
+                    }
                 }
             }
         }
@@ -61,16 +63,12 @@ class WordDictionary {
 
 class Node{
     Node[] links = new Node[26];
-    boolean flag = false;
+    boolean flag;
 
-    public Node()
-    {
-
-    }
 
     public boolean containsKey(char ch)
     {
-        return (links[ch - 'a'] != null);
+        return links[ch - 'a'] != null;
     }
 
     public void setKey(char ch, Node node)
@@ -78,20 +76,20 @@ class Node{
         links[ch - 'a'] = node;
     }
 
-    public Node get(char ch)
-    {
-        return links[ch - 'a'];
-    }
     public void setEnd()
     {
         flag = true;
+    }
+
+    public Node getKey(char ch)
+    {
+        return links[ch - 'a'];
     }
 
     public boolean isEnd()
     {
         return flag;
     }
-
 }
 
 /**
