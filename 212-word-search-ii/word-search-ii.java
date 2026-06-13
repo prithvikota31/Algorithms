@@ -1,93 +1,102 @@
 class Solution {
-    Node root = new Node();
-    
-    public List<String> findWords(char[][] board, String[] words) {
-        Set<String> set = new HashSet<>();
-        int m = board.length;
-        int n = board[0].length;
 
-        for(String word : words)
+    Node root = new Node();
+    public void addWord(String word)
+    {
+        Node node = root;
+        for(int i = 0; i < word.length(); i++)
         {
-            addWord(word);
+            char ch = word.charAt(i);
+            if(!node.containsKey(ch))
+            {
+                node.setKey(ch, new Node());
+            }
+
+            node = node.getKey(ch);
         }
 
+        node.word = word;
+    }
+    public List<String> findWords(char[][] board, String[] words) {
+        //create a trie, and then do dfs from each cell
+        for(String s: words)
+        {
+            addWord(s);
+        }
+
+        int m = board.length;
+        int n = board[0].length;
+        
+        int[] delRow = {0, 1, 0, -1};
+        int[] delCol = {-1, 0, 1, 0};
+
+        Set<String> ans = new HashSet<>();
         for(int i = 0; i < m; i++)
         {
             for(int j = 0; j < n; j++)
             {
-                dfs(board, set, root, i, j);
+                dfs(board, ans, i, j, root, delRow, delCol);
             }
         }
 
-        return new ArrayList<>(set);
+        return new ArrayList<>(ans);
     }
 
-    public void addWord(String word)
+    public void dfs(char[][] board, Set<String> ans, int row, int col, Node node,
+                    int[] delRow,  int[] delCol)
     {
-        int l = word.length();
-        Node curr = root;
-        for(int i = 0; i < l; i++)
+        
+
+        if(node.word != null)
         {
-            char c = word.charAt(i);
-            if(!curr.containsKey(c))
-            {
-                curr.put(c, new Node());
-            }
-            curr = curr.get(c);
+            ans.add(node.word);
         }
 
-        curr.word = word;
-    }
-
-    public void dfs(char[][] board, Set<String> ans,  Node root, int row, int col)
-    {
-        if(row < 0 || row >= board.length || col < 0 || col >= board[0].length || board[row][col] == '*')
+        
+        if(!(row >= 0 && row < board.length && col >= 0 && col < board[0].length && board[row][col] != 'X'))
         {
             return;
         }
 
-        char c = board[row][col];
+        char ch = board[row][col];
 
-        if(!root.containsKey(c))
+        if(!node.containsKey(ch)) //node doesn't contain ch return
         {
             return;
         }
 
-        Node curr = root.get(c);
 
-        if(curr.word != null)
+        
+        char origChar = board[row][col];
+        board[row][col] = 'X';
+        for(int i = 0; i < delRow.length; i++)
         {
-            ans.add(curr.word);
+            int nRow = row + delRow[i];
+            int nCol = col + delCol[i];
+            dfs(board, ans, nRow, nCol, node.getKey(ch), delRow, delCol);     
         }
+        board[row][col] = origChar;
 
-        board[row][col] = '*';
+    }
+}
 
-        dfs(board, ans, curr, row, col + 1);
-        dfs(board, ans, curr, row, col - 1);
-        dfs(board, ans, curr, row + 1, col);
-        dfs(board, ans, curr, row - 1, col);
+class Node{
+    Node[] links = new Node[26];
+    String word = null;
 
-        board[row][col] = c;
+    public boolean containsKey(char ch)
+    {
+        return links[ch - 'a'] != null;
     }
 
-    class Node{
-        Node[] links = new Node[26];
-        String word = null;
+    public Node getKey(char ch)
+    {
+        return links[ch - 'a'];
+    }
 
-        public boolean containsKey(char key)
-        {
-            return links[key - 'a'] != null;
-        }
-
-        public Node get(char key)
-        {
-            return links[key - 'a'];
-        }
-
-        public void put(char key, Node value)
-        {
-            links[key - 'a'] = value;
-        }
+    public void setKey(char ch, Node node)
+    {
+        links[ch - 'a'] = node;
     }
 
 
