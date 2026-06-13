@@ -43,38 +43,40 @@ class Solution {
     }
 
     public void dfs(char[][] board, Set<String> ans, int row, int col, Node node,
-                    int[] delRow,  int[] delCol)
-    {
+                int[] delRow, int[] delCol) {
+
         char ch = board[row][col];
 
-
-
-        if(!node.containsKey(ch)) //node doesn't contain ch return
-        {
+        // If current board char is not a valid next trie path, stop.
+        if (!node.containsKey(ch)) {
             return;
         }
 
-        
-        char origChar = board[row][col];
-        board[row][col] = 'X';
+        // Move trie pointer to the node representing this board character.
+        node = node.getKey(ch);
 
-        Node nNode = node.getKey(ch);
-        if(nNode.word != null)
-        {
-            ans.add(nNode.word);
+        // If a word ends here, collect it.
+        if (node.word != null) {
+            ans.add(node.word);
         }
-        for(int i = 0; i < delRow.length; i++)
-        {
+
+        // Mark visited so same cell is not reused in this DFS path.
+        board[row][col] = '#';
+
+        for (int i = 0; i < 4; i++) {
             int nRow = row + delRow[i];
             int nCol = col + delCol[i];
 
-            if(nRow >= 0 && nRow < board.length && nCol >= 0 && nCol < board[0].length && board[nRow][nCol] != 'X')
-            {
-                dfs(board, ans, nRow, nCol, nNode, delRow, delCol);
-            }       
-        }
-        board[row][col] = origChar;
+            if (nRow >= 0 && nRow < board.length &&
+                nCol >= 0 && nCol < board[0].length &&
+                board[nRow][nCol] != '#') {
 
+                dfs(board, ans, nRow, nCol, node, delRow, delCol);
+            }
+        }
+
+        // Restore board for other DFS paths.
+        board[row][col] = ch;
     }
 }
 
