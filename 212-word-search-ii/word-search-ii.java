@@ -45,14 +45,26 @@ class Solution {
     public void dfs(char[][] board, Set<String> ans, int row, int col, Node node,
                     int[] delRow,  int[] delCol)
     {
+        
+
+        if(node.word != null)
+        {
+            ans.add(node.word);
+        }
+
+        
+        if(!(row >= 0 && row < board.length && col >= 0 && col < board[0].length && board[row][col] != 'X'))
+        {
+            return;
+        }
+
         char ch = board[row][col];
-
-
 
         if(!node.containsKey(ch)) //node doesn't contain ch return
         {
             return;
         }
+
 
         
         char origChar = board[row][col];
@@ -61,15 +73,7 @@ class Solution {
         {
             int nRow = row + delRow[i];
             int nCol = col + delCol[i];
-            Node nNode = node.getKey(ch);
-            if(nNode.word != null)
-            {
-                ans.add(nNode.word);
-            }
-            if(nRow >= 0 && nRow < board.length && nCol >= 0 && nCol < board[0].length && board[nRow][nCol] != 'X')
-            {
-                dfs(board, ans, nRow, nCol, node.getKey(ch), delRow, delCol);
-            }       
+            dfs(board, ans, nRow, nCol, node.getKey(ch), delRow, delCol);     
         }
         board[row][col] = origChar;
 
