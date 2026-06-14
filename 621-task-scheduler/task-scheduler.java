@@ -2,43 +2,48 @@ class Solution {
     public int leastInterval(char[] tasks, int n) {
         int[] freq = new int[26];
 
-        for(char t: tasks)
-        {
-            freq[t - 'A']++;
+        // Count how many times each task appears.
+        for (char task : tasks) {
+            freq[task - 'A']++;
         }
 
-        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> Integer.compare(b, a));
+        // Max heap = tasks that are available to run now.
+        // We always pick the task with the highest remaining count.
+        PriorityQueue<Integer> maxHeap =
+            new PriorityQueue<>((a, b) -> Integer.compare(b, a));
 
-        for(int f: freq)
-        {
-            if(f > 0)
-            {
-                maxHeap.offer(f);
+        for (int count : freq) {
+            if (count > 0) {
+                maxHeap.offer(count);
             }
         }
 
-        //“Continue the simulation until there are no runnable tasks and no waiting tasks.”
-        Queue<int[]> q = new LinkedList<>(); // to store items which needs cooldown, int[] = {a, b}
+        // cooldownQueue = tasks waiting for cooldown to finish.
+        // int[] = {remainingCount, readyTime}
+        Queue<int[]> cooldownQueue = new LinkedList<>();
+
         int time = 0;
-        while(!q.isEmpty() || !maxHeap.isEmpty())
-        {
+
+        // Continue until no runnable tasks and no cooling tasks remain.
+        while (!maxHeap.isEmpty() || !cooldownQueue.isEmpty()) {
             time++;
-            if(!maxHeap.isEmpty())
-            {
-                int elementFreq = maxHeap.poll();
-                elementFreq--;
-                if(elementFreq > 0) // needs cooldown
-                {
-                    q.offer(new int[]{elementFreq, time + n});
+
+            // Run the most frequent available task.
+            if (!maxHeap.isEmpty()) {
+                int remainingCount = maxHeap.poll();
+                remainingCount--;
+
+                // If same task still remains, put it into cooldown.
+                if (remainingCount > 0) {
+                    cooldownQueue.offer(new int[] {remainingCount, time + n});
                 }
             }
 
-            while(!q.isEmpty() && time >= q.peek()[1])
-            {
-                int cooledDownFreq = q.poll()[0];
-                maxHeap.offer(cooledDownFreq);
+            // Move tasks whose cooldown is finished back into available heap.
+            while (!cooldownQueue.isEmpty() && time >= cooldownQueue.peek()[1]) {
+                int cooledDownCount = cooldownQueue.poll()[0];
+                maxHeap.offer(cooledDownCount);
             }
-
         }
 
         return time;
