@@ -10,8 +10,8 @@
  */
 class Solution {
     public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
-        ListNode result = new ListNode();
-        ListNode dummy = result;
+        ListNode finalNode = new ListNode();
+        ListNode dummy = finalNode;
 
         while(list1 != null && list2 != null)
         {
@@ -38,6 +38,6 @@ class Solution {
             dummy.next = list1;
         }
 
-        return result.next;
+        return finalNode.next;
     }
 }
