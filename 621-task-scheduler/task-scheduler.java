@@ -1,40 +1,48 @@
 class Solution {
     public int leastInterval(char[] tasks, int n) {
+        int l = tasks.length;
+
         int[] freq = new int[26];
-        for(char task: tasks)
+
+        for(char c : tasks)
         {
-            freq[task - 'A']++;
+            freq[c - 'A']++;
         }
 
-        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> (b - a));
-        for(int count: freq)
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a,b) -> b - a);
+
+        for(int f : freq)
         {
-            if(count > 0)
-                maxHeap.offer(count);
+            if(f > 0)
+            {
+                maxHeap.offer(f);
+            }
         }
-        Queue<int[]> queue = new LinkedList<>();
-        //use a queue to store tasks which are in cooldown
+
+        Queue<int[]> cooldown = new LinkedList<>();
         int time = 0;
-        while(!maxHeap.isEmpty() || !queue.isEmpty())
+
+        while(!maxHeap.isEmpty() || !cooldown.isEmpty())
         {
             time++;
             if(!maxHeap.isEmpty())
             {
-                int elementCount = maxHeap.poll();
-                elementCount--;
-                if(elementCount > 0) // still we need to schedule later, so keep it in cooldown
+                int cnt = maxHeap.poll();
+                cnt--;
+                if(cnt > 0)
                 {
-                    queue.offer(new int[]{elementCount, time + n}); // at the time we can add it into the heap
+                    cooldown.offer(new int[]{cnt, time + n});
                 }
             }
 
-            //now check queue if any cooldown element can be added
-            while(!queue.isEmpty() && time >= queue.peek()[1])
+            if(!cooldown.isEmpty() && cooldown.peek()[1] == time)
             {
-                maxHeap.offer(queue.poll()[0]);
+                maxHeap.offer(cooldown.poll()[0]);
             }
-        } 
+
+        }
 
         return time;
+ 
     }
 }
