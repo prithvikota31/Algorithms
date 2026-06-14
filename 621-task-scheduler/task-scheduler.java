@@ -1,17 +1,15 @@
 class Solution {
     public int leastInterval(char[] tasks, int n) {
-        int l = tasks.length;
-
         int[] freq = new int[26];
 
-        for(char c : tasks)
+        for(char t: tasks)
         {
-            freq[c - 'A']++;
+            freq[t - 'A']++;
         }
 
-        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a,b) -> b - a);
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> Integer.compare(b, a));
 
-        for(int f : freq)
+        for(int f: freq)
         {
             if(f > 0)
             {
@@ -19,30 +17,30 @@ class Solution {
             }
         }
 
-        Queue<int[]> cooldown = new LinkedList<>();
+        //“Continue the simulation until there are no runnable tasks and no waiting tasks.”
+        Queue<int[]> q = new LinkedList<>(); // to store items which needs cooldown, int[] = {a, b}
         int time = 0;
-
-        while(!maxHeap.isEmpty() || !cooldown.isEmpty())
+        while(!q.isEmpty() || !maxHeap.isEmpty())
         {
             time++;
             if(!maxHeap.isEmpty())
             {
-                int cnt = maxHeap.poll();
-                cnt--;
-                if(cnt > 0)
+                int elementFreq = maxHeap.poll();
+                elementFreq--;
+                if(elementFreq > 0) // needs cooldown
                 {
-                    cooldown.offer(new int[]{cnt, time + n});
+                    q.offer(new int[]{elementFreq, time + n});
                 }
             }
 
-            if(!cooldown.isEmpty() && cooldown.peek()[1] == time)
+            while(!q.isEmpty() && time >= q.peek()[1])
             {
-                maxHeap.offer(cooldown.poll()[0]);
+                int cooledDownFreq = q.poll()[0];
+                maxHeap.offer(cooledDownFreq);
             }
 
         }
 
         return time;
- 
     }
 }
