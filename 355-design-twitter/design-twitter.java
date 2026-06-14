@@ -1,126 +1,92 @@
-import java.util.*;
-
 class Twitter {
-
-    // Global timestamp to maintain tweet ordering
     private int timestamp = 0;
+    Map<Integer, Set<Integer>> followerToFollowees = new HashMap<>();
+    Map<Integer, List<Tweet>> usersToTweets = new HashMap<>();
+    public Twitter() {
 
-    // follower -> followees
-    private Map<Integer, Set<Integer>> followMap = new HashMap<>();
+    }
 
-    // user -> tweets
-    private Map<Integer, List<Tweet>> tweetMap = new HashMap<>();
-
-    class Tweet {
+    class Tweet{
         int tweetId;
-        int time;
-
-        Tweet(int tweetId, int time) {
+        int timestamp;
+        public Tweet(int tweetId, int timestamp)
+        {
             this.tweetId = tweetId;
-            this.time = time;
+            this.timestamp = timestamp;
         }
     }
-
-    public Twitter() {}
-
-    // Append tweet to user's tweet list
+    
     public void postTweet(int userId, int tweetId) {
-        tweetMap.putIfAbsent(userId, new ArrayList<>());
-        tweetMap.get(userId).add(
-            new Tweet(tweetId, timestamp++)
-        );
+        usersToTweets.putIfAbsent(userId, new ArrayList<>());
+        usersToTweets.get(userId).add(new Tweet(tweetId, timestamp++));
     }
-
-    // Add follow relationship
-    public void follow(int followerId, int followeeId) {
-        followMap.putIfAbsent(followerId, new HashSet<>());
-        followMap.get(followerId).add(followeeId);
-    }
-
-    // Remove follow relationship
-    public void unfollow(int followerId, int followeeId) {
-        if (followMap.containsKey(followerId)) {
-            followMap.get(followerId).remove(followeeId);
-        }
-    }
-
+    
     public List<Integer> getNewsFeed(int userId) {
-
-        List<Integer> result = new ArrayList<>();
-
-        // Gather all users whose tweets should appear
-        Set<Integer> users = new HashSet<>();
-        users.add(userId);
-
-        if (followMap.containsKey(userId)) {
-            users.addAll(followMap.get(userId));
+        List<Integer> newsFeed = new ArrayList<>();
+        Set<Integer> feedUserIds = new HashSet<>();
+        feedUserIds.add(userId); // need personal feed too 
+        if(followerToFollowees.containsKey(userId))
+        {
+            feedUserIds.addAll(followerToFollowees.get(userId));
         }
 
-        /*
-         * Max Heap Entry:
-         * [time, tweetId, userId, index]
-         *
-         * Used to perform a K-way merge of tweet lists.
-         */
-        PriorityQueue<int[]> maxHeap =
-            new PriorityQueue<>((a, b) -> b[0] - a[0]);
+        //create a maxheap
+        PriorityQueue<int[]> pqMaxHeap = new PriorityQueue<>((a, b) -> Integer.compare(b[0],a[0]));
 
-        // Push newest tweet from every relevant user
-        for (int user : users) {
+        //add max timestamp tweet from each user
+        // its present at end of list
+        for(int user: feedUserIds)
+        {
+           List<Tweet> userTweets =  usersToTweets.get(user);
 
-            List<Tweet> tweets = tweetMap.get(user);
-
-            if (tweets == null) {
-                continue;
-            }
-
-            int index = tweets.size() - 1;
-            Tweet tweet = tweets.get(index);
-
-            maxHeap.offer(
-                new int[]{
-                    tweet.time,
-                    tweet.tweetId,
-                    user,
-                    index
-                }
-            );
+           if(userTweets == null || userTweets.isEmpty())
+           {
+            continue;
+           }
+           int index = userTweets.size() - 1;
+           Tweet recentTweetOfUser = userTweets.get(index);
+           pqMaxHeap.offer(new int[]{recentTweetOfUser.timestamp, recentTweetOfUser.tweetId, index, user});
         }
 
-        /*
-         * Merge K sorted tweet lists:
-         * Pop newest tweet globally,
-         * then push the next older tweet
-         * from the same user.
-         */
-        while (!maxHeap.isEmpty() && result.size() < 10) {
+        //now user k map sorting type;
 
-            int[] curr = maxHeap.poll();
-
-            int tweetId = curr[1];
-            int user = curr[2];
-            int index = curr[3];
-
-            result.add(tweetId);
-
-            index--;
-
-            if (index >= 0) {
-
-                Tweet nextTweet =
-                    tweetMap.get(user).get(index);
-
-                maxHeap.offer(
-                    new int[]{
-                        nextTweet.time,
-                        nextTweet.tweetId,
-                        user,
-                        index
-                    }
-                );
+        while(!pqMaxHeap.isEmpty() && newsFeed.size() < 10)
+        {
+            int tweetId = pqMaxHeap.peek()[1];
+            newsFeed.add(tweetId);
+            int user = pqMaxHeap.peek()[3];
+            int nextIndex = pqMaxHeap.peek()[2] - 1;
+            
+            pqMaxHeap.poll();
+            if(nextIndex >= 0)
+            {
+                Tweet nextTweet = usersToTweets.get(user).get(nextIndex);
+                pqMaxHeap.offer(new int[]{nextTweet.timestamp, nextTweet.tweetId, nextIndex, user});
             }
         }
 
-        return result;
+        return newsFeed;
+
+    }
+    
+    public void follow(int followerId, int followeeId) {
+        followerToFollowees.putIfAbsent(followerId, new HashSet<>());
+        followerToFollowees.get(followerId).add(followeeId);
+    }
+    
+    public void unfollow(int followerId, int followeeId) {
+        if(followerToFollowees.containsKey(followerId))
+        {
+            followerToFollowees.get(followerId).remove(followeeId);
+        }
     }
 }
+
+/**
+ * Your Twitter object will be instantiated and called as such:
+ * Twitter obj = new Twitter();
+ * obj.postTweet(userId,tweetId);
+ * List<Integer> param_2 = obj.getNewsFeed(userId);
+ * obj.follow(followerId,followeeId);
+ * obj.unfollow(followerId,followeeId);
+ */
