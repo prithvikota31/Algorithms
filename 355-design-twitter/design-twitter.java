@@ -70,7 +70,7 @@ class Twitter {
 
             List<Tweet> tweets = tweetMap.get(user);
 
-            if (tweets == null || tweets.isEmpty()) {
+            if (tweets == null) {
                 continue;
             }
 
