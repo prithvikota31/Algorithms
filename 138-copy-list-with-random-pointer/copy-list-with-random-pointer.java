@@ -15,49 +15,61 @@ class Node {
 
 class Solution {
     public Node copyRandomList(Node head) {
-        if(head == null)    return null;
-        //interleave
+        if(head == null)
+        {
+            return null;
+        }
 
+        //interleave
+        // A -> B -> C
         Node cur = head;
         while(cur != null)
         {
-            Node curNext = cur.next;
+            Node temp = cur.next;
             Node copy = new Node(cur.val);
             cur.next = copy;
-            copy.next = curNext;
-            cur = curNext;
+            copy.next = temp;
+            cur = temp;
         }
 
-        //set random for copy
+        //connect random pointers
         cur = head;
+       
         while(cur != null)
         {
+            Node curCopy = cur.next;
             Node curRandom = cur.random;
-            Node copy = cur.next;
             if(curRandom != null)
             {
-                copy.random = curRandom.next;
+                curCopy.random = curRandom.next;
             }
-
             cur = cur.next.next;
+            
         }
 
-        // remove interleave
+
+        // Separate original and copied list
+        cur = head;
         Node copyHead = head.next;
 
-        Node result = copyHead;
-        cur = head;
+        while (cur != null) {
+            Node copy = cur.next;       // copied node after current original
+            Node nextOriginal = copy.next; // next original node
 
-        while(cur != null)
-        {
-            cur.next = copyHead.next;
-            if(copyHead.next != null)
-                copyHead.next = cur.next.next;
+            // Restore original list
+            cur.next = nextOriginal;
 
-            cur = cur.next;
-            copyHead = copyHead.next;
+            // Connect copied list
+            if (nextOriginal != null) {
+                copy.next = nextOriginal.next;
+            } else {
+                copy.next = null;
+            }
+
+            // Move to next original node
+            cur = nextOriginal;
         }
 
-        return result;
+        return copyHead;
     }
 }
