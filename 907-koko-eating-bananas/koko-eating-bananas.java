@@ -28,8 +28,8 @@ class Solution {
             }
             // valid speed, try smaller speed
             else {
-                //answer = mid; 
-                answer = Math.min(answer, mid);
+                answer = mid; 
+                //answer = Math.min(answer, mid);
                 high = mid - 1;
             }
         }
