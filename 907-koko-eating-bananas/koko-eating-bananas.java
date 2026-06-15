@@ -1,39 +1,39 @@
 class Solution {
     public int minEatingSpeed(int[] piles, int h) {
-        //piles.length <= h, so always possible
-        //max hours is piles.length
-        //we need to find proper k between range, 1 to max
+
         int low = 1;
         int high = 0;
 
-        for(int p: piles)
-        {
-            high = Math.max(high, p);
+        // maximum possible useful speed
+        for (int pile : piles) {
+            high = Math.max(high, pile);
         }
 
-        int k = high;
-        while(low <= high)
-        {
+        int answer = high;
+
+        while (low <= high) {
+
             int mid = low + (high - low) / 2;
 
-            //calculate hours using mid speed
-            long hrs = 0;
-            for(int pile : piles)
-            {
-                hrs += (pile + mid - 1) / mid;
+            long totalHours = 0;
+
+            // calculate total hours needed at speed = mid
+            for (int pile : piles) {
+                totalHours += (pile + mid - 1) / mid;
             }
 
-            if(hrs > h)
-            {
+            // speed too slow
+            if (totalHours > h) {
                 low = mid + 1;
             }
-            else
-            {
-                k = Math.min(k, mid);
+            // valid speed, try smaller speed
+            else {
+                //answer = mid; 
+                answer = Math.min(answer, mid);
                 high = mid - 1;
             }
         }
-        return k;
 
+        return answer;
     }
 }
