@@ -19,7 +19,7 @@ class Solution {
 
         // slow is the middle node.
         // prev is the node before middle.
-        prev.next = slow.next;
+        prev.next = prev.next.next;
 
         return head;
     }
