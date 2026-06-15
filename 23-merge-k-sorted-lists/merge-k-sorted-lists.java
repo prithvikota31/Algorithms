@@ -10,30 +10,58 @@
  */
 class Solution {
     public ListNode mergeKLists(ListNode[] lists) {
-        PriorityQueue<ListNode> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.val, b.val));
-
-        for(ListNode node: lists)
-        {
-            if(node != null)
-            {
-                minHeap.offer(node);
-            }
+        if (lists == null || lists.length == 0) {
+            return null;
         }
 
-        ListNode dummyNode = new ListNode();
-        ListNode cur = dummyNode;
-        while(!minHeap.isEmpty())
+        return divide(lists, 0, lists.length - 1);
+    }
+
+    private ListNode divide(ListNode[] lists, int left, int right) //divide lists
+    {
+        if(left == right)
         {
-            ListNode minNode = minHeap.poll();
-            cur.next = minNode;
-            if(minNode.next != null)
-            {
-                minHeap.offer(minNode.next);
-            }
-            cur = cur.next;
-            
+            return lists[left];
         }
 
-        return dummyNode.next;
+        int mid = left + (right - left) / 2;
+
+        ListNode leftList = divide(lists, left, mid);
+        ListNode rightList = divide(lists, mid + 1, right);
+
+        return mergeTwoLists(leftList, rightList);
+    }
+
+
+    private ListNode mergeTwoLists(ListNode list1, ListNode list2) {
+        ListNode finalNode = new ListNode();
+        ListNode dummy = finalNode;
+
+        while(list1 != null && list2 != null)
+        {
+            if(list1.val < list2.val)
+            {
+                dummy.next = list1;
+                list1 = list1.next;
+            }
+            else
+            {
+                dummy.next = list2;
+                list2 = list2.next;
+            }
+
+            dummy = dummy.next;
+        }
+
+        if(list1 == null)
+        {
+            dummy.next = list2;
+        }
+        else
+        {
+            dummy.next = list1;
+        }
+
+        return finalNode.next;
     }
 }
