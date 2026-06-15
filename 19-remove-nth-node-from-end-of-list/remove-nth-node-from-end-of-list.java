@@ -10,17 +10,19 @@
  */
 class Solution {
     public ListNode removeNthFromEnd(ListNode head, int n) {
-        //make fast move
-
-        ListNode dummy = new ListNode(); // using dummy because there's no node before head
-        // We have to reach one node before to remvoe the node and head has no prev node so dummy
-        dummy.next = head;
-        ListNode slow = dummy;
-        ListNode fast = dummy;
+        ListNode fast = head;
         for(int i = 0; i < n; i++)
         {
             fast = fast.next;
         }
+
+        if(fast == null)
+        {
+            head = head.next;
+            return head;
+        }
+
+        ListNode slow = head;
 
         while(fast.next != null)
         {
@@ -30,6 +32,6 @@ class Solution {
 
         slow.next = slow.next.next;
 
-        return dummy.next;
+        return head;
     }
 }
