@@ -20,7 +20,7 @@ class LRUCache {
             Node node = map.get(key);
             remove(node);
             insert(node);
-            return map.get(key).val;
+            return node.val;
         }
     }
     
