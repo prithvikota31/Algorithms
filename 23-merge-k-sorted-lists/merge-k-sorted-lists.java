@@ -10,42 +10,30 @@
  */
 class Solution {
     public ListNode mergeKLists(ListNode[] lists) {
-        int k = lists.length;
-        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> (a.val - b.val));
+        PriorityQueue<ListNode> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a.val, b.val));
 
-        for(int i = 0; i < k; i++)
+        for(ListNode node: lists)
         {
-            if(lists[i] != null)
+            if(node != null)
             {
-                pq.offer(new Pair(lists[i].val, lists[i]));
+                minHeap.offer(node);
             }
         }
+
         ListNode dummyNode = new ListNode();
         ListNode cur = dummyNode;
-
-        while(!pq.isEmpty())
+        while(!minHeap.isEmpty())
         {
-            Pair temp = pq.poll();
-            cur.next = temp.node;
-            cur = cur.next;
-            ListNode nextNodeToInsert = temp.node.next;
-            if(nextNodeToInsert != null)
+            ListNode minNode = minHeap.poll();
+            cur.next = minNode;
+            if(minNode.next != null)
             {
-                pq.offer(new Pair(nextNodeToInsert.val, nextNodeToInsert));
+                minHeap.offer(minNode.next);
             }
-        } 
+            cur = cur.next;
+            
+        }
 
         return dummyNode.next;
-    }
-}
-
-class Pair{
-    int val;
-    ListNode node;
-
-    public Pair(int val, ListNode node)
-    {
-        this.val = val;
-        this.node = node;
     }
 }
