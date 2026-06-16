@@ -1,30 +1,26 @@
 class Solution {
     public int[][] merge(int[][] intervals) {
-        Arrays.sort(intervals, (a, b) -> (a[0] - b[0]));
-        List<int[]> trackingList = new ArrayList<>();
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
 
-        trackingList.add(intervals[0]); // minimum 1 interval is present per constraint
+        List<int[]> ans = new ArrayList<>();
+        ans.add(intervals[0]);
 
-        int ind = 1;
-
-        while(ind < intervals.length)
+        int n = intervals.length;
+        int ind = 0;
+        while(ind < n)
         {
-            int[] lastinterval = trackingList.get(trackingList.size() - 1);
-            //lastinterval.start >= intervals.end 
-            if(lastinterval[0] <= intervals[ind][1] &&
-                             lastinterval[1] >= intervals[ind][0])
+            int[] lastInterval = ans.get(ans.size() - 1);
+            if(intervals[ind][0] <= lastInterval[1]) //overlap
             {
-                lastinterval[0] = Math.min(lastinterval[0], intervals[ind][0]);
-                lastinterval[1] = Math.max(lastinterval[1], intervals[ind][1]);
+                lastInterval[1] = Math.max(intervals[ind][1], lastInterval[1]);
             }
             else
             {
-                trackingList.add(intervals[ind]);
+                ans.add(intervals[ind]);
             }
             ind++;
         }
 
-        int[][] result = trackingList.toArray(new int[0][]);
-        return result;
+        return ans.toArray(new int[0][]);
     }
 }
