@@ -2,39 +2,44 @@ public class Codec {
 
     // Encodes a list of strings to a single string.
     public String encode(List<String> strs) {
-        //length, delimiter, str
-
         StringBuilder sb = new StringBuilder();
+
         for(String str: strs)
         {
-            sb.append(str.length()).append('*').append(str);
+            sb.append(str.length());
+            sb.append('#');
+            sb.append(str);
         }
+
         return sb.toString();
     }
 
     // Decodes a single string to a list of strings.
-    //eg: 3*abc5*daceb
+    //5#abcde3#xyz
     public List<String> decode(String s) {
-        
-        int i = 0;
         List<String> result = new ArrayList<>();
+        int i = 0;
         while(i < s.length())
         {
-            //need j pointer to capture number
             int j = i;
-            while(s.charAt(j) != '*')
+
+            while(s.charAt(j) != '#')
             {
                 j++;
             }
-            //after while j is at *
-            int len = Integer.parseInt(s.substring(i, j));
-            j++;
-            result.add(s.substring(j, j + len));
-            i = j + len;
+            int strLength = Integer.parseInt(s.substring(i, j)); // this gives 5;
+            int strStart = j + 1;
+            result.add(s.substring(strStart, strStart + strLength));
 
+            i = strStart + strLength;
         }
 
         return result;
+        
+
+
+
+
     }
 }
 
