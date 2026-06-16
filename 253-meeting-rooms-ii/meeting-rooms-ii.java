@@ -1,38 +1,29 @@
 class Solution {
     public int minMeetingRooms(int[][] intervals) {
-        int[] start = new int[intervals.length];
-        int[] end = new int[intervals.length];
+        if (intervals.length == 0) return 0;
 
-        for(int i = 0; i < intervals.length; i++)
-        {
-            start[i] = intervals[i][0];
-            end[i] = intervals[i][1];
-        }
+        // Process meetings in the order they start.
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
 
-        Arrays.sort(start);
-        Arrays.sort(end);
+        // Min-heap stores end times of currently active meetings.
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        int ans = 0;
 
-        int rooms = 0;
-        int maxRooms = 0;
-        int i = 0; //tracking start
-        int j = 0; //tracking end
-        while(i < intervals.length && j < intervals.length)
-        {
-            if(start[i] < end[j])
-            {
-                rooms++;
-                i++;
-            }
-            else
-            {
-                rooms--;
-                j++;
+        for (int[] interval : intervals) {
+            int start = interval[0];
+            int end = interval[1];
+
+            // Release all rooms whose meetings already ended.
+            while (!minHeap.isEmpty() && minHeap.peek() <= start) {
+                minHeap.poll();
             }
 
-            maxRooms = Math.max(rooms, maxRooms);
+            // Current meeting occupies one room.
+            minHeap.offer(end);
 
+            ans = Math.max(ans, minHeap.size());
         }
 
-        return maxRooms;
+        return ans;
     }
 }
