@@ -6,12 +6,12 @@ class Solution {
         {
             map.put(num, map.getOrDefault(num, 0) + 1);
         }
-        List<Integer> freqList = new ArrayList<>(map.keySet());
+        List<Integer> keyList = new ArrayList<>(map.keySet());
         PriorityQueue<Integer> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(map.get(a), map.get(b)));
 
-        for(int freq: freqList)
+        for(int key: keyList)
         {
-            minHeap.offer(freq);
+            minHeap.offer(key);
 
             if(minHeap.size() > k)
             {
