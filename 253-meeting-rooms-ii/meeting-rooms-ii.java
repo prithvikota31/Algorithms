@@ -2,28 +2,36 @@ class Solution {
     public int minMeetingRooms(int[][] intervals) {
         if (intervals.length == 0) return 0;
 
-        // Process meetings in the order they start.
-        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+        int n = intervals.length;
+        int[] starts = new int[n];
+        int[] ends = new int[n];
 
-        // Min-heap stores end times of currently active meetings.
-        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
-        int ans = 0;
-
-        for (int[] interval : intervals) {
-            int start = interval[0];
-            int end = interval[1];
-
-            // Release all rooms whose meetings already ended.
-            while (!minHeap.isEmpty() && minHeap.peek() <= start) {
-                minHeap.poll();
-            }
-
-            // Current meeting occupies one room.
-            minHeap.offer(end);
-
-            ans = Math.max(ans, minHeap.size());
+        // Split start times and end times.
+        for (int i = 0; i < n; i++) {
+            starts[i] = intervals[i][0];
+            ends[i] = intervals[i][1];
         }
 
-        return ans;
+        // Sort both timelines independently.
+        Arrays.sort(starts);
+        Arrays.sort(ends);
+
+        int rooms = 0;
+        int endPtr = 0;
+ 
+        // Process meetings by start time.
+        for (int startPtr = 0; startPtr < n; startPtr++) {
+
+            // Earliest meeting ended, so reuse that room.
+            if (starts[startPtr] >= ends[endPtr]) {
+                endPtr++;
+            } 
+            // No room free, need a new room.
+            else {
+                rooms++;
+            }
+        }
+
+        return rooms;
     }
 }
