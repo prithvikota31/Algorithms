@@ -6,28 +6,24 @@ class Solution {
         {
             set.add(num);
         }
-        int ans = 0;
-        int count = 0;
+        int max = 0;
 
         for(int num: set)
         {
-            if(set.contains(num + 1))
+            if(set.contains(num - 1))
             {
                 continue;
             }
 
-            count = 0;
+            int count = 0;
             while(set.contains(num))
             {
                 count++;
-                num -= 1;
+                num++;
             }
 
-            ans = Math.max(count, ans);
-
+            max = Math.max(max, count);
         }
-
-        return ans;
-
+        return max;
     }
 }
