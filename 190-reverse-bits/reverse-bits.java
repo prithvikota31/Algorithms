@@ -1,16 +1,12 @@
 class Solution {
     public int reverseBits(int n) {
+        //1101
         int ans = 0;
-
         for(int i = 0; i < 32; i++)
         {
-            int lastbit = n & 1;
-            n = n >>> 1;
-            ans = ans << 1;  
-            ans = ans | lastbit;
-            
+            ans = (ans << 1) | (n & 1);
+            n = n >> 1;
         }
-
         return ans;
     }
 }
