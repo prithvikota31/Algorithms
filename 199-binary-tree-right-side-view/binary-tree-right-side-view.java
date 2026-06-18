@@ -16,31 +16,26 @@
 class Solution {
     public List<Integer> rightSideView(TreeNode root) {
         
-        List<Integer> result = new ArrayList<>();
-        if(root == null)    return result;
+        List<Integer> ans = new ArrayList<>();
+        if(root == null)    return ans;
         Deque<TreeNode> q = new ArrayDeque<>();
-        q.offer(root);
 
+        q.offer(root);
         while(!q.isEmpty())
         {
             int size = q.size();
             for(int i = 0; i < size; i++)
             {
                 TreeNode cur = q.poll();
-                if(i == size - 1)   result.add(cur.val); 
-                if(cur.left != null)
-                {
-                    q.offer(cur.left);
-                }
-                if(cur.right != null)
-                {
-                    q.offer(cur.right);
-                }
-            }
+                if(i == size - 1)   ans.add(cur.val);
 
+                if(cur.left != null)    q.offer(cur.left);
+                if(cur.right != null)   q.offer(cur.right);
+            }
 
         }
 
-        return result;
+        return ans;
     }
+
 }
