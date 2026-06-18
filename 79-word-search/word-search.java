@@ -1,24 +1,17 @@
 class Solution {
-
-    int[] delRow = {1, 0, -1, 0};
-    int[] delCol = {0, 1, 0, -1};
-
     public boolean exist(char[][] board, String word) {
+        int m = board.length;
+        int n = board[0].length;
+        int[] delRow = {0, 1, 0, -1};
+        int[] delCol = {1, 0, -1, 0};
 
-        int rows = board.length;
-        int cols = board[0].length;
-
-        // Try every cell as starting point
-        for(int row = 0; row < rows; row++) {
-
-            for(int col = 0; col < cols; col++) {
-
-                // First character matched
-                if(board[row][col] == word.charAt(0)) {
-
-                    if(dfs(board, word, row, col, 0)) {
-                        return true;
-                    }
+        for(int i = 0; i < board.length; i++)
+        {
+            for(int j = 0; j < board[0].length; j++)
+            {
+                if(find(board, word, 0, i, j, delRow, delCol))
+                {
+                    return true;
                 }
             }
         }
@@ -26,47 +19,38 @@ class Solution {
         return false;
     }
 
-    public boolean dfs(char[][] board,
-                       String word,
-                       int row,
-                       int col,
-                       int index) {
+    public boolean find(char[][] board, String word, int index, int row, int col, int[] delRow, int[] delCol)
+    {
+        if(board[row][col] != word.charAt(index))
+        {
+            return false;
+        }
 
-        // Entire word matched
-        if(index == word.length()) {
+        if(index == word.length() - 1)
+        {
             return true;
         }
 
-        // Boundary check
-        if(row < 0 || col < 0 ||
-           row >= board.length ||
-           col >= board[0].length) {
-            return false;
-        }
 
-        // Character mismatch
-        if(board[row][col] != word.charAt(index)) {
-            return false;
-        }
+        char curChar = board[row][col];
+        board[row][col] = '*';
 
-        // Mark visited
-        char temp = board[row][col];
-        board[row][col] = '#';
+        for(int i = 0; i < 4; i++)
+        {
+            int nRow = row + delRow[i];
+            int nCol = col + delCol[i];
 
-        // Explore all 4 directions
-        for(int i = 0; i < 4; i++) {
-
-            int newRow = row + delRow[i];
-            int newCol = col + delCol[i];
-
-            if(dfs(board, word, newRow, newCol, index + 1)) {
-                return true;
+            if(nRow >= 0 && nRow < board.length && nCol >= 0 && nCol < board[0].length)
+            {
+                if(find(board, word, index + 1, nRow, nCol, delRow, delCol))
+                {
+                    return true;
+                }
             }
         }
-
-        // Backtrack
-        board[row][col] = temp;
+        board[row][col] = curChar;
 
         return false;
+
     }
 }
