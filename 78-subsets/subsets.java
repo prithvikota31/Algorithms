@@ -1,21 +1,25 @@
 class Solution {
     public List<List<Integer>> subsets(int[] nums) {
-        List<List<Integer>> result = new ArrayList<>();
-        List<Integer> temp = new ArrayList<>();
-        collectSubsets(nums, temp, result, 0);
-        return result;
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> curr = new ArrayList<>();
+        dfs(nums, ans, curr, 0);
+
+        return ans;
+     
     }
 
-    public void collectSubsets(int[] nums, List<Integer> temp, 
-                                    List<List<Integer>> result, int ind)
+    public void dfs(int[] nums, List<List<Integer>> ans, List<Integer> curr, int index)
     {
-        result.add(new ArrayList<>(temp));
-
-        for(int i = ind; i < nums.length; i++)
+        if(index == nums.length)
         {
-            temp.add(nums[i]);
-            collectSubsets(nums, temp, result, i + 1);
-            temp.remove(temp.size() - 1); //remove last
+            ans.add(new ArrayList<>(curr));
+            return;
         }
+        curr.add(nums[index]);
+        dfs(nums, ans, curr, index+1);
+
+        curr.remove(curr.size() - 1);
+        
+        dfs(nums, ans, curr, index+1);
     }
 }
