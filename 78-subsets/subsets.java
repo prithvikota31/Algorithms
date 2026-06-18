@@ -1,25 +1,23 @@
 class Solution {
     public List<List<Integer>> subsets(int[] nums) {
         List<List<Integer>> ans = new ArrayList<>();
-        List<Integer> curr = new ArrayList<>();
-        dfs(nums, ans, curr, 0);
-
+        getSubsets(ans, 0, nums, new ArrayList<>());
         return ans;
-     
     }
 
-    public void dfs(int[] nums, List<List<Integer>> ans, List<Integer> curr, int index)
+    public void getSubsets(List<List<Integer>> ans, int index, int[] nums, List<Integer> trackingList)
     {
         if(index == nums.length)
         {
-            ans.add(new ArrayList<>(curr));
+            ans.add(new ArrayList<>(trackingList));
             return;
         }
-        curr.add(nums[index]);
-        dfs(nums, ans, curr, index+1);
+        trackingList.add(nums[index]);
+        getSubsets(ans, index + 1, nums, trackingList);
+        trackingList.remove(trackingList.size() - 1);
+        getSubsets(ans, index + 1, nums, trackingList);
 
-        curr.remove(curr.size() - 1);
-        
-        dfs(nums, ans, curr, index+1);
     }
+
+
 }
