@@ -1,47 +1,42 @@
 class Solution {
     public List<List<String>> partition(String s) {
-        int l = s.length();
-        List<List<String>> ans = new ArrayList<>();
+        List<List<String>>  result = new ArrayList<>();
 
-        List<String> curr = new ArrayList<>();
-
-        backtracking(s, ans, curr, 0);
-
-        return ans;
+        backtrack(result, 0, s, new ArrayList<>());
+        return result;
     }
-    
-    public void backtracking(String s, List<List<String>> ans, List<String> curr , int index)
+
+    private void backtrack(List<List<String>>  result, int ind, String s, List<String> tracking)
     {
-        if(index == s.length())
+        if(ind == s.length())
         {
-            ans.add(new ArrayList<>(curr));
+            result.add(new ArrayList<>(tracking));
             return;
         }
 
-        for(int i = index; i < s.length(); i++)
+        for(int i = ind; i < s.length(); i++)
         {
-            if(isPalindrome(s, index, i))
+            if(isPalindrome(s, ind, i))
             {
-                curr.add(s.substring(index, i+1));
-                backtracking(s, ans, curr, i+1);
-                curr.remove(curr.size() - 1);
+                tracking.add(s.substring(ind, i + 1));
+                backtrack(result, i + 1, s, tracking);
+                tracking.remove(tracking.size() - 1);
             }
         }
     }
 
-    public boolean isPalindrome(String s, int l, int r)
+
+    private boolean isPalindrome(String s, int i, int j)
     {
-        while(l <= r)
+        while(i <= j)
         {
-            if(s.charAt(l) != s.charAt(r))
+            if(s.charAt(i) != s.charAt(j))
             {
                 return false;
             }
-
-            l++;
-            r--;
+            i++;
+            j--;
         }
-
         return true;
     }
 }
