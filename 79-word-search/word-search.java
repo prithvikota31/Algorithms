@@ -1,7 +1,6 @@
 class Solution {
     public boolean exist(char[][] board, String word) {
-        int m = board.length;
-        int n = board[0].length;
+
         int[] delRow = {0, 1, 0, -1};
         int[] delCol = {1, 0, -1, 0};
 
@@ -44,6 +43,8 @@ class Solution {
             {
                 if(find(board, word, index + 1, nRow, nCol, delRow, delCol))
                 {
+                    board[row][col] = curChar; // restore before returning
+
                     return true;
                 }
             }
