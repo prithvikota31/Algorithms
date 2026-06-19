@@ -12,8 +12,6 @@ class Solution {
         int target = sum / 2;
 
         return targetSum(nums, target);
-
-
     }
 
     public boolean targetSum(int[] nums, int target)
