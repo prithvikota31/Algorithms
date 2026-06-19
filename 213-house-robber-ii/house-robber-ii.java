@@ -10,8 +10,6 @@ class Solution {
         int secondHalf = robHelper(nums, 1, n - 1);
 
         return Math.max(firstHalf, secondHalf);
-        //0 to n - 2
-        //1 to n - 1
     }
 
     public int robHelper(int[] nums, int start, int end) {
