@@ -6,7 +6,6 @@ class Solution {
         int bottom = matrix.length - 1;
 
         List<Integer> result = new ArrayList<>();
-
         while(left <= right && top <= bottom)
         {
             for(int i = left; i <= right; i++)
@@ -19,12 +18,12 @@ class Solution {
                 result.add(matrix[i][right]);
             }
             right--;
+
             if(top <= bottom)
             {
                 for(int i = right; i >= left; i--)
                 {
                     result.add(matrix[bottom][i]);
-                    
                 }
                 bottom--;
             }
@@ -36,7 +35,7 @@ class Solution {
                     result.add(matrix[i][left]);
                 }
                 left++;
-            }   
+            }
 
         }
 
