@@ -27,12 +27,12 @@ class Solution {
                     j++;
                     k--;
 
-                    while(j > i + 1 && j < k && nums[j] == nums[j - 1])  
+                    while(j < k && nums[j] == nums[j - 1])  
                     {
                         j++;
                     }
                 
-                    while(k < n - 1 && j < k && nums[k] == nums[k + 1])  
+                    while(j < k && nums[k] == nums[k + 1])  
                     {
                         k--;
                     }
