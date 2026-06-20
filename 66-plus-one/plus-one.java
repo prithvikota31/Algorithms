@@ -1,41 +1,26 @@
 class Solution {
     public int[] plusOne(int[] digits) {
-        
-        int left = 0;
-        int right = digits.length - 1;
+        int n = digits.length;
 
-        int index = right;
-        int carry = 1;
-        while(index >= left || carry == 0)
-        {
-            if(digits[index] == 9)
-            {
-                digits[index] = 0;
-                carry = 1;
+        // Start from the last digit because +1 affects the rightmost side first.
+        for (int i = n - 1; i >= 0; i--) {
+
+            // If current digit is not 9, we can safely add 1 and finish.
+            // No more carry needed.
+            if (digits[i] < 9) {
+                digits[i]++;
+                return digits;
             }
-            else
-            {
-                digits[index]++;
-                carry = 0;
-                break;
-            }
-            index--;
+
+            // If current digit is 9, 9 + 1 becomes 0 with carry to the left.
+            digits[i] = 0;
         }
 
-        if(carry == 0)
-        {
-            return digits;
-        }
-        else
-        {
-            int[] result = new int[digits.length + 1];
+        // If we reached here, all digits were 9.
+        // Example: 999 + 1 = 1000
+        int[] result = new int[n + 1];
+        result[0] = 1;
 
-            result[0] = 1;
-            for(int i = 1; i < result.length; i++)
-            {
-                result[i] = digits[i - 1];
-            }
-            return result;
-        }
+        return result;
     }
 }
