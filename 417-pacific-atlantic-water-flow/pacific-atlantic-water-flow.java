@@ -23,8 +23,15 @@ class Solution {
 
         for(int j = 0; j < n; j++)
         {
-            dfs(heights, 0, j, canPacific);
-            dfs(heights, m-1, j, canAtlantic);
+            if(!canPacific[0][j])
+            {
+                dfs(heights, 0, j, canPacific);
+            }
+
+            if(!canAtlantic[m - 1][j])
+            {
+                dfs(heights, m-1, j, canAtlantic);
+            }
         }
 
         for(int i = 0; i < m; i++)
