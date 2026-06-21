@@ -12,10 +12,6 @@ class Solution {
             {
                 count++;
                 end = farthest;
-                if(end >= nums.length - 1)
-                {
-                    break;
-                }
             }
         }
 
