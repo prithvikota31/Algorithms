@@ -1,72 +1,53 @@
 class Solution {
     public int orangesRotting(int[][] grid) {
-        int[] delRow = {-1, 0, 1, 0};
-        int[] delCol = {0, -1, 0, 1};
-
         int m = grid.length;
         int n = grid[0].length;
-        
+
+        Deque<int[]> q = new ArrayDeque<>();
         int fresh = 0;
-        Deque<Pair> q= new ArrayDeque<>();
-        for(int i = 0; i < m; i++)
-        {
-            for(int j = 0; j < n; j++)
-            {
-                if(grid[i][j] == 1)
-                {
+
+        // Put all initially rotten oranges into queue.
+        // This is multi-source BFS.
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 2) {
+                    q.offer(new int[]{i, j});
+                } else if (grid[i][j] == 1) {
                     fresh++;
-                }
-                if(grid[i][j] == 2)
-                {
-                    q.offer(new Pair(i, j));
                 }
             }
         }
 
+        int[] delRow = {0, 1, 0, -1};
+        int[] delCol = {-1, 0, 1, 0};
+
         int time = 0;
-        int rotten = 0;
 
-        while(!q.isEmpty())
-        {
+        // Each BFS level = 1 minute.
+        while (!q.isEmpty() && fresh > 0) {
             int size = q.size();
-            for(int i = 0; i < size; i++)
-            {
-                Pair cur = q.poll();
-                int cRow = cur.row;
-                int cCol = cur.col;
 
-                for(int j = 0; j < 4; j++)
-                {
-                    int nRow = cRow + delRow[j];
-                    int nCol = cCol + delCol[j];
-                    if(nRow >= 0 && nRow < m && nCol >= 0 && nCol < n && grid[nRow][nCol] == 1)
-                    {
+            for (int i = 0; i < size; i++) {
+                int[] cur = q.poll();
+
+                for (int d = 0; d < 4; d++) {
+                    int nRow = cur[0] + delRow[d];
+                    int nCol = cur[1] + delCol[d];
+
+                    if (nRow >= 0 && nRow < m &&
+                        nCol >= 0 && nCol < n &&
+                        grid[nRow][nCol] == 1) {
+
                         grid[nRow][nCol] = 2;
-                        q.offer(new Pair(nRow, nCol));
-                        rotten++;
+                        fresh--;
+                        q.offer(new int[]{nRow, nCol});
                     }
                 }
             }
 
-            if(!q.isEmpty())
-            {
-                time++;
-            }
+            time++;
         }
 
-        if(fresh != rotten) return -1;
-        else return time;
-    }
-
-}
-
-class Pair{
-    int row;
-    int col;
-
-    public Pair(int row, int col)
-    {
-        this.row = row;
-        this.col = col;
+        return fresh == 0 ? time : -1;
     }
 }
