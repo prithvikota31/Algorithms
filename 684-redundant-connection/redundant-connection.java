@@ -19,6 +19,7 @@ class Solution {
             if(!union(edges[i][0], edges[i][1]))
             {
                 lastIndex = i;
+                break;
             }
         }
 
