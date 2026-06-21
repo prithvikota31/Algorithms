@@ -15,21 +15,25 @@ class Solution {
                 minOpen--;
                 maxOpen--;
             }
-            else
+            else 
             {
-                minOpen -= 1;
-                maxOpen += 1;
-
+                //*
+                minOpen--;
+                maxOpen++;
             }
-            
-            if(maxOpen < 0) return false;
+
+            if(maxOpen < 0)
+            {
+                return false;
+            }
+
             if(minOpen < 0)
             {
                 minOpen = 0;
             }
+
         }
 
-        return (minOpen == 0)? true: false;
-
+        return minOpen == 0;
     }
 }
