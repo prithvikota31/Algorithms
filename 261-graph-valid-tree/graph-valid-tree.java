@@ -1,7 +1,7 @@
 class Solution {
     public boolean validTree(int n, int[][] edges) {
         List<List<Integer>> graph = new ArrayList<>();
-
+            if (edges.length != n - 1) return false;
             for(int i = 0; i < n; i++)
             {
                 graph.add(new ArrayList<>());
