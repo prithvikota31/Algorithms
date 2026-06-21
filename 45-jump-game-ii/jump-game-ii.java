@@ -1,29 +1,24 @@
 class Solution {
     public int jump(int[] nums) {
-
-        int jumps = 0;
-
-        // Current window end
-        int end = 0;
-
-        // Farthest reachable index
+        int count = 0;
         int farthest = 0;
-
-        for(int i = 0; i < nums.length - 1; i++) {
-
-            // Expand reachable range
+        
+        int end = 0;
+        //2, 3, 1, 1, 4
+        for(int i = 0; i < nums.length - 1; i++)
+        {
             farthest = Math.max(farthest, i + nums[i]);
-
-            // End of current jump window
-            if(i == end) {
-
-                jumps++;
-
-                // Move to next window
+            if(i == end)
+            {
+                count++;
                 end = farthest;
+                if(end >= nums.length - 1)
+                {
+                    break;
+                }
             }
         }
 
-        return jumps;
+        return count;
     }
 }
