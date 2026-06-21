@@ -1,28 +1,37 @@
 class Solution {
     public int largestRectangleArea(int[] heights) {
-        Stack<Integer> st = new Stack<>();
+        Deque<Integer> stack = new ArrayDeque<>(); //indices
+        //we maintin a striclty increasing stack because when we encounter a lesser number
+        // we calculate maxarea and the element below it is left side min
         int maxArea = 0;
-
-        for(int i = 0; i <= heights.length; i++)
+        stack.offerLast(-1);
+        for(int i = 0; i < heights.length; i++)
         {
-            int currHt = (i == heights.length) ? 0 : heights[i];
-
-            while(!st.isEmpty() && heights[st.peek()] > currHt)
+            while(stack.peekLast() != -1 && heights[stack.peekLast()] > heights[i])
             {
-                int h = heights[st.pop()];
-                int right = i;
-                int left = st.isEmpty() ? -1 : st.peek();
-
-                int w = right - left - 1;
-
-                maxArea = Math.max(maxArea, h*w);
+                //now caculate
+                int rightSideMin = i;
+                int curVal = heights[stack.pollLast()];
+                int leftSideMin = stack.peekLast();
+                maxArea = Math.max(maxArea, curVal * (rightSideMin - leftSideMin - 1));
             }
+            stack.offerLast(i);
+        }
 
-            st.push(i);
+        while(stack.peekLast() != -1)
+        {
+            int rightSideMin = heights.length;
+            int curVal = heights[stack.pollLast()];
+            int leftSideMin = stack.peekLast();
+            
+
+            maxArea = Math.max(maxArea, curVal * (rightSideMin - leftSideMin - 1));
 
         }
 
-        return maxArea;
 
+
+
+        return maxArea;
     }
 }
