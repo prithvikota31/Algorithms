@@ -1,66 +1,57 @@
 class Solution {
-    List<Integer> parent = new ArrayList<>();
-    List<Integer> size = new ArrayList<>();
+    private int[] parent;
+    private int[] size;
 
-    //findParent and union functions are crucial
-    //size always number of nodes connected to the node
     public int[] findRedundantConnection(int[][] edges) {
-        int n = edges.length; //number of nodes
-        for(int i = 0; i <= n; i++)
-        {
-            size.add(1);
-            parent.add(i);
+        int n = edges.length;
+
+        parent = new int[n + 1];
+        size = new int[n + 1];
+
+        // Each node starts as its own component.
+        for (int i = 1; i <= n; i++) {
+            parent[i] = i;
+            size[i] = 1;
         }
 
-
-        int lastIndex = -1;
-        for(int i = 0; i < edges.length; i++)
-        {
-            if(!union(edges[i][0], edges[i][1]))
-            {
-                lastIndex = i;
-                break;
+        // If two nodes already have the same ultimate parent,
+        // adding this edge creates a cycle.
+        for (int[] edge : edges) {
+            if (!union(edge[0], edge[1])) {
+                return edge;
             }
         }
 
-        return edges[lastIndex];
-
+        return new int[0];
     }
 
-
-    private boolean union(int u, int v)
-    {
-        int ulu = findUparent(u);
-        int ulv = findUparent(v);
-        if(ulu == ulv)
-        {
-            return false;
-        }
-        if(size.get(ulu) <= size.get(ulv))
-        {
-            //connect u to v
-            parent.set(ulu, ulv);
-            size.set(ulv, size.get(ulv) + size.get(ulv));
-        }
-        else
-        {
-            //connect v to u
-            parent.set(ulv, ulu);
-            size.set(ulu, size.get(ulu) + size.get(ulv));
-        }
-        return true;
-    }
-
-    private int findUparent(int node)
-    {
-        if(parent.get(node) == node)
-        {
+    private int find(int node) {
+        if (parent[node] == node) {
             return node;
         }
 
-        int ulp = findUparent(parent.get(node));
-        //path compression
-        parent.set(node, ulp);
-        return parent.get(node);
+        // Path compression: directly attach node to ultimate parent.
+        parent[node] = find(parent[node]);
+        return parent[node];
+    }
+
+    private boolean union(int u, int v) {
+        int pu = find(u);
+        int pv = find(v);
+
+        if (pu == pv) {
+            return false;
+        }
+
+        // Union by size: attach smaller component under larger component.
+        if (size[pu] < size[pv]) {
+            parent[pu] = pv;
+            size[pv] += size[pu];
+        } else {
+            parent[pv] = pu;
+            size[pu] += size[pv];
+        }
+
+        return true;
     }
 }
