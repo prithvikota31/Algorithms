@@ -6,44 +6,62 @@ class Solution {
 
         List<List<Integer>> ans = new ArrayList<>();
 
-        boolean[][] atlanticReachable = new boolean[m][n];
-        boolean[][] pacificReachable = new boolean[m][n];
+        boolean[][] canPacific = new boolean[m][n];
+        boolean[][] canAtlantic = new boolean[m][n];
 
-        for(int i = 0; i < m; i++) {
-            dfs(heights, m, n, i, 0, pacificReachable);
-            dfs(heights, m, n, i, n-1, atlanticReachable);  
+        for(int i = 0; i < m; i++)
+        {
+            if(!canPacific[i][0])
+            {
+                dfs(heights, i, 0, canPacific);
+            }
+            if(!canAtlantic[i][n - 1])
+            {
+                dfs(heights, i, n-1, canAtlantic);
+            }
         }
 
-        for(int j = 0; j < n; j++) {
-            dfs(heights, m, n, 0, j, pacificReachable);
-            dfs(heights, m, n, m-1, j, atlanticReachable);  
+        for(int j = 0; j < n; j++)
+        {
+            dfs(heights, 0, j, canPacific);
+            dfs(heights, m-1, j, canAtlantic);
         }
 
+        for(int i = 0; i < m; i++)
+        {
+            for(int j = 0; j < n; j++)
+            {
 
-        for(int i = 0; i < m; i++) {
-            for(int j = 0; j < n; j++) {
-                if(pacificReachable[i][j] && atlanticReachable[i][j]) {
-                    ans.add(Arrays.asList(i, j));
+                if(canPacific[i][j] && canAtlantic[i][j])
+                {
+                    ans.add(Arrays.asList(i,j));
                 }
             }
+            
         }
 
-        return ans;  
+        return ans;
     }
 
-    public void dfs(int[][] heights, int m, int n, int row, int col, boolean[][] vis) {
+    public void dfs(int[][] heights, int row, int col, boolean[][] vis)
+    {
+        int m = heights.length;
+        int n = heights[0].length; 
+        int[] dr = {1,-1,0,0};
+        int[] dc = {0,0,1,-1};
+
         vis[row][col] = true;
 
-        int[] delR = {1,0,-1,0};
-        int[] delC = {0,1,0,-1};
+        for(int i = 0; i < 4; i++)
+        {
+            int r = dr[i] + row;
+            int c = dc[i] + col;
 
-        for(int i = 0; i < 4; i++) {
-            int r = row + delR[i];
-            int c = col + delC[i];
-
-            if(r >= 0 && r < m && c >= 0 && c < n && !vis[r][c] && heights[r][c] >= heights[row][col]) {
-                dfs(heights, m, n, r, c, vis);
+            if(r >= 0 && r < m && c >= 0 && c < n && !vis[r][c] && heights[r][c] >= heights[row][col])
+            {
+                dfs(heights, r, c, vis);
             }
         }
+
     }
 }
