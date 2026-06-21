@@ -1,58 +1,54 @@
 class Solution {
-
     public boolean validTree(int n, int[][] edges) {
-
-        // tree must have exactly n-1 edges
-        if (edges.length != n - 1) {
-            return false;
-        }
-
         List<List<Integer>> graph = new ArrayList<>();
 
-        for (int i = 0; i < n; i++) {
-            graph.add(new ArrayList<>());
-        }
+            for(int i = 0; i < n; i++)
+            {
+                graph.add(new ArrayList<>());
+            }
 
-        for (int[] edge : edges) {
+            for(int i = 0; i < edges.length; i++)
+            {
+                graph.get(edges[i][0]).add(edges[i][1]);
+                graph.get(edges[i][1]).add(edges[i][0]);
+            }
 
-            int a = edge[0];
-            int b = edge[1];
+            int[] visited = new int[n];
+            Deque<int[]> q = new ArrayDeque<>();
+            q.offer(new int[]{0, -1});
+            visited[0] = 1;
 
-            graph.get(a).add(b);
-            graph.get(b).add(a);
-        }
 
-        Queue<Integer> q = new LinkedList<>();
-
-        boolean[] visited = new boolean[n];
-
-        q.offer(0);
-
-        visited[0] = true;
-
-        while (!q.isEmpty()) {
-
-            int node = q.poll();
-
-            for (int nei : graph.get(node)) {
-
-                if (!visited[nei]) {
-
-                    visited[nei] = true;
-
-                    q.offer(nei);
+            while(!q.isEmpty())
+            {
+                int[] curNode = q.poll();
+                int curValue = curNode[0];
+                int curParent = curNode[1];
+                for(int nei: graph.get(curValue))
+                {
+                    if(visited[nei] == 0)
+                    {
+                        q.offer(new int[]{nei, curValue});
+                        visited[nei] = 1;
+                    }
+                    else if(nei != curParent)
+                    {
+                        return false;
+                    }
                 }
             }
-        }
 
-        // all nodes must be connected
-        for (boolean v : visited) {
-
-            if (!v) {
-                return false;
+            for(int i = 0; i < n; i++)
+            {
+                if(visited[i] == 0)
+                {
+                    return false;
+                }
             }
-        }
 
-        return true;
+            return true;
+
+
+        }
     }
-}
+
