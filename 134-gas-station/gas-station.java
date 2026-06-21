@@ -6,8 +6,9 @@ class Solution {
         int start = 0;
         for(int i = 0; i < gas.length; i++)
         {
-            availableGas += gas[i] - cost[i];
-            totalGas += gas[i] - cost[i];
+            int diff = gas[i] - cost[i];
+            availableGas += diff;
+            totalGas += diff;
             if(availableGas < 0)
             {
                 start = i + 1;
