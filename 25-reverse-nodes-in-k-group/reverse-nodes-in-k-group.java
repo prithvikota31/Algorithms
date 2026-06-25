@@ -20,14 +20,14 @@ class Solution {
         ListNode kth = getKthNode(dummy, k);
         //dummy -> 1 -> 2 -> 3 -> null
         
-        ListNode nextFirst = kth.next; //4
+        // ListNode nextFirst = kth.next; //4
         // ListNode cur = dummy;
         
 
         while(kth != null)
         {
             ListNode oldHead = prevLast.next;
-            nextFirst = kth.next;
+            ListNode nextFirst = kth.next;
             kth.next = null;
             ListNode newHead = reverse(oldHead);
 
