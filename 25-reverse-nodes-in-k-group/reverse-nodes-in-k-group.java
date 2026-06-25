@@ -10,46 +10,46 @@
  */
 class Solution {
     public ListNode reverseKGroup(ListNode head, int k) {
-        //prevGroup -> reversegroup -> nextGroup
-        ListNode dummy = new ListNode(0);
+        //capture prevLast and nextFirst always
+        //current list curHead capture 
+        //reverse will give new head
+
+        ListNode dummy = new ListNode();
         dummy.next = head;
-        ListNode prevGroupTail = dummy;
+        ListNode prevLast = dummy;
         ListNode kth = getKthNode(dummy, k);
+        //dummy -> 1 -> 2 -> 3 -> null
+        
+        ListNode nextFirst = kth.next; //4
+        // ListNode cur = dummy;
+        
 
         while(kth != null)
         {
-            ListNode nextGroupHead = kth.next;
+            ListNode oldHead = prevLast.next;
+            nextFirst = kth.next;
             kth.next = null;
-            reverse(prevGroupTail.next); //return again gives kth node;
-            //make connections
-            //old head will be new prevgrouptail
-            ListNode oldHead = prevGroupTail.next;
-            prevGroupTail.next = kth;
-            oldHead.next = nextGroupHead;
-            prevGroupTail = oldHead;
-            kth = getKthNode(prevGroupTail, k);
+            ListNode newHead = reverse(oldHead);
+
+            prevLast.next = newHead; //dummy -> 3 -> 2 -> 1 -> 4
+            oldHead.next = nextFirst;
+            prevLast = oldHead;
+            
+            kth = getKthNode(prevLast, k);
         }
+
 
         return dummy.next;
 
+
     }
 
-    public ListNode getKthNode(ListNode node, int k) // send head prev noe to get kth node
-    {
-        ListNode cur = node;
-        while(k > 0 & cur != null)
-        {
-            cur = cur.next;
-            k--;
-        }
+    //reverse a list
 
-        return cur;
-    }
-
-
-    public ListNode reverse(ListNode head)
+    private ListNode reverse(ListNode head)
     {
         ListNode prev = null;
+
         ListNode cur = head;
         while(cur != null)
         {
@@ -60,5 +60,20 @@ class Solution {
         }
 
         return prev;
+    }
+
+    private ListNode getKthNode(ListNode node, int k) //always give prevLast to get kth node
+    {
+        //1 -> 2 -> 3 -> 4 -> 5
+        // k = 3
+        //
+        ListNode cur = node;
+        while(k > 0 && cur != null) //cur = 4, k = 0
+        {
+            cur = cur.next;
+            k--;
+        }
+
+        return cur;
     }
 }
