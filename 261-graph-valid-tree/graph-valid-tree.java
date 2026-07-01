@@ -21,18 +21,17 @@ class Solution {
         q.offer(0);
         visited[0] = true;
 
-        int count = 1;
+        int count = 0;
 
         // BFS checks whether all nodes are connected.
         while (!q.isEmpty()) {
             int curNode = q.poll();
+            count++;
 
             for (int nei : graph.get(curNode)) {
                 if (!visited[nei]) {
                     visited[nei] = true;
                     q.offer(nei);
-                                count++;
-
                 }
             }
         }
