@@ -6,28 +6,32 @@ class Solution {
         {
             graph.add(new ArrayList<>());
         }
-
+        //[i, j] => j -> i
         int[] inDegree = new int[numCourses];
-        for(int i = 0;i < prerequisites.length; i++)
+        for(int i = 0; i < prerequisites.length; i++)
         {
             graph.get(prerequisites[i][1]).add(prerequisites[i][0]);
             inDegree[prerequisites[i][0]]++;
         }
 
+
+        int[] topoSort = new int[numCourses];
         Deque<Integer> q = new ArrayDeque<>();
-        for(int i = 0; i < numCourses; i++)
+
+        for(int i = 0; i < inDegree.length; i++)
         {
             if(inDegree[i] == 0)
+            {
                 q.offer(i);
+            }         
         }
-
-        int count = 0;
+        int index = 0;
         while(!q.isEmpty())
         {
-            int node = q.poll();
-            count++;
+            int curNode = q.poll();
+            topoSort[index++] = curNode;
 
-            for(int nei: graph.get(node))
+            for(int nei: graph.get(curNode))
             {
                 inDegree[nei]--;
                 if(inDegree[nei] == 0)
@@ -37,6 +41,15 @@ class Solution {
             }
         }
 
-        return count == numCourses;
+        if(index == numCourses)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+
     }
 }
