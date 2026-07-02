@@ -1,61 +1,51 @@
-import java.util.*;
-
-class Pair {
-    int node;
-    int distance;
-
-    Pair(int distance, int node) {
-        this.distance = distance;
-        this.node = node;
-    }
-}
-
 class Solution {
-
     public int minCostConnectPoints(int[][] points) {
+        int v = points.length;
 
-        int V = points.length;
+        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> (a.distance - b.distance));
 
-        PriorityQueue<Pair> pq =
-            new PriorityQueue<>((x, y) -> x.distance - y.distance);
-
-        int[] vis = new int[V];
-
-        // start from node 0
-        pq.add(new Pair(0, 0));
-
-        int sum = 0;
+        int[] visited = new int[v];
+        int minSum = 0;
         int nodesUsed = 0;
+        pq.offer(new Pair(0, 0));
 
-        while (nodesUsed < V) {
-
+        while(!pq.isEmpty())
+        {
             Pair cur = pq.poll();
+            int cNode = cur.node;
+            int cDistance = cur.distance;
 
-            int node = cur.node;
-            int wt = cur.distance;
+            if(visited[cNode] == 1) continue; //already visited with less wieght
 
-            if (vis[node] == 1)
-                continue;
-
-            vis[node] = 1;
+            visited[cNode] = 1;
+            minSum += cDistance;
             nodesUsed++;
 
-            sum += wt;
-
-            // add all neighbors
-            for (int adjNode = 0; adjNode < V; adjNode++) {
-
-                if (vis[adjNode] == 0) {
-
-                    int dist =
-                        Math.abs(points[node][0] - points[adjNode][0]) +
-                        Math.abs(points[node][1] - points[adjNode][1]);
-
-                    pq.add(new Pair(dist, adjNode));
+            
+            for(int i = 0; i < v; i++)
+            {
+                if(visited[i] == 0)
+                {
+                    //points (xi, yi)
+                    int neighDistance = Math.abs(points[cNode][0] - points[i][0]) 
+                                                + Math.abs(points[cNode][1] - points[i][1]);
+                    pq.offer(new Pair(i, neighDistance));
                 }
             }
         }
 
-        return sum;
+        return minSum;
+    }
+
+
+    class Pair{
+        int node;
+        int distance;
+
+        public Pair(int n, int d)
+        {
+            node = n;
+            distance = d;
+        }
     }
 }
