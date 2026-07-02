@@ -1,69 +1,60 @@
 class Solution {
     public List<List<String>> solveNQueens(int n) {
-        List<List<String>> result = new ArrayList<>();
         char[][] board = new char[n][n];
-
-        for (int i = 0; i < n; i++) {
+        //create empty board
+        for(int i = 0; i < n; i++)
+        {
             Arrays.fill(board[i], '.');
         }
-
+        List<List<String>> ans = new ArrayList<>();
         Set<Integer> rows = new HashSet<>();
-        Set<Integer> diag1 = new HashSet<>(); // row - col
-        Set<Integer> diag2 = new HashSet<>(); // row + col
+        Set<Integer> d1 = new HashSet<>();
+        Set<Integer> d2 = new HashSet<>();
 
-        backtrack(0, n, board, rows, diag1, diag2, result);
-        return result;
+        //do backtrack each col is filled and proceeded to next column
+        backtrack(0, rows, d1, d2, board, ans);
+        return ans;
+
+
     }
 
-    private void backtrack(
-        int col,
-        int n,
-        char[][] board,
-        Set<Integer> rows,
-        Set<Integer> diag1,
-        Set<Integer> diag2,
-        List<List<String>> result
-    ) {
-        // If all columns are filled, we placed n queens safely
-        if (col == n) {
-            result.add(buildBoard(board));
+    private void backtrack(int col, Set<Integer> rows, Set<Integer> d1, Set<Integer> d2,
+                            char[][] board, List<List<String>> ans)
+    {
+        if(col == board.length) // it successful fiulled col 0 -> n -1
+        {
+            ans.add(createResultBoard(board));
             return;
         }
 
-        // For this column, try placing queen in every row
-        for (int row = 0; row < n; row++) {
-            int d1 = row - col;
-            int d2 = row + col;
-
-            // Unsafe if same row or diagonal is already occupied
-            if (rows.contains(row) || diag1.contains(d1) || diag2.contains(d2)) {
+        for(int i = 0; i < board.length; i++) // for current col try all possibilites
+        {
+            int row = i;
+            if(rows.contains(row) || d1.contains(row + col) || d2.contains(row - col))
+            {
                 continue;
             }
 
-            // Choose
             board[row][col] = 'Q';
             rows.add(row);
-            diag1.add(d1);
-            diag2.add(d2);
-
-            // Explore next column
-            backtrack(col + 1, n, board, rows, diag1, diag2, result);
-
-            // Undo
-            board[row][col] = '.';
+            d1.add(row + col);
+            d2.add(row - col);
+            backtrack(col + 1, rows, d1, d2, board, ans);
             rows.remove(row);
-            diag1.remove(d1);
-            diag2.remove(d2);
+            d1.remove(row + col);
+            d2.remove(row - col);
+            board[row][col] = '.';    
         }
     }
 
-    private List<String> buildBoard(char[][] board) {
-        List<String> list = new ArrayList<>();
-
-        for (char[] row : board) {
-            list.add(new String(row));
+    private List<String> createResultBoard(char[][] board)
+    {
+        //board has char Arrays
+        List<String> result = new ArrayList<>();
+        for(int i = 0; i < board.length; i++)
+        {
+            result.add(new String(board[i]));
         }
-
-        return list;
+        return result;
     }
 }
