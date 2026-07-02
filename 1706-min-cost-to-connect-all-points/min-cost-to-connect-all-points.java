@@ -1,51 +1,39 @@
 class Solution {
     public int minCostConnectPoints(int[][] points) {
-        int v = points.length;
+        int n = points.length;
 
-        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> (a.distance - b.distance));
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> Integer.compare(a[1], b[1]));
 
-        int[] visited = new int[v];
-        int minSum = 0;
-        int nodesUsed = 0;
-        pq.offer(new Pair(0, 0));
+        //start from point zero
+        //int[] contains point index, edgeweight
+        pq.offer(new int[]{0, 0});
 
-        while(nodesUsed < v)
+        boolean[] visited = new boolean[n];
+        int min = 0;
+
+        while(!pq.isEmpty())
         {
-            Pair cur = pq.poll();
-            int cNode = cur.node;
-            int cDistance = cur.distance;
+            int[] cur = pq.poll();
+            int curIndex = cur[0];
+            int curEdgeWeight = cur[1];
 
-            if(visited[cNode] == 1) continue; //already visited with less wieght
-
-            visited[cNode] = 1;
-            minSum += cDistance;
-            nodesUsed++;
-
-            
-            for(int i = 0; i < v; i++)
+            if(visited[curIndex])
             {
-                if(visited[i] == 0)
+                continue;
+            }
+            visited[curIndex] = true;
+            min += curEdgeWeight;
+            for(int i = 0; i < n; i++)
+            {
+                if(!visited[i])
                 {
-                    //points (xi, yi)
-                    int neighDistance = Math.abs(points[cNode][0] - points[i][0]) 
-                                                + Math.abs(points[cNode][1] - points[i][1]);
-                    pq.offer(new Pair(i, neighDistance));
+                    int nextEdgeWt = Math.abs(points[curIndex][0] - points[i][0]) 
+                                            + Math.abs(points[curIndex][1] - points[i][1]);
+                    pq.offer(new int[]{i, nextEdgeWt});
                 }
             }
         }
 
-        return minSum;
-    }
-
-
-    class Pair{
-        int node;
-        int distance;
-
-        public Pair(int n, int d)
-        {
-            node = n;
-            distance = d;
-        }
+        return min;
     }
 }
