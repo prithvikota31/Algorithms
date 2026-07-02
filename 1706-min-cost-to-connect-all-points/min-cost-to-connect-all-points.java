@@ -10,8 +10,8 @@ class Solution {
 
         boolean[] visited = new boolean[n];
         int min = 0;
-
-        while(!pq.isEmpty())
+        int connected = 0;
+        while(connected < n)
         {
             int[] cur = pq.poll();
             int curIndex = cur[0];
@@ -23,6 +23,7 @@ class Solution {
             }
             visited[curIndex] = true;
             min += curEdgeWeight;
+            connected++;
             for(int i = 0; i < n; i++)
             {
                 if(!visited[i])
