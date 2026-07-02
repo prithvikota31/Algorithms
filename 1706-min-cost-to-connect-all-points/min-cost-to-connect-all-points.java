@@ -9,7 +9,7 @@ class Solution {
         int nodesUsed = 0;
         pq.offer(new Pair(0, 0));
 
-        while(!pq.isEmpty())
+        while(nodesUsed < v)
         {
             Pair cur = pq.poll();
             int cNode = cur.node;
