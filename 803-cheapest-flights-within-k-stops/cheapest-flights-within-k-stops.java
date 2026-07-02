@@ -14,6 +14,7 @@ class Solution {
 
         // Create a queue to store the node, its distance from the source, and the number of stops
         Deque<int[]> q = new ArrayDeque<>();
+        //stops, node, dist
         q.offer(new int[]{0, src, 0});  // Push the source node with 0 stops and 0 cost
 
         // Create a distance array to store the minimum cost to reach each node
