@@ -30,7 +30,7 @@ class Solution {
 
             // If the number of stops exceeds K, continue to the next iteration
             if (stops > K)
-                continue;
+                break;
 
             // Iterate over all the adjacent nodes (next destinations)
             for (int[] adjNode : adj.get(node)) {
