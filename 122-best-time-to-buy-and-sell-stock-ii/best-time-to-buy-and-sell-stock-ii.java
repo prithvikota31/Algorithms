@@ -5,12 +5,6 @@ class Solution {
         int n = arr.length;
         if (n == 0) return 0;
 
-        // DP table where dp[ind][buy] stores max profit from index 'ind' onwards
-        // buy = 0 → can buy, buy = 1 → can sell
-        long[][] dp = new long[n + 1][2];
-
-        // Base condition: When at day n (beyond last), no profit can be made
-        dp[n][0] = dp[n][1] = 0;
         int[] prev = new int[2];
 
         // Iterate from the end of the array towards the beginning
