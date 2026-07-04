@@ -20,7 +20,7 @@ public class Codec {
             TreeNode cur = q.poll();
             if(cur == null)
             {
-                sb.append("null,");
+                sb.append("#,");
                 continue;
             }
             sb.append(cur.val + ",");
@@ -45,13 +45,13 @@ public class Codec {
         for(int i = 1; i < values.length; i++)
         {
             TreeNode cur = q.poll();
-            if(!values[i].equals("null"))
+            if(!values[i].equals("#"))
             {
                 cur.left = new TreeNode(Integer.parseInt(values[i]));
                 q.offer(cur.left);
             }
             i++;
-            if(!values[i].equals("null"))
+            if(!values[i].equals("#"))
             {
                 cur.right = new TreeNode(Integer.parseInt(values[i]));
                 q.offer(cur.right);
