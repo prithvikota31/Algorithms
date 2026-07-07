@@ -15,36 +15,35 @@
  */
 class Solution {
     public boolean isSubtree(TreeNode root, TreeNode subRoot) {
-        if(root == null && subRoot == null) return true;
-        if(root == null)    return false;
-
-        if(root.val == subRoot.val)
+        if(root == null)
         {
-            if(isSametree(root, subRoot))
-            {
-                return true;
-            }
+            return false;
         }
-
-        return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
-        
-    }
-
-    public boolean isSametree(TreeNode root1, TreeNode root2)
-    {
-        if(root1 == null && root2 == null)
+        if(isSameTree(root, subRoot))
         {
             return true;
         }
-        if(root1 == null || root2 == null)
-        {
-            return false;
-        }
-        if(root1.val != root2.val)
-        {
-            return false;
-        }
 
-        return isSametree(root1.left, root2.left) && isSametree(root1.right, root2.right);
+        boolean left = isSubtree(root.left, subRoot);
+        boolean right = isSubtree(root.right, subRoot);
+
+        return left || right;   
+    }
+
+   public boolean isSameTree(TreeNode p, TreeNode q) {
+        if(p == null && q == null)
+        {
+            return true;
+        }
+        else if(p == null || q == null || p.val != q.val)
+        {
+            return false;
+        }
+ 
+
+        boolean left = isSameTree(p.left, q.left);
+        boolean right = isSameTree(p.right, q.right);
+
+        return left && right;  
     }
 }
