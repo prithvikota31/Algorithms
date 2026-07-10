@@ -86,14 +86,14 @@ class Solution {
             int cRow = cur[1];
             int cCol = cur[2];
 
-            if (cSafety < maxPossibleSafety[cRow][cCol]) {
-                continue;
-            }
+            // if (cSafety < maxPossibleSafety[cRow][cCol]) {
+            //     continue;
+            // }
 
-            if(cRow == m - 1 && cCol == n - 1)
-            {
-                return cSafety;
-            }
+            // if(cRow == m - 1 && cCol == n - 1)
+            // {
+            //     return cSafety;
+            // }
 
             for(int i = 0; i < delRow.length; i++)
             {
