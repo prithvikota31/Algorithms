@@ -21,10 +21,6 @@ class Solution {
             }
         }
         
-
-
-
-
         if(gridMatrix[0][0] == 1 || gridMatrix[m - 1][n - 1] == 1)
         {
             return 0;
@@ -86,14 +82,14 @@ class Solution {
             int cRow = cur[1];
             int cCol = cur[2];
 
-            // if (cSafety < maxPossibleSafety[cRow][cCol]) {
-            //     continue;
-            // }
+            if (cSafety < maxPossibleSafety[cRow][cCol]) {
+                continue;
+            }
 
-            // if(cRow == m - 1 && cCol == n - 1)
-            // {
-            //     return cSafety;
-            // }
+            if(cRow == m - 1 && cCol == n - 1)
+            {
+                return cSafety;
+            }
 
             for(int i = 0; i < delRow.length; i++)
             {
@@ -102,7 +98,7 @@ class Solution {
 
                 if(nRow >= 0 && nRow < m && nCol >= 0 && nCol < n)
                 {
-                    int nSafety = Math.min(safetyMatrix[nRow][nCol], cSafety);
+                    int nSafety = Math.min(cSafety, safetyMatrix[nRow][nCol]);
 
                     if(nSafety > maxPossibleSafety[nRow][nCol])
                     {
