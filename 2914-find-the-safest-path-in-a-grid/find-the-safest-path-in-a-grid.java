@@ -72,14 +72,11 @@ class Solution {
             }
         }
 
-        //maxSafetyMatrix
-        int[][] maxSafety = new int[m][n];
-
-
-
+        //maxPossibleSafetyMatrix
+        int[][] maxPossibleSafety = new int[m][n];
 
         PriorityQueue<int[]> maxQueue = new PriorityQueue<>((a, b) -> (b[0] - a[0]));
-        maxSafety[0][0] = safetyMatrix[0][0];
+        maxPossibleSafety[0][0] = safetyMatrix[0][0];
         maxQueue.offer(new int[]{safetyMatrix[0][0], 0, 0});
 
         while(!maxQueue.isEmpty())
@@ -89,7 +86,7 @@ class Solution {
             int cRow = cur[1];
             int cCol = cur[2];
 
-            // if (cSafety < maxSafety[cRow][cCol]) {
+            // if (cSafety < maxPossibleSafety[cRow][cCol]) {
             //     continue;
             // }
 
@@ -107,9 +104,9 @@ class Solution {
                 {
                     int nSafety = Math.min(safetyMatrix[nRow][nCol], cSafety);
 
-                    if(nSafety > maxSafety[nRow][nCol])
+                    if(nSafety > maxPossibleSafety[nRow][nCol])
                     {
-                        maxSafety[nRow][nCol] = nSafety;
+                        maxPossibleSafety[nRow][nCol] = nSafety;
                         maxQueue.offer(new int[]{nSafety, nRow, nCol});
                     }         
                 }
@@ -117,7 +114,7 @@ class Solution {
         }
 
 
-        return maxSafety[m - 1][n - 1];
+        return maxPossibleSafety[m - 1][n - 1];
 
 
     }
