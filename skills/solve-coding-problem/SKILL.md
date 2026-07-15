@@ -121,7 +121,18 @@ it (DP/memo) or what's re-scanned → precompute/index it (prefix sums, sorting)
 - Overflow & types: sums/products may exceed `int`; pick the right width early.
 - Don't install compilers/toolchains just to "verify" — hand-trace if the toolchain
   is absent (see the note in section 0).
+- NEVER run `git checkout -- .` / `git reset --hard` to clean line-ending or
+  whitespace noise: it also discards the user's UNCOMMITTED work. Scope the
+  cleanup (specific paths) or commit/stash the user's file first. For CRLF noise,
+  prefer `git config core.autocrlf input` + `git add --renormalize .` and only
+  discard the renormalized files, not the working edits.
 
 ## Solved log (append one line per problem)
 
 <!-- Format: <id> — <one-line problem> → <technique>. File: <path>. -->
+- gci #10 — character order from `a>b` pairs → topological sort (Kahn's BFS);
+  cycle ⇒ "". File: `gci/10-character-order-from-pairs/`.
+- gci #14 — longest increasing subsequence, adjacent diff exactly 1 (follow-ups:
+  diff ≤ D, path reconstruction) → value-keyed DP; O(n) hashmap for diff 1,
+  segment-tree range-max for diff ≤ D, parent pointers for the path.
+  File: `gci/14-longest-inc-subseq-adjacent-diff/`.

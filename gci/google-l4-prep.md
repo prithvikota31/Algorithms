@@ -23,7 +23,7 @@
 | 11 | ☐ | Perform recursive placeholder substitution where replacement values may reference other placeholders; follow-up: detect cycles. |
 | 12 | ☐ | Build a filesystem, URL, or path hierarchy and support queries involving descendants, prefixes, subtree properties, or aggregated values. |
 | 13 | ☐ | Given files represented as arrays of lines, find the maximum common-prefix length between any pair of files. |
-| 14 | ☐ | Find the longest increasing subsequence where adjacent difference is exactly 1; follow-up: difference at most D; follow-up: reconstruct the indices or path. |
+| 14 | ☑ | Find the longest increasing subsequence where adjacent difference is exactly 1; follow-up: difference at most D; follow-up: reconstruct the indices or path. → [solution](14-longest-inc-subseq-adjacent-diff/LongestSubseqAdjacentDiff.java) |
 | 15 | ☐ | Maintain or compute the Top K elements from a stream, such as users, words, scores, or records. |
 | 16 | ☐ | Given strings containing `L`, `R`, and `_`, determine whether the start can reach the target when `L` moves only left and `R` moves only right. |
 | 17 | ☐ | Interval progression: determine whether two intervals overlap; follow-ups: whether any pair overlaps, count overlaps, insert an interval, and merge overlaps. |
