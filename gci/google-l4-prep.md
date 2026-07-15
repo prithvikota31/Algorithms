@@ -19,7 +19,7 @@
 | 7 | ☐ | Time-aware flight or package routing: determine whether a package can reach a destination while respecting flight departure and arrival times. |
 | 8 | ☐ | Multiple people travel to one destination and may share parts of their routes; minimize total cost or number of distinct edges used. |
 | 9 | ☐ | Given multiple preference or dependency orderings, construct one valid global topological ordering or determine that none exists. |
-| 10 | ☐ | Given pairwise character relationships such as `a > b` and `b > c`, reconstruct a valid character order or report impossibility. |
+| 10 | ☑ | Given pairwise character relationships such as `a > b` and `b > c`, reconstruct a valid character order or report impossibility. → [solution](10-character-order-from-pairs/CharacterOrderFromPairs.java) |
 | 11 | ☐ | Perform recursive placeholder substitution where replacement values may reference other placeholders; follow-up: detect cycles. |
 | 12 | ☐ | Build a filesystem, URL, or path hierarchy and support queries involving descendants, prefixes, subtree properties, or aggregated values. |
 | 13 | ☐ | Given files represented as arrays of lines, find the maximum common-prefix length between any pair of files. |
