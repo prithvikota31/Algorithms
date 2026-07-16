@@ -4,6 +4,8 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
+**Progress (Phase 1): 3 / 56 solved.**
+
 ---
 
 ## Phase 1 — The 56 Priority Problems (solve these first)
@@ -14,60 +16,60 @@
 | 2 | ☐ | Grid source-to-target reachability; follow-up: maximize a safety metric such as the minimum distance from a cat or danger source. |
 | 3 | ☐ | Multi-source BFS: compute distance from every grid cell to its nearest source, boundary, or special object. |
 | 4 | ☐ | Router signal propagation: determine whether a source router can reach a destination through routers within transmission range; follow-up: each router has its own radius. |
-| 5 | ☐ | Router reachability: given routers at 2D coordinates with common range R, determine whether a message from source can reach destination through relay broadcasts. |
-| 6 | ☐ | Router activation time: given OFF routers in 2D with common radius R, choose a starting router and find the minimum time for all routers to turn ON. Follow-up: each router has its own radius. |
-| 7 | ☐ | Time-aware flight or package routing: determine whether a package can reach a destination while respecting flight departure and arrival times. |
-| 8 | ☐ | Multiple people travel to one destination and may share parts of their routes; minimize total cost or number of distinct edges used. |
-| 9 | ☐ | Given multiple preference or dependency orderings, construct one valid global topological ordering or determine that none exists. |
-| 10 | ☑ | Given pairwise character relationships such as `a > b` and `b > c`, reconstruct a valid character order or report impossibility. → [solution](10-character-order-from-pairs/CharacterOrderFromPairs.java) |
-| 11 | ☐ | Perform recursive placeholder substitution where replacement values may reference other placeholders; follow-up: detect cycles. |
-| 12 | ☐ | Build a filesystem, URL, or path hierarchy and support queries involving descendants, prefixes, subtree properties, or aggregated values. |
-| 13 | ☐ | Given files represented as arrays of lines, find the maximum common-prefix length between any pair of files. |
-| 14 | ☑ | Find the longest increasing subsequence where adjacent difference is exactly 1; follow-up: difference at most D; follow-up: reconstruct the indices or path. → [solution](14-longest-inc-subseq-adjacent-diff/LongestSubseqAdjacentDiff.java) |
-| 15 | ☑ | Maintain or compute the Top K elements from a stream, such as users, words, scores, or records. → [solution](15-top-k-from-stream/TopKFromStream.java) |
-| 16 | ☐ | Given strings containing `L`, `R`, and `_`, determine whether the start can reach the target when `L` moves only left and `R` moves only right. |
-| 17 | ☐ | Interval progression: determine whether two intervals overlap; follow-ups: whether any pair overlaps, count overlaps, insert an interval, and merge overlaps. |
-| 18 | ☐ | Design a stream data structure supporting `add(x)` and querying a product, mean, or statistic over the last K values; follow-up: dynamic K. |
-| 19 | ☐ | Evaluate arithmetic expressions represented in infix or postfix form using stacks; follow-ups may modify the supported grammar. |
-| 20 | ☐ | Merge two trees or N-ary trees by recursively combining children with matching names while following value-conflict rules. |
-| 21 | ☐ | Process tree leaves based on maximum ancestor values, root-to-leaf properties, or iterative leaf removal. |
-| 22 | ☐ | Given a binary tree whose nodes contain 0 or 1, count connected components of 1 nodes or find the largest such component. |
-| 23 | ☐ | Maintain points on a 2D plane; determine whether rectangles exist and follow up by finding the maximum rectangle area. |
-| 24 | ☐ | Given rectangles on a plane, find a vertical line that divides their total area equally; variation: rectangles may overlap. |
-| 25 | ☐ | Find the longest non-decreasing contiguous subarray; follow-up: change one value arbitrarily to maximize the result. |
-| 26 | ☐ | Remove adjacent invalid character pairs, such as the same letter in opposite cases; follow-up: solve without an explicit stack. |
-| 27 | ☐ | Given a dictionary of special words, determine whether qualifying subsequences of an input string belong to the dictionary. |
-| 28 | ☐ | Given an array, from index i either skip or take the element; taking it adds a score and jumps according to `arr[i]`; maximize total score. |
-| 29 | ☐ | Find arithmetic subarrays where every adjacent difference is exactly +1 or exactly -1. |
-| 30 | ☐ | Given three sorted arrays, find triples containing one value from each array such that every pairwise difference is at most D. |
-| 31 | ☐ | Logger rate limiter: suppress duplicate messages that occur again within a specified time window. |
-| 32 | ☐ | Design a random music shuffler where no song may repeat within the previous K plays while maintaining correct random selection. |
-| 33 | ☐ | Given friends located on graph nodes and cafés on other nodes, choose the café minimizing the maximum distance traveled by any friend. |
-| 34 | ☐ | Given a movie-similarity graph and a starting movie, find the Top N reachable movies by rating. |
-| 35 | ☐ | Find the shortest path through broken teleporters; follow-up: repaired teleporters introduce 0/1 edge costs. |
-| 36 | ☐ | Given currency exchange rates, determine whether an arbitrage cycle exists. |
-| 37 | ☐ | Determine how broadcast signals can propagate through a network of connected or reachable transmitters. |
-| 38 | ☐ | Given an issue-blocker or dependency graph, find all dependency cycles. |
-| 39 | ☐ | Given recipes, required ingredients, and available supplies, determine which recipes can eventually be produced. |
-| 40 | ☐ | Given pairs of similar sentences or words, determine similarity using transitive relationships. |
-| 41 | ☐ | Given multiple subsequences describing ordering constraints, determine whether a target sequence is uniquely reconstructible. |
-| 42 | ☐ | Build a translator using mappings or dependency relationships between language tokens. |
-| 43 | ☐ | Given parent-child relationships, construct the corresponding tree. |
-| 44 | ☐ | Merge two N-ary trees while resolving matching children and field conflicts according to specified rules. |
-| 45 | ☐ | Repeatedly delete leaves from a multi-tree according to the required deletion process. |
-| 46 | ☐ | Return tree leaves grouped by the round in which they would be removed. |
-| 47 | ☐ | Count connected components of 1-valued nodes in a tree. |
-| 48 | ☐ | Find the largest connected component of 1-valued nodes in a tree. |
-| 49 | ☐ | Given an undirected tree where node degree is bounded, choose the best root so the rooted structure satisfies binary-tree constraints. |
-| 50 | ☐ | Reroot a tree while satisfying alternating node-color constraints by level. |
-| 51 | ☐ | A mouse moves from index i to a later index j and earns `(j - i) * nums[j]`; maximize the total score to reach the end. |
-| 52 | ☐ | Given F1 tyres with initial lap time and degradation factor, find the minimum race time using one tyre. |
-| 53 | ☐ | Extend the F1 tyre problem by allowing tyre changes with a fixed replacement cost; minimize total race time. |
-| 54 | ☐ | Given a microwave keypad and target cooking time, choose an input near the target while minimizing keypresses and finger-movement cost. |
-| 55 | ☐ | Given horizontal and vertical line segments, count the number of squares they form. |
-| 56 | ☐ | Given rectangles, find the vertical line that splits their total area equally. |
+| 5 | ☐ | Time-aware flight or package routing: determine whether a package can reach a destination while respecting flight departure and arrival times. |
+| 6 | ☐ | Multiple people travel to one destination and may share parts of their routes; minimize total cost or number of distinct edges used. |
+| 7 | ☐ | Given multiple preference or dependency orderings, construct one valid global topological ordering or determine that none exists. |
+| 8 | ☑ | Given pairwise character relationships such as `a > b` and `b > c`, reconstruct a valid character order or report impossibility. → [solution](10-character-order-from-pairs/CharacterOrderFromPairs.java) |
+| 9 | ☐ | Perform recursive placeholder substitution where replacement values may reference other placeholders; follow-up: detect cycles. |
+| 10 | ☐ | Build a filesystem, URL, or path hierarchy and support queries involving descendants, prefixes, subtree properties, or aggregated values. |
+| 11 | ☐ | Given files represented as arrays of lines, find the maximum common-prefix length between any pair of files. |
+| 12 | ☐ | Find the longest increasing subsequence where adjacent difference is exactly 1; follow-up: difference at most D; follow-up: reconstruct the indices or path. |
+| 13 | ☑ | Maintain or compute the Top K elements from a stream, such as users, words, scores, or records. → [solution](15-top-k-from-stream/TopKFromStream.java) |
+| 14 | ☑ | Given strings containing `L`, `R`, and `_`, determine whether the start can reach the target when `L` moves only left and `R` moves only right. → [solution](14-move-pieces-to-string/MovePiecesToString.java) |
+| 15 | ☐ | Interval progression: determine whether two intervals overlap; follow-ups: whether any pair overlaps, count overlaps, insert an interval, and merge overlaps. |
+| 16 | ☐ | Design a stream data structure supporting `add(x)` and querying a product, mean, or statistic over the last K values; follow-up: dynamic K. |
+| 17 | ☐ | Evaluate arithmetic expressions represented in infix or postfix form using stacks; follow-ups may modify the supported grammar. |
+| 18 | ☐ | Merge two trees or N-ary trees by recursively combining children with matching names while following value-conflict rules. |
+| 19 | ☐ | Process tree leaves based on maximum ancestor values, root-to-leaf properties, or iterative leaf removal. |
+| 20 | ☐ | Given a binary tree whose nodes contain 0 or 1, count connected components of 1 nodes or find the largest such component. |
+| 21 | ☐ | Maintain points on a 2D plane; determine whether rectangles exist and follow up by finding the maximum rectangle area. |
+| 22 | ☐ | Given rectangles on a plane, find a vertical line that divides their total area equally; variation: rectangles may overlap. |
+| 23 | ☐ | Find the longest non-decreasing contiguous subarray; follow-up: change one value arbitrarily to maximize the result. |
+| 24 | ☐ | Remove adjacent invalid character pairs, such as the same letter in opposite cases; follow-up: solve without an explicit stack. |
+| 25 | ☐ | Given a dictionary of special words, determine whether qualifying subsequences of an input string belong to the dictionary. |
+| 26 | ☐ | Given an array, from index i either skip or take the element; taking it adds a score and jumps according to `arr[i]`; maximize total score. |
+| 27 | ☐ | Find arithmetic subarrays where every adjacent difference is exactly +1 or exactly -1. |
+| 28 | ☐ | Given three sorted arrays, find triples containing one value from each array such that every pairwise difference is at most D. |
+| 29 | ☐ | Logger rate limiter: suppress duplicate messages that occur again within a specified time window. |
+| 30 | ☐ | Design a random music shuffler where no song may repeat within the previous K plays while maintaining correct random selection. |
+| 31 | ☐ | Given friends located on graph nodes and cafés on other nodes, choose the café minimizing the maximum distance traveled by any friend. |
+| 32 | ☐ | Given a movie-similarity graph and a starting movie, find the Top N reachable movies by rating. |
+| 33 | ☐ | Find the shortest path through broken teleporters; follow-up: repaired teleporters introduce 0/1 edge costs. |
+| 34 | ☐ | Given currency exchange rates, determine whether an arbitrage cycle exists. |
+| 35 | ☐ | Determine how broadcast signals can propagate through a network of connected or reachable transmitters. |
+| 36 | ☐ | Given an issue-blocker or dependency graph, find all dependency cycles. |
+| 37 | ☐ | Given recipes, required ingredients, and available supplies, determine which recipes can eventually be produced. |
+| 38 | ☐ | Given pairs of similar sentences or words, determine similarity using transitive relationships. |
+| 39 | ☐ | Given multiple subsequences describing ordering constraints, determine whether a target sequence is uniquely reconstructible. |
+| 40 | ☐ | Build a translator using mappings or dependency relationships between language tokens. |
+| 41 | ☐ | Given parent-child relationships, construct the corresponding tree. |
+| 42 | ☐ | Merge two N-ary trees while resolving matching children and field conflicts according to specified rules. |
+| 43 | ☐ | Repeatedly delete leaves from a multi-tree according to the required deletion process. |
+| 44 | ☐ | Return tree leaves grouped by the round in which they would be removed. |
+| 45 | ☐ | Count connected components of 1-valued nodes in a tree. |
+| 46 | ☐ | Find the largest connected component of 1-valued nodes in a tree. |
+| 47 | ☐ | Given an undirected tree where node degree is bounded, choose the best root so the rooted structure satisfies binary-tree constraints. |
+| 48 | ☐ | Reroot a tree while satisfying alternating node-color constraints by level. |
+| 49 | ☐ | A mouse moves from index i to a later index j and earns `(j - i) * nums[j]`; maximize the total score to reach the end. |
+| 50 | ☐ | Given F1 tyres with initial lap time and degradation factor, find the minimum race time using one tyre. |
+| 51 | ☐ | Extend the F1 tyre problem by allowing tyre changes with a fixed replacement cost; minimize total race time. |
+| 52 | ☐ | Given a microwave keypad and target cooking time, choose an input near the target while minimizing keypresses and finger-movement cost. |
+| 53 | ☐ | Given horizontal and vertical line segments, count the number of squares they form. |
+| 54 | ☐ | Given rectangles, find the vertical line that splits their total area equally. |
+| 55 | ☐ | Maintain a set of 2D points and answer whether a rectangle can be formed from stored points. |
+| 56 | ☐ | Given a set of 2D points, find the maximum-area rectangle that can be formed. |
 
-> Note: #56 above and #24 describe the same core "split rectangle area with a vertical line" idea; they are kept separate here to preserve the original formulations. Additional related point/rectangle problems: maintain a set of 2D points and answer whether a rectangle can be formed from stored points; find the maximum-area rectangle from a set of 2D points.
+> Note: #54 and #22 describe the same core "split rectangle area with a vertical line" idea; they are kept separate here to preserve the original formulations. Numbering matches the originally selected 56 (the earlier duplicate router-reachability item and the router-activation-time item were dropped; the two point-set rectangle problems are #55–#56).
 
 ---
 
