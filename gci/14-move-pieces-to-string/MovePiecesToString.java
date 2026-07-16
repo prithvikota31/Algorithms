@@ -32,12 +32,12 @@
  *   Optimal     : one linear pass with two pointers (below).
  *
  * ALGORITHM
- *   i scans start, j scans target.
+ *   startIndex scans start, targetIndex scans target.
  *   1. Skip '_' in both.
  *   2. If one ran out -> valid only if BOTH ran out (equal piece counts).
  *   3. Pieces must match (same relative order).
- *   4. 'L' && i < j  -> would move right -> false.
- *      'R' && i > j  -> would move left  -> false.
+ *   4. 'L' && startIndex < targetIndex  -> would move right -> false.
+ *      'R' && startIndex > targetIndex  -> would move left  -> false.
  *   5. Advance both.
  *
  * COMPLEXITY
@@ -49,43 +49,43 @@ public class MovePiecesToString {
 
     public boolean canChange(String start, String target) {
         int n = start.length();
-        int i = 0;
-        int j = 0;
+        int startIndex = 0;
+        int targetIndex = 0;
 
-        while (i < n || j < n) {
+        while (startIndex < n || targetIndex < n) {
 
             // Blank spaces do not represent pieces, so skip them.
-            while (i < n && start.charAt(i) == '_') {
-                i++;
+            while (startIndex < n && start.charAt(startIndex) == '_') {
+                startIndex++;
             }
-            while (j < n && target.charAt(j) == '_') {
-                j++;
+            while (targetIndex < n && target.charAt(targetIndex) == '_') {
+                targetIndex++;
             }
 
             // One string has remaining pieces while the other does not.
-            if (i == n || j == n) {
-                return i == n && j == n;
+            if (startIndex == n || targetIndex == n) {
+                return startIndex == n && targetIndex == n;
             }
 
-            char piece = start.charAt(i);
+            char piece = start.charAt(startIndex);
 
             // Corresponding pieces must appear in the same relative order.
-            if (piece != target.charAt(j)) {
+            if (piece != target.charAt(targetIndex)) {
                 return false;
             }
 
             // L cannot move right.
-            if (piece == 'L' && i < j) {
+            if (piece == 'L' && startIndex < targetIndex) {
                 return false;
             }
 
             // R cannot move left.
-            if (piece == 'R' && i > j) {
+            if (piece == 'R' && startIndex > targetIndex) {
                 return false;
             }
 
-            i++;
-            j++;
+            startIndex++;
+            targetIndex++;
         }
 
         return true;
