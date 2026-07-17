@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 3 / 56 solved.**
+**Progress (Phase 1): 5 / 56 solved.**
 
 ---
 
@@ -27,14 +27,14 @@
 | 13 | ☑ | Maintain or compute the Top K elements from a stream, such as users, words, scores, or records. → [solution](15-top-k-from-stream/TopKFromStream.java) |
 | 14 | ☑ | Given strings containing `L`, `R`, and `_`, determine whether the start can reach the target when `L` moves only left and `R` moves only right. → [solution](14-move-pieces-to-string/MovePiecesToString.java) |
 | 15 | ☐ | Interval progression: determine whether two intervals overlap; follow-ups: whether any pair overlaps, count overlaps, insert an interval, and merge overlaps. |
-| 16 | ☐ | Design a stream data structure supporting `add(x)` and querying a product, mean, or statistic over the last K values; follow-up: dynamic K. |
+| 16 | ☑ | Design a stream data structure supporting `add(x)` and querying a product, mean, or statistic over the last K values; follow-up: dynamic K. → [fixed-K](16-product-last-k-stream/LastKProduct.java), [dynamic-K](16-product-last-k-stream/ProductOfNumbers.java) |
 | 17 | ☐ | Evaluate arithmetic expressions represented in infix or postfix form using stacks; follow-ups may modify the supported grammar. |
 | 18 | ☐ | Merge two trees or N-ary trees by recursively combining children with matching names while following value-conflict rules. |
 | 19 | ☐ | Process tree leaves based on maximum ancestor values, root-to-leaf properties, or iterative leaf removal. |
 | 20 | ☐ | Given a binary tree whose nodes contain 0 or 1, count connected components of 1 nodes or find the largest such component. |
 | 21 | ☐ | Maintain points on a 2D plane; determine whether rectangles exist and follow up by finding the maximum rectangle area. |
 | 22 | ☐ | Given rectangles on a plane, find a vertical line that divides their total area equally; variation: rectangles may overlap. |
-| 23 | ☐ | Find the longest non-decreasing contiguous subarray; follow-up: change one value arbitrarily to maximize the result. |
+| 23 | ☑ | Find the longest non-decreasing contiguous subarray; follow-up: change one value arbitrarily to maximize the result. → [solution](23-longest-non-decreasing-subarray/LongestNonDecreasingSubarray.java) |
 | 24 | ☐ | Remove adjacent invalid character pairs, such as the same letter in opposite cases; follow-up: solve without an explicit stack. |
 | 25 | ☐ | Given a dictionary of special words, determine whether qualifying subsequences of an input string belong to the dictionary. |
 | 26 | ☐ | Given an array, from index i either skip or take the element; taking it adds a score and jumps according to `arr[i]`; maximize total score. |
