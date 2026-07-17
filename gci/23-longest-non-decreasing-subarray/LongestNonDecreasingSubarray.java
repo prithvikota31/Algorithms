@@ -135,8 +135,6 @@ public class LongestNonDecreasingSubarray {
 
     int ans = 1;
     for (int i = 0; i < n; i++) {
-        ans = Math.max(ans, end[i]); // no-change baseline
-
         int left = (i - 1 >= 0) ? end[i - 1] : 0;   // run just left of i
         int right = (i + 1 < n) ? start[i + 1] : 0; // run just right of i
 
