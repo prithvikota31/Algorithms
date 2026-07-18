@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 7 / 56 solved.**
+**Progress (Phase 1): 8 / 56 solved.**
 
 ---
 
@@ -13,7 +13,7 @@
 | # | Status | Problem |
 |---|--------|---------|
 | 1 | ☐ | Evaluate nested function expressions such as `mul(2, add(3,5))`; follow-ups: `sub`, `div`, `pow`, decimals, spaces, and invalid expressions. |
-| 2 | ☐ | Grid source-to-target reachability; follow-up: maximize a safety metric such as the minimum distance from a cat or danger source. |
+| 2 | ☑ | Grid source-to-target reachability; follow-up: maximize a safety metric such as the minimum distance from a cat or danger source. → [reachability](2-grid-reachability/GridReachability.java), [safest-path](2-grid-reachability/MaximumSafetyPath.java) |
 | 3 | ☑ | Multi-source BFS: compute distance from every grid cell to its nearest source, boundary, or special object. → [solution](3-multi-source-bfs/MultiSourceBFS.java) |
 | 4 | ☐ | Router signal propagation: determine whether a source router can reach a destination through routers within transmission range; follow-up: each router has its own radius. |
 | 5 | ☐ | Time-aware flight or package routing: determine whether a package can reach a destination while respecting flight departure and arrival times. |
