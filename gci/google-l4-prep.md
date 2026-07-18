@@ -19,12 +19,12 @@
 | 5 | ☐ | Time-aware flight or package routing: determine whether a package can reach a destination while respecting flight departure and arrival times. |
 | 6 | ☐ | Multiple people travel to one destination and may share parts of their routes; minimize total cost or number of distinct edges used. |
 | 7 | ☐ | Given multiple preference or dependency orderings, construct one valid global topological ordering or determine that none exists. |
-| 8 | ☑ | Given pairwise character relationships such as `a > b` and `b > c`, reconstruct a valid character order or report impossibility. → [solution](10-character-order-from-pairs/CharacterOrderFromPairs.java) |
+| 8 | ☑ | Given pairwise character relationships such as `a > b` and `b > c`, reconstruct a valid character order or report impossibility. → [solution](8-character-order-from-pairs/CharacterOrderFromPairs.java) |
 | 9 | ☐ | Perform recursive placeholder substitution where replacement values may reference other placeholders; follow-up: detect cycles. |
 | 10 | ☐ | Build a filesystem, URL, or path hierarchy and support queries involving descendants, prefixes, subtree properties, or aggregated values. |
 | 11 | ☐ | Given files represented as arrays of lines, find the maximum common-prefix length between any pair of files. |
 | 12 | ☐ | Find the longest increasing subsequence where adjacent difference is exactly 1; follow-up: difference at most D; follow-up: reconstruct the indices or path. |
-| 13 | ☑ | Maintain or compute the Top K elements from a stream, such as users, words, scores, or records. → [solution](15-top-k-from-stream/TopKFromStream.java) |
+| 13 | ☑ | Maintain or compute the Top K elements from a stream, such as users, words, scores, or records. → [solution](13-top-k-from-stream/TopKFromStream.java) |
 | 14 | ☑ | Given strings containing `L`, `R`, and `_`, determine whether the start can reach the target when `L` moves only left and `R` moves only right. → [solution](14-move-pieces-to-string/MovePiecesToString.java) |
 | 15 | ☐ | Interval progression: determine whether two intervals overlap; follow-ups: whether any pair overlaps, count overlaps, insert an interval, and merge overlaps. |
 | 16 | ☑ | Design a stream data structure supporting `add(x)` and querying a product, mean, or statistic over the last K values; follow-up: dynamic K. → [fixed-K](16-product-last-k-stream/LastKProduct.java), [dynamic-K](16-product-last-k-stream/ProductOfNumbers.java) |
