@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 6 / 56 solved.**
+**Progress (Phase 1): 7 / 56 solved.**
 
 ---
 
@@ -42,7 +42,7 @@
 | 28 | ☐ | Given three sorted arrays, find triples containing one value from each array such that every pairwise difference is at most D. |
 | 29 | ☐ | Logger rate limiter: suppress duplicate messages that occur again within a specified time window. |
 | 30 | ☐ | Design a random music shuffler where no song may repeat within the previous K plays while maintaining correct random selection. |
-| 31 | ☐ | Given friends located on graph nodes and cafés on other nodes, choose the café minimizing the maximum distance traveled by any friend. |
+| 31 | ☑ | Given friends located on graph nodes and cafés on other nodes, choose the café minimizing the maximum distance traveled by any friend. → [solution](31-best-cafe-for-friends/FindBestCafe.java) |
 | 32 | ☐ | Given a movie-similarity graph and a starting movie, find the Top N reachable movies by rating. |
 | 33 | ☐ | Find the shortest path through broken teleporters; follow-up: repaired teleporters introduce 0/1 edge costs. |
 | 34 | ☐ | Given currency exchange rates, determine whether an arbitrage cycle exists. |
