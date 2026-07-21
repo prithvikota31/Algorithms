@@ -14,6 +14,19 @@
  * sources.  [inferred] follow-up: WEIGHTED graph -> replace BFS with Dijkstra
  * (this weighted variant is essentially LeetCode 2203).
  *
+ * WHY MULTI-SOURCE DOESN'T GENERALIZE (conceptual — deliberately not coded):
+ *   With >2 people, a SINGLE merge node M is no longer enough: groups can merge
+ *   gradually (S1,S2 merge at X, then merge with S3 at Y). The unrestricted
+ *   problem is a STEINER TREE — the smallest connected subgraph containing all
+ *   required terminals — which is NP-hard. Recognizing that is the high-value
+ *   insight. Tractable only under special structure:
+ *     - everyone must merge at ONE node  -> this 3xBFS meeting-node method;
+ *     - graph is a TREE                   -> union of unique source->D paths;
+ *     - very small k (#sources)           -> subset DP dp[mask][v] = min cost to
+ *         connect the sources in `mask` through node v; combine submasks at the
+ *         same v: dp[full][v] = min over splits (dp[sub][v] + dp[full^sub][v]),
+ *         then relax along edges; answer = dp[(1<<k)-1][D]. Size 2^k x n.
+ *
  * EXAMPLE
  *   A -- X -- Y -- D , with B also attached to Y
  *   Alice: A->X->Y->D ; Bob: B->Y->D. Y->D is shared -> counts once.
@@ -39,11 +52,7 @@
  * ----------------------------------------------------------------------------
  */
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class SharedRouteMeetingPoint {
 
@@ -51,58 +60,59 @@ public class SharedRouteMeetingPoint {
     // `destination`, sharing edges where possible. Returns -1 if impossible.
     public int minimumDistinctEdges(int n, int[][] edges,
                                     int alice, int bob, int destination) {
-
-        // Build the undirected adjacency list.
+        //construct graph
         List<List<Integer>> graph = new ArrayList<>();
-        for (int node = 0; node < n; node++) {
+    
+        for(int i = 0; i < n; i++)
+        {
             graph.add(new ArrayList<>());
         }
-        for (int[] edge : edges) {
-            graph.get(edge[0]).add(edge[1]);
-            graph.get(edge[1]).add(edge[0]);
+
+        for(int i = 0; i < edges.length; i++)
+        {
+            int u = edges[i][0];
+            int v = edges[i][1];
+            graph.get(u).add(v);
+            graph.get(v).add(u);
         }
-
-        // Shortest distance from each terminal to every node.
-        int[] distAlice = bfs(alice, graph);
-        int[] distBob = bfs(bob, graph);
-        int[] distDest = bfs(destination, graph);
-
-        int minimumEdges = Integer.MAX_VALUE;
-
-        // Try every node as the meeting point M where the two routes merge.
-        for (int m = 0; m < n; m++) {
-            // All three terminals must be able to reach M.
-            if (distAlice[m] == -1 || distBob[m] == -1 || distDest[m] == -1) {
-                continue;
+        int[] distA = bfs(alice, graph);
+        int[] distB = bfs(bob, graph);
+        int[] distD = bfs(destination, graph);
+        int ans = Integer.MAX_VALUE;
+        for(int i = 0; i < n; i++)
+        {
+            if(distA[i] != (int)1e9 && distB[i] != (int)1e9 && distD[i] != (int)1e9)
+            {
+                ans = Math.min(ans, distA[i] + distB[i] + distD[i]);
             }
-            int distinctEdges = distAlice[m] + distBob[m] + distDest[m];
-            minimumEdges = Math.min(minimumEdges, distinctEdges);
         }
 
-        return minimumEdges == Integer.MAX_VALUE ? -1 : minimumEdges;
+        return ans == Integer.MAX_VALUE? -1: ans;
     }
 
     // BFS shortest distance from `source` to every node; -1 if unreachable.
     private int[] bfs(int source, List<List<Integer>> graph) {
         int n = graph.size();
-        int[] distance = new int[n];
-        Arrays.fill(distance, -1);
-
-        Queue<Integer> queue = new ArrayDeque<>();
-        distance[source] = 0;
-        queue.offer(source);
-
-        while (!queue.isEmpty()) {
-            int current = queue.poll();
-            for (int neighbor : graph.get(current)) {
-                // First time we reach a node is its shortest distance (unweighted).
-                if (distance[neighbor] == -1) {
-                    distance[neighbor] = distance[current] + 1;
-                    queue.offer(neighbor);
+        Deque<Integer> q = new ArrayDeque<>();
+        q.offer(source);
+        int[] dist = new int[n];
+        Arrays.fill(dist, (int)1e9);
+        dist[source] = 0;
+        while(!q.isEmpty())
+        {
+            int cur = q.poll();
+            for(int nei: graph.get(cur))
+            {
+                if(dist[nei] == (int)1e9)
+                {
+                    dist[nei] = dist[cur] + 1;
+                    q.offer(nei);
                 }
             }
         }
-        return distance;
+
+        return dist;
+
     }
 
     // ------------------------------------------------------------------
