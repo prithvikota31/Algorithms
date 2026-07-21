@@ -14,6 +14,14 @@
  * flights/airports used. Not part of this row's stated scope; can be added by
  * storing a parent pointer per airport.
  *
+ * >>> FUTURE FOLLOW-UP (NOT solving today) <<<
+ *   Reach-before-deadline variant: given a deadline T, return whether the
+ *   destination can be reached with arrivalTime <= T (one report phrases it as
+ *   returning the SHORTEST valid path that arrives before the deadline).
+ *   Idea: same earliest-arrival Dijkstra; prune any state with arrivalTime > T,
+ *   and on reaching destination check arrival <= T (combine with parent-pointer
+ *   path reconstruction for the "shortest valid path" phrasing).
+ *
  * EXAMPLE
  *   A->B dep1 arr10 ; A->B dep2 arr4 ; B->C dep5 arr7
  *   Reach C? yes: A->B(arr4) then B->C(dep5>=4). The arr10 A->B is too late.
@@ -42,6 +50,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Arrays;
+import java.util.Collections;
 
     // TODO:
     //  1. trivial: if source.equals(destination) return true.
@@ -149,6 +159,93 @@ public class TimeAwarePackageRouting {
         return false;
     }
 
+        //use minHeap in order of arrival times so packet can reach sooner and have more options
+    public List<String> findBestPath(String source, String destination, List<Flight> flights) {
+
+        if(source.equals(destination))
+        {
+            return Arrays.asList(source);
+        }
+        
+        //first construct a graph. airports are node
+        //src -> dest
+        //Map<String, List<flights>>
+        Map<String, List<Flight>> graph = new HashMap<>();
+
+        //no mutations on graph
+        for(Flight flight: flights)
+        {
+            graph.putIfAbsent(flight.source, new ArrayList<>());
+            graph.get(flight.source).add(flight);
+        }
+
+        Map<String, String> parentAirport = new HashMap<>();
+
+        // for(String airport: graph.keySet())
+        // {
+        //     parentAirport.put(airport, airport);
+        // }
+
+        //heap to maintain arrival times in order, source 
+        PriorityQueue<CurrentPos> pq = new PriorityQueue<>((a, b) 
+                                        -> Integer.compare(a.packetArrivalTime, b.packetArrivalTime));
+        pq.offer(new CurrentPos(source, 0));
+        //similar to distance array
+        Map<String, Integer> arrivalTimes = new HashMap<>();
+        arrivalTimes.put(source, 0);
+        parentAirport.put(source, source);
+        while(!pq.isEmpty())
+        {
+            CurrentPos current = pq.poll();
+            String curAirport = current.source;
+            int curPacketArrivalTime = current.packetArrivalTime;
+
+            // if(curAirport.equals(destination))
+            // {
+            //     return true;
+            // }
+
+            if(!graph.containsKey(curAirport))
+            {
+                continue;
+            }
+
+            for(Flight nextFlight: graph.get(curAirport))
+            {
+                String nextDest = nextFlight.dest;
+                int nextDeparture = nextFlight.departureTime;
+                if(curPacketArrivalTime > nextDeparture)
+                {
+                    continue;
+                }
+
+                int nextPrevBestArrivalTime = arrivalTimes.getOrDefault(nextDest, Integer.MAX_VALUE);
+                if(nextPrevBestArrivalTime > nextFlight.arrivalTime)
+                {
+                    arrivalTimes.put(nextDest, nextFlight.arrivalTime);
+                    pq.offer(new CurrentPos(nextDest, nextFlight.arrivalTime));
+                    parentAirport.put(nextDest, curAirport);
+                }
+                      
+            }
+        }
+
+        List<String> path = new ArrayList<>();
+
+        if(!parentAirport.containsKey(destination)) {
+            return new ArrayList<>();   // unreachable, no path
+        }
+
+        String airport = destination;
+        while(!parentAirport.get(airport).equals(airport))
+        {
+            path.add(airport);
+            airport = parentAirport.get(airport);
+        }
+        path.add(source);
+        Collections.reverse(path); 
+        return path;
+    }
     // ------------------------------------------------------------------
     // Quick self-test.
     // ------------------------------------------------------------------

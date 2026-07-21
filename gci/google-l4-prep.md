@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 9 / 56 solved.**
+**Progress (Phase 1): 10 / 56 solved.**
 
 ---
 
@@ -16,7 +16,7 @@
 | 2 | ☑ | Grid source-to-target reachability; follow-up: maximize a safety metric such as the minimum distance from a cat or danger source. → [reachability](2-grid-reachability/GridReachability.java), [safest-path](2-grid-reachability/MaximumSafetyPath.java) |
 | 3 | ☑ | Multi-source BFS: compute distance from every grid cell to its nearest source, boundary, or special object. → [solution](3-multi-source-bfs/MultiSourceBFS.java) |
 | 4 | ☑ | Router signal propagation: determine whether a source router can reach a destination through routers within transmission range; follow-up: each router has its own radius. → [uniform-range](4-router-signal-propagation/RouterSignalPropagation.java), [per-router-radius](4-router-signal-propagation/RouterRadiusReachability.java) |
-| 5 | ☐ | Time-aware flight or package routing: determine whether a package can reach a destination while respecting flight departure and arrival times. _(base done; return-the-path follow-up pending)_ → [solution](5-time-aware-routing/TimeAwarePackageRouting.java) |
+| 5 | ☑ | Time-aware flight or package routing: determine whether a package can reach a destination while respecting flight departure and arrival times; return-the-path follow-up done. **<span style="color:red">Future follow-up (not solving today): reach-before-deadline — can the destination be reached with arrivalTime ≤ T; one report phrases it as returning the shortest valid path before the deadline.</span>** → [solution](5-time-aware-routing/TimeAwarePackageRouting.java) |
 | 6 | ☐ | Multiple people travel to one destination and may share parts of their routes; minimize total cost or number of distinct edges used. |
 | 7 | ☐ | Given multiple preference or dependency orderings, construct one valid global topological ordering or determine that none exists. |
 | 8 | ☑ | Given pairwise character relationships such as `a > b` and `b > c`, reconstruct a valid character order or report impossibility. → [solution](8-character-order-from-pairs/CharacterOrderFromPairs.java) |
