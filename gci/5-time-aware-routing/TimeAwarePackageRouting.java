@@ -267,5 +267,38 @@ public class TimeAwarePackageRouting {
         System.out.println(sol.canReach("A", "C", flights2)); // false
 
         System.out.println(sol.canReach("A", "A", flights));  // true (same airport)
+
+        // ---- findBestPath tests ----
+        System.out.println("--- findBestPath ---");
+
+        // 1) basic 2-hop; must pick catchable A->B(arr4), not A->B(arr10)
+        System.out.println(sol.findBestPath("A", "C", flights));   // [A, B, C]
+
+        // 2) unreachable: slow A->B(arr10) misses B->C(dep5)
+        System.out.println(sol.findBestPath("A", "C", flights2));  // []
+
+        // 3) source == destination
+        System.out.println(sol.findBestPath("A", "A", flights));   // [A]
+
+        // 4) two routes to D; earliest arrival wins (via B arr6, not via C arr10)
+        List<Flight> flights3 = List.of(
+            new Flight("A", "B", 0, 5),
+            new Flight("A", "C", 0, 3),
+            new Flight("B", "D", 5, 6),
+            new Flight("C", "D", 3, 10)
+        );
+        System.out.println(sol.findBestPath("A", "D", flights3));  // [A, B, D]
+
+        // 5) direct single hop
+        List<Flight> flights4 = List.of(new Flight("A", "B", 0, 4));
+        System.out.println(sol.findBestPath("A", "B", flights4));  // [A, B]
+
+        // 6) longer chain A->B->C->D, all catchable
+        List<Flight> flights5 = List.of(
+            new Flight("A", "B", 1, 2),
+            new Flight("B", "C", 2, 3),
+            new Flight("C", "D", 3, 4)
+        );
+        System.out.println(sol.findBestPath("A", "D", flights5));  // [A, B, C, D]
     }
 }
