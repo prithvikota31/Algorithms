@@ -73,7 +73,7 @@ public class SharedRouteMeetingPointWeighted {
 
         // {distanceSoFar, node}, min-heap by distance.
         PriorityQueue<long[]> minHeap =
-                new PriorityQueue<>(Comparator.comparingLong(a -> a[0]));
+                new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0]));
 
         distance[source] = 0;
         minHeap.offer(new long[]{0, source});
