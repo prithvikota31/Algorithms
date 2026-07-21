@@ -38,87 +38,114 @@
  */
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+    // TODO:
+    //  1. trivial: if source.equals(destination) return true.
+    //  2. build graph: Map<String, List<Flight>> of source -> its flights
+    //     (computeIfAbsent + add).
+    //  3. earliestArrival: Map<String,Integer>, put(source, 0).
+    //  4. min-heap of State by arrivalTime; offer (source, 0).
+    //  5. loop while heap non-empty:
+    //       - poll current
+    //       - skip stale: if current.arrivalTime > earliestArrival[current.airport] continue
+    //       - if current.airport == destination return true
+    //       - for each outgoing flight with departureTime >= current.arrivalTime:
+    //           if flight.arrivalTime < best known for its destination,
+    //           update earliestArrival and offer the new State.
+    //  6. return false if the heap empties without reaching destination.
 public class TimeAwarePackageRouting {
 
-    static class Flight {
+    static class Flight{
         String source;
-        String destination;
+        String dest;
+        int arrivalTime;
         int departureTime;
-        int arrivalTime;
 
-        Flight(String source, String destination, int departureTime, int arrivalTime) {
+        public Flight(String source, String dest, int departureTime, int arrivalTime)
+        {
             this.source = source;
-            this.destination = destination;
+            this.arrivalTime = arrivalTime;
             this.departureTime = departureTime;
-            this.arrivalTime = arrivalTime;
+            this.dest = dest;
         }
     }
 
-    static class State {
-        String airport;
-        int arrivalTime;
+    static class CurrentPos{
+        String source; //to get flights from this loc
+        int packetArrivalTime; //to this souce
 
-        State(String airport, int arrivalTime) {
-            this.airport = airport;
-            this.arrivalTime = arrivalTime;
+        public CurrentPos(String s, int aT)
+        {
+            this.source = s;
+            this.packetArrivalTime = aT;
         }
     }
 
+
+    //use minHeap in order of arrival times so packet can reach sooner and have more options
     public boolean canReach(String source, String destination, List<Flight> flights) {
-        if (source.equals(destination)) {
+
+        if(source.equals(destination))
+        {
             return true;
         }
-
-        // airport -> flights departing from it.
+        
+        //first construct a graph. airports are node
+        //src -> dest
+        //Map<String, List<flights>>
         Map<String, List<Flight>> graph = new HashMap<>();
-        for (Flight flight : flights) {
-            graph.computeIfAbsent(flight.source, key -> new ArrayList<>()).add(flight);
+
+        //no mutations on graph
+        for(Flight flight: flights)
+        {
+            graph.putIfAbsent(flight.source, new ArrayList<>());
+            graph.get(flight.source).add(flight);
         }
+        //heap to maintain arrival times in order, source 
+        PriorityQueue<CurrentPos> pq = new PriorityQueue<>((a, b) 
+                                        -> Integer.compare(a.packetArrivalTime, b.packetArrivalTime));
+        pq.offer(new CurrentPos(source, 0));
+        //similar to distance array
+        Map<String, Integer> arrivalTimes = new HashMap<>();
+        arrivalTimes.put(source, 0);
+        while(!pq.isEmpty())
+        {
+            CurrentPos current = pq.poll();
+            String curAirport = current.source;
+            int curPacketArrivalTime = current.packetArrivalTime;
 
-        // Earliest time the package can be at each airport.
-        Map<String, Integer> earliestArrival = new HashMap<>();
-        earliestArrival.put(source, 0);
-
-        PriorityQueue<State> minHeap =
-                new PriorityQueue<>(Comparator.comparingInt(state -> state.arrivalTime));
-        minHeap.offer(new State(source, 0));
-
-        while (!minHeap.isEmpty()) {
-            State current = minHeap.poll();
-
-            // Stale entry: a better arrival at this airport already settled.
-            if (current.arrivalTime != earliestArrival.get(current.airport)) {
-                continue;
-            }
-
-            // Processed by earliest arrival -> first pop of destination wins.
-            if (current.airport.equals(destination)) {
+            if(curAirport.equals(destination))
+            {
                 return true;
             }
 
-            for (Flight flight : graph.getOrDefault(current.airport, List.of())) {
-                // Can only board a flight that has not yet departed.
-                if (flight.departureTime < current.arrivalTime) {
+            if(!graph.containsKey(curAirport))
+            {
+                continue;
+            }
+
+            for(Flight nextFlight: graph.get(curAirport))
+            {
+                String nextSource = nextFlight.dest;
+                int nextDeparture = nextFlight.departureTime;
+                if(curPacketArrivalTime > nextDeparture)
+                {
                     continue;
                 }
 
-                int previousBestArrival =
-                        earliestArrival.getOrDefault(flight.destination, Integer.MAX_VALUE);
-
-                // Keep only routes that reach the next airport earlier.
-                if (flight.arrivalTime < previousBestArrival) {
-                    earliestArrival.put(flight.destination, flight.arrivalTime);
-                    minHeap.offer(new State(flight.destination, flight.arrivalTime));
+                int nextPrevBestArrivalTime = arrivalTimes.getOrDefault(nextSource, Integer.MAX_VALUE);
+                if(nextPrevBestArrivalTime > nextFlight.arrivalTime)
+                {
+                    arrivalTimes.put(nextSource, nextFlight.arrivalTime);
+                    pq.offer(new CurrentPos(nextSource, nextFlight.arrivalTime));
                 }
+                      
             }
-        }
-
+        }      
         return false;
     }
 
