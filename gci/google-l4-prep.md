@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 11 / 56 solved.**
+**Progress (Phase 1): 12 / 56 solved.**
 
 ---
 
@@ -18,7 +18,7 @@
 | 4 | ☑ | Router signal propagation: determine whether a source router can reach a destination through routers within transmission range; follow-up: each router has its own radius. → [uniform-range](4-router-signal-propagation/RouterSignalPropagation.java), [per-router-radius](4-router-signal-propagation/RouterRadiusReachability.java) |
 | 5 | ☑ | Time-aware flight or package routing: determine whether a package can reach a destination while respecting flight departure and arrival times; return-the-path follow-up done. **<span style="color:red">Future follow-up (not solving today): reach-before-deadline — can the destination be reached with arrivalTime ≤ T; one report phrases it as returning the shortest valid path before the deadline.</span>** → [solution](5-time-aware-routing/TimeAwarePackageRouting.java) |
 | 6 | ☑ | Multiple people travel to one destination and may share parts of their routes; minimize total cost or number of distinct edges used. _(2-person unweighted 3×BFS + weighted 3×Dijkstra (≈ LC 2203) both done. Multi-source intentionally NOT coded — general case is a Steiner Tree (NP-hard); only special structure is tractable, noted in file.)_ → [unweighted-BFS](6-shared-route-meeting-point/SharedRouteMeetingPoint.java), [weighted-Dijkstra](6-shared-route-meeting-point/SharedRouteMeetingPointWeighted.java) |
-| 7 | ☐ | Given multiple preference or dependency orderings, construct one valid global topological ordering or determine that none exists. |
+| 7 | ☑ | Given multiple preference or dependency orderings, construct one valid global topological ordering or determine that none exists. → [solution](7-merge-orderings-topo-sort/MergeOrderingsTopoSort.java) |
 | 8 | ☑ | Given pairwise character relationships such as `a > b` and `b > c`, reconstruct a valid character order or report impossibility. → [solution](8-character-order-from-pairs/CharacterOrderFromPairs.java) |
 | 9 | ☐ | Perform recursive placeholder substitution where replacement values may reference other placeholders; follow-up: detect cycles. |
 | 10 | ☐ | Build a filesystem, URL, or path hierarchy and support queries involving descendants, prefixes, subtree properties, or aggregated values. |
