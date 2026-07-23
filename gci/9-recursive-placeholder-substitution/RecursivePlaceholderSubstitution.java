@@ -65,7 +65,8 @@ public class RecursivePlaceholderSubstitution {
      */
     public String substitute(String input, Map<String, String> replacements) {
         Map<String, String> cache = new HashMap<>();
-        return expand(input, replacements, cache);
+        Set<String> currentPath = new HashSet<>();
+        return expand(input, replacements, cache, currentPath);
     }
 
     /*
@@ -75,7 +76,7 @@ public class RecursivePlaceholderSubstitution {
     private String expand(
             String text,
             Map<String, String> replacements,
-            Map<String, String> cache) {
+            Map<String, String> cache, Set<String> currentPath) {
 
         StringBuilder result = new StringBuilder();
 
@@ -99,7 +100,7 @@ public class RecursivePlaceholderSubstitution {
             String key = text.substring(i + 1, end);
 
             if (replacements.containsKey(key)) {
-                result.append(resolve(key, replacements, cache));
+                result.append(resolve(key, replacements, cache, currentPath));
             } else {
                 // Unknown placeholder stays unchanged.
                 result.append(text, i, end + 1);
@@ -119,17 +120,25 @@ public class RecursivePlaceholderSubstitution {
     private String resolve(
             String key,
             Map<String, String> replacements,
-            Map<String, String> cache) {
+            Map<String, String> cache, Set<String> currentPath) {
 
         // Reuse previously resolved value.
         if (cache.containsKey(key)) {
             return cache.get(key);
         }
 
+        if(currentPath.contains(key))
+        {
+            throw new IllegalArgumentException("Cycle detected involving key: " + key);
+        }
+
+        currentPath.add(key);
+
         String rawValue = replacements.get(key);
 
         // Recursively resolve placeholders inside this value.
-        String resolvedValue = expand(rawValue, replacements, cache);
+        String resolvedValue = expand(rawValue, replacements, cache, currentPath);
+        currentPath.remove(key);
 
         cache.put(key, resolvedValue);
         return resolvedValue;
@@ -161,5 +170,17 @@ public class RecursivePlaceholderSubstitution {
         //    read as an (unknown) key and left as-is.
         System.out.println(sol.substitute("50% done by %USER%", map));
         // expected: 50% done by %USER%
+
+        // 5) Cycle detection: A -> %B% -> %A% -> ...  (follow-up)
+        Map<String, String> cyclic = new HashMap<>();
+        cyclic.put("A", "%B%");
+        cyclic.put("B", "%A%");
+        try {
+            sol.substitute("start %A% end", cyclic);
+            System.out.println("no cycle detected (unexpected)");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+        // expected: Cycle detected involving key: A
     }
 }
