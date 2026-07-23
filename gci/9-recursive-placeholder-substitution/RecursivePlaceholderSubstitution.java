@@ -77,43 +77,39 @@ public class RecursivePlaceholderSubstitution {
             Map<String, String> replacements,
             Map<String, String> cache) {
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder result = new StringBuilder();
 
-        for(int i = 0; i < text.length(); i++)
-        {
-            char ch = text.charAt(i);
-            if(ch != '%')
-            {
-                sb.append(ch);
+        for (int i = 0; i < text.length(); i++) {
+
+            // Normal character: copy it.
+            if (text.charAt(i) != '%') {
+                result.append(text.charAt(i));
                 continue;
             }
-            //eg: % a b c %
-            //    i       end
+
+            // Find the ending '%' of %KEY%.
             int end = text.indexOf('%', i + 1);
 
-            if(end == -1)
-            {
-                sb.append(ch);
+            // No matching '%': treat it as a normal character.
+            if (end == -1) {
+                result.append('%');
                 continue;
             }
 
             String key = text.substring(i + 1, end);
 
-            if(replacements.containsKey(key))
-            {
-                String keyFinalValue = resolve(key, replacements, cache);
-                sb.append(keyFinalValue);
-                i = end; // consume the whole %KEY%
+            if (replacements.containsKey(key)) {
+                result.append(resolve(key, replacements, cache));
+            } else {
+                // Unknown placeholder stays unchanged.
+                result.append(text, i, end + 1);
             }
-            else //unknown key: opening '%' is a literal, keep scanning so a
-                 //later real placeholder can still be matched
-            {
-                sb.append(ch);
-            }
+
+            // Skip everything inside %KEY%.
+            i = end;
         }
 
-        return sb.toString();
-
+        return result.toString();
     }
 
     /*
@@ -125,18 +121,18 @@ public class RecursivePlaceholderSubstitution {
             Map<String, String> replacements,
             Map<String, String> cache) {
 
-        if(cache.containsKey(key))
-        {
+        // Reuse previously resolved value.
+        if (cache.containsKey(key)) {
             return cache.get(key);
         }
 
-        String currentKeyOriginalValue = replacements.get(key);
+        String rawValue = replacements.get(key);
 
-        String currentKeyReplacementValue = expand(currentKeyOriginalValue, replacements, cache);
+        // Recursively resolve placeholders inside this value.
+        String resolvedValue = expand(rawValue, replacements, cache);
 
-        cache.put(key, currentKeyReplacementValue);
-        return currentKeyReplacementValue;
-
+        cache.put(key, resolvedValue);
+        return resolvedValue;
     }
 
     // ---------------------------------------------------------------------
@@ -161,8 +157,9 @@ public class RecursivePlaceholderSubstitution {
         System.out.println(sol.substitute("Hi %NAME%", map));
         // expected: Hi %NAME%
 
-        // 4) Lone '%' is an ordinary character.
+        // 4) A bare '%' greedily pairs with the next '%', so " done by " is
+        //    read as an (unknown) key and left as-is.
         System.out.println(sol.substitute("50% done by %USER%", map));
-        // expected: 50% done by admin
+        // expected: 50% done by %USER%
     }
 }
