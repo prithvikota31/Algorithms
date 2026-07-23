@@ -81,9 +81,22 @@ public class FileSystem {
 
         for(String part: parts)
         {
+            // Can't create/descend into a child under a file (e.g. /docs/a.txt/x).
+            if(current.isFile)
+            {
+                throw new IllegalArgumentException(
+                    "A file cannot contain children: " + path);
+            }
             current.children.putIfAbsent(part, new Node());
             current = current.children.get(part);
             nodePath.add(current);
+        }
+
+        // Can't turn a non-empty directory into a file (e.g. addFile("/docs", 10)).
+        if(!current.children.isEmpty())
+        {
+            throw new IllegalArgumentException(
+                "A directory cannot be replaced by a file: " + path);
         }
 
         // Overwrite-safe delta: new size - old size (old = 0 for a fresh file).
