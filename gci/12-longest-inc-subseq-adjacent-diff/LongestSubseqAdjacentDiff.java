@@ -1,7 +1,7 @@
 /*
  * ============================================================================
- * Problem 14 (Google L4 prep) — Longest Increasing Subsequence with a Bounded
- *                               Adjacent Difference   [plain O(n^2) DP version]
+ * Problem 12 (Google L4 prep) — Longest Increasing Subsequence with a Bounded
+ *                               Adjacent Difference   [O(n) base + O(n^2) DP]
  * ============================================================================
  *
  * PROMPT
@@ -42,9 +42,14 @@
  *   parent[i] = the j that gave dp[i] its value (or -1 if it started fresh).
  *   Track the index with the global max dp; walk parents back and reverse.
  *
- * COMPLEXITY  (all methods)
- *   Time O(n^2)   Space O(n)   (n = nums.length)
- *   (The O(n) / O(n log n) speed-ups exist but are intentionally not used here.)
+ * COMPLEXITY
+ *   Base diff-1, OPTIMAL: lengthDiffOneOptimal (length) and
+ *     indicesDiffOneOptimal (path indices) -> O(n) time / O(n) space
+ *     (value-keyed DP; the only legal predecessor of value x is x - 1, so no
+ *      inner scan is needed).
+ *   diff<=D and its path reconstruction: O(n^2) time / O(n) space.
+ *     (An O(n log n) segment-tree range-max speed-up for diff<=D exists but is
+ *      intentionally not used here.)
  * ----------------------------------------------------------------------------
  */
 
@@ -71,6 +76,77 @@ public class LongestSubseqAdjacentDiff {
             ans = Math.max(ans, dp[i]);
         }
         return ans;
+    }
+
+    // ------------------------------------------------------------------
+    // BASE, OPTIMAL O(n): longest subsequence with adjacent difference
+    // EXACTLY 1. The only legal predecessor of a value x is x - 1, so instead
+    // of scanning earlier indices we key the DP by VALUE:
+    //      bestLen[x] = bestLen[x - 1] + 1
+    // long keys avoid overflow when x == Integer.MIN_VALUE (x - 1 underflow).
+    // ------------------------------------------------------------------
+    public int lengthDiffOneOptimal(int[] nums) {
+        Map<Long, Integer> bestLength = new HashMap<>();
+        int max = 0;
+        //bestLength(value) = bestLength(value - 1) + 1
+        for(int num: nums)
+        {
+            long value = num;
+            int bestPossible = bestLength.getOrDefault(value - 1, 0) + 1;
+            bestLength.put(value, Math.max(bestLength.getOrDefault(value, 0), bestPossible));
+            max = Math.max(max, bestLength.get(value));
+        }
+
+        return max;
+    }
+
+    // ------------------------------------------------------------------
+    // BASE + PATH, OPTIMAL O(n): reconstruct the INDICES of the longest
+    // subsequence with adjacent difference EXACTLY 1.
+    //   bestEndIndex[value] = index where the best chain ending at `value` ends
+    //   parent[i]           = index used just before i (breadcrumb), or -1
+    // The map finds the best previous index (value - 1); parent[] leaves the
+    // trail back to it. long value-keys avoid the Integer.MIN_VALUE - 1 underflow.
+    // ------------------------------------------------------------------
+    public List<Integer> indicesDiffOneOptimal(int[] nums) {
+        int n = nums.length;
+        Map<Long, Integer> bestEndIndex = new HashMap<>();
+
+        int[] length = new int[n];          // length[i] = best chain length ending at i
+        int[] parent = new int[n];          // predecessor index for i, or -1
+        Arrays.fill(parent, -1);
+
+        int bestOverallEnd = -1;
+
+        for (int i = 0; i < n; i++) {
+            long value = nums[i];
+
+            // Best earlier chain ends at value - 1 (the only legal predecessor).
+            Integer previousIndex = bestEndIndex.get(value - 1);
+            if (previousIndex == null) {
+                length[i] = 1;
+            } else {
+                length[i] = length[previousIndex] + 1;
+                parent[i] = previousIndex;
+            }
+
+            // Keep i as the representative end for `value` only if it's better.
+            Integer existingEnd = bestEndIndex.get(value);
+            if (existingEnd == null || length[i] > length[existingEnd]) {
+                bestEndIndex.put(value, i);
+            }
+
+            if (bestOverallEnd == -1 || length[i] > length[bestOverallEnd]) {
+                bestOverallEnd = i;
+            }
+        }
+
+        // Follow parent breadcrumbs backward, prepending to get index order.
+        LinkedList<Integer> indices = new LinkedList<>();
+        for (int i = bestOverallEnd; i != -1; i = parent[i]) {
+            indices.addFirst(i);
+        }
+        return indices;
     }
 
     // ------------------------------------------------------------------
@@ -133,6 +209,7 @@ public class LongestSubseqAdjacentDiff {
 
         int[] a = {1, 2, 3, 5, 4, 5, 6};
         System.out.println(sol.lengthDiffOne(a));        // 6
+        System.out.println(sol.lengthDiffOneOptimal(a)); // 6  (O(n) value-keyed)
         System.out.println(sol.pathDiffOne(a));          // [1, 2, 3, 4, 5, 6]
 
         int[] b = {10, 9, 8};
@@ -142,5 +219,8 @@ public class LongestSubseqAdjacentDiff {
         int[] c = {1, 3, 5, 7};
         System.out.println(sol.pathDiffAtMostD(c, 2));   // [1, 3, 5, 7]
         System.out.println(sol.pathDiffAtMostD(a, 1));   // [1, 2, 3, 4, 5, 6]
+
+        int[] d = {2, 3, 1, 4, 3, 5, 6};
+        System.out.println(sol.indicesDiffOneOptimal(d)); // [0, 1, 3, 5, 6]
     }
 }
