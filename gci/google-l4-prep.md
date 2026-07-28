@@ -22,7 +22,7 @@
 | 8 | ☑ | Given pairwise character relationships such as `a > b` and `b > c`, reconstruct a valid character order or report impossibility. → [solution](8-character-order-from-pairs/CharacterOrderFromPairs.java) |
 | 9 | ☑ | Perform recursive placeholder substitution where replacement values may reference other placeholders; follow-up: detect cycles. → [solution](9-recursive-placeholder-substitution/RecursivePlaceholderSubstitution.java) |
 | 10 | ☑ | Build a filesystem, URL, or path hierarchy and support queries involving descendants, prefixes, subtree properties, or aggregated values. → [solution](10-filesystem-path-hierarchy/FileSystem.java) |
-| 11 | ☐ | Given files represented as arrays of lines, find the maximum common-prefix length between any pair of files. |
+| 11 | ☑ | Given files represented as arrays of lines, find the maximum common-prefix length between any pair of files. → [solution](11-max-common-prefix-files/FilePrefixMatcher.java) |
 | 12 | ☐ | Find the longest increasing subsequence where adjacent difference is exactly 1; follow-up: difference at most D; follow-up: reconstruct the indices or path. |
 | 13 | ☑ | Maintain or compute the Top K elements from a stream, such as users, words, scores, or records. → [solution](13-top-k-from-stream/TopKFromStream.java) |
 | 14 | ☑ | Given strings containing `L`, `R`, and `_`, determine whether the start can reach the target when `L` moves only left and `R` moves only right. → [solution](14-move-pieces-to-string/MovePiecesToString.java) |
