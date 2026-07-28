@@ -102,51 +102,159 @@ public class LongestSubseqAdjacentDiff {
 
     // ------------------------------------------------------------------
     // BASE + PATH, OPTIMAL O(n): reconstruct the INDICES of the longest
-    // subsequence with adjacent difference EXACTLY 1.
-    //   bestEndIndex[value] = index where the best chain ending at `value` ends
-    //   parent[i]           = index used just before i (breadcrumb), or -1
-    // The map finds the best previous index (value - 1); parent[] leaves the
-    // trail back to it. long value-keys avoid the Integer.MIN_VALUE - 1 underflow.
+    // subsequence with adjacent difference EXACTLY 1. long value-keys avoid
+    // the Integer.MIN_VALUE - 1 underflow.
     // ------------------------------------------------------------------
-    public List<Integer> indicesDiffOneOptimal(int[] nums) {
-        int n = nums.length;
-        Map<Long, Integer> bestEndIndex = new HashMap<>();
 
-        int[] length = new int[n];          // length[i] = best chain length ending at i
-        int[] parent = new int[n];          // predecessor index for i, or -1
+    public List<Integer> indicesDiffOneOptimalV2(int[] nums) {
+        int n = nums.length;
+        if(n == 0)
+        {
+            return new ArrayList<>();
+        }
+
+        Map<Integer, Integer> bestValueIndex = new HashMap<>(); //value -> indice
+
+        int[] parent = new int[n];
+        int[] length = new int[n]; //gives best length ending at i
         Arrays.fill(parent, -1);
 
-        int bestOverallEnd = -1;
+        for(int i = 0; i < n; i++)
+        {
+            int currentValue = nums[i];
 
-        for (int i = 0; i < n; i++) {
-            long value = nums[i];
-
-            // Best earlier chain ends at value - 1 (the only legal predecessor).
-            Integer previousIndex = bestEndIndex.get(value - 1);
-            if (previousIndex == null) {
+            Integer previousIndex = bestValueIndex.get(currentValue - 1);
+            if(previousIndex == null) //nothing exists before this value
+            {
                 length[i] = 1;
-            } else {
+            }
+            else
+            {
                 length[i] = length[previousIndex] + 1;
                 parent[i] = previousIndex;
             }
 
-            // Keep i as the representative end for `value` only if it's better.
-            Integer existingEnd = bestEndIndex.get(value);
-            if (existingEnd == null || length[i] > length[existingEnd]) {
-                bestEndIndex.put(value, i);
-            }
+            //check if currentValue have a previous best
+            Integer currentValueBestIndex = bestValueIndex.get(currentValue);
 
-            if (bestOverallEnd == -1 || length[i] > length[bestOverallEnd]) {
-                bestOverallEnd = i;
+            if(currentValueBestIndex == null 
+                || length[i] > length[currentValueBestIndex])
+            {
+                bestValueIndex.put(currentValue, i);
+            }
+        }
+        int bestendingIndex = -1;
+        //for best index, loop through length to get it
+        for(int i = 0; i < n; i++)
+        {
+            if(bestendingIndex == -1 || length[i] > length[bestendingIndex])
+            {
+                bestendingIndex = i;
             }
         }
 
-        // Follow parent breadcrumbs backward, prepending to get index order.
-        LinkedList<Integer> indices = new LinkedList<>();
-        for (int i = bestOverallEnd; i != -1; i = parent[i]) {
-            indices.addFirst(i);
+        //now get the result
+        List<Integer> path = new ArrayList<>();
+
+        //start with bestendingIndex
+        int index = bestendingIndex;
+        while(index != -1)
+        {
+            path.add(index);
+            index = parent[index];
         }
-        return indices;
+
+        Collections.reverse(path);
+        return path;
+    }
+    public List<Integer> indicesDiffOneOptimal(int[] nums) {
+        int n = nums.length;
+
+        if (n == 0) {
+            return new ArrayList<>();
+        }
+
+        /*
+         * value -> index
+         *
+         * For each value, remember the index where the longest path
+         * ending with that value currently finishes.
+         *
+         * Example:
+         * nums = [2, 3]
+         * bestIndexEndingWithValue:
+         * 2 -> 0
+         * 3 -> 1
+         */
+        Map<Long, Integer> bestIndexEndingWithValue = new HashMap<>();
+
+        /*
+         * pathLengthEndingAt[i]:
+         * Length of the best path whose final element is nums[i].
+         *
+         * previousIndex[i]:
+         * Index immediately before i in that path.
+         * -1 means nums[i] starts the path.
+         */
+        int[] pathLengthEndingAt = new int[n];
+        int[] previousIndex = new int[n];
+        Arrays.fill(previousIndex, -1);
+
+        /*
+         * Index where the longest path found anywhere ends.
+         * We start reconstruction from this index.
+         */
+        int longestPathEndIndex = 0;
+
+        for (int currentIndex = 0; currentIndex < n; currentIndex++) {
+            long currentValue = nums[currentIndex];
+
+            /*
+             * To place currentValue after another element,
+             * the previous value must be currentValue - 1.
+             * If currentValue = 4, search for the best path ending at 3.
+             */
+            Integer predecessorIndex = bestIndexEndingWithValue.get(currentValue - 1);
+
+            if (predecessorIndex == null) {
+                // No predecessor exists, so start a new path.
+                pathLengthEndingAt[currentIndex] = 1;
+            } else {
+                // Extend the predecessor's path.
+                pathLengthEndingAt[currentIndex] = pathLengthEndingAt[predecessorIndex] + 1;
+                // Leave a breadcrumb for reconstruction.
+                previousIndex[currentIndex] = predecessorIndex;
+            }
+
+            /*
+             * Decide whether currentIndex is now the best ending index
+             * for paths whose final value is currentValue.
+             */
+            Integer existingEndIndex = bestIndexEndingWithValue.get(currentValue);
+            if (existingEndIndex == null
+                    || pathLengthEndingAt[currentIndex] > pathLengthEndingAt[existingEndIndex]) {
+                bestIndexEndingWithValue.put(currentValue, currentIndex);
+            }
+
+            // Remember where the longest path across all values ends.
+            if (pathLengthEndingAt[currentIndex] > pathLengthEndingAt[longestPathEndIndex]) {
+                longestPathEndIndex = currentIndex;
+            }
+        }
+
+        /*
+         * Walk backward through the breadcrumbs, then reverse.
+         * Example: 6 -> 5 -> 3 -> 1 -> 0
+         */
+        List<Integer> resultIndices = new ArrayList<>();
+        int currentIndex = longestPathEndIndex;
+        while (currentIndex != -1) {
+            resultIndices.add(currentIndex);
+            currentIndex = previousIndex[currentIndex];
+        }
+        Collections.reverse(resultIndices);
+
+        return resultIndices;
     }
 
     // ------------------------------------------------------------------
@@ -221,6 +329,15 @@ public class LongestSubseqAdjacentDiff {
         System.out.println(sol.pathDiffAtMostD(a, 1));   // [1, 2, 3, 4, 5, 6]
 
         int[] d = {2, 3, 1, 4, 3, 5, 6};
-        System.out.println(sol.indicesDiffOneOptimal(d)); // [0, 1, 3, 5, 6]
+        System.out.println(sol.indicesDiffOneOptimal(d));   // [0, 1, 3, 5, 6]
+        System.out.println(sol.indicesDiffOneOptimalV2(d)); // [0, 1, 3, 5, 6]
+
+        int[] e = {5, 6, 7, 1, 2, 3};                        // two runs of len 3; earliest wins
+        System.out.println(sol.indicesDiffOneOptimal(e));   // [0, 1, 2]  (values 5,6,7)
+        System.out.println(sol.indicesDiffOneOptimalV2(e)); // [0, 1, 2]  (values 5,6,7)
+
+        int[] f = {4, 4, 5, 6};                              // duplicate 4; still values 4,5,6
+        System.out.println(sol.indicesDiffOneOptimal(f));   // [0, 2, 3]  (values 4,5,6)
+        System.out.println(sol.indicesDiffOneOptimalV2(f)); // [0, 2, 3]  (values 4,5,6)
     }
 }
