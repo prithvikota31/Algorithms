@@ -47,9 +47,11 @@
  *     indicesDiffOneOptimal (path indices) -> O(n) time / O(n) space
  *     (value-keyed DP; the only legal predecessor of value x is x - 1, so no
  *      inner scan is needed).
- *   diff<=D and its path reconstruction: O(n^2) time / O(n) space.
- *     (An O(n log n) segment-tree range-max speed-up for diff<=D exists but is
- *      intentionally not used here.)
+ *   diff<=D:
+ *     lengthDiffAtMostDOptimal -> O(n log M) time / O(M) space (M = max value),
+ *       segment tree keyed by VALUE: range-max over [value-D, value-1] +
+ *       point-update at `value`. Assumes values >= 1 (LeetCode 2407).
+ *     Path reconstruction (pathDiffAtMostD) stays O(n^2) time / O(n) space.
  * ----------------------------------------------------------------------------
  */
 
@@ -310,6 +312,106 @@ public class LongestSubseqAdjacentDiff {
     }
 
     // ------------------------------------------------------------------
+    // FOLLOW-UP A, OPTIMAL O(n log M): LENGTH of the longest strictly-
+    // increasing subsequence with 1 <= adjacent diff <= D  (LeetCode 2407).
+    //
+    // Value-keyed DP: bestLength[value] = longest chain ending EXACTLY at value.
+    // To append `value`, the previous value must lie in [value - D, value - 1]
+    // (upper bound value-1 keeps it STRICTLY increasing). A segment tree over
+    // the value axis answers that range-max window and the point-update at
+    // `value` in O(log M). Assumes values >= 1 (LeetCode: 1 <= nums[i] <= 1e5).
+    // ------------------------------------------------------------------
+    public int lengthDiffAtMostDOptimal(int[] nums, int D) {
+        // Phase 1: edge cases.
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        if (D <= 0) {
+            return 1;               // no adjacent step is legal -> a single element is best
+        }
+
+        // Phase 2: size the tree. Positions ARE the numeric values, so size = max value.
+        int maxValue = 0;
+        for (int value : nums) {
+            maxValue = Math.max(maxValue, value);
+        }
+
+        SegmentTree tree = new SegmentTree(maxValue);
+        int longest = 1;
+
+        // Phase 3: core DP. Process values left-to-right so predecessors are
+        // exactly the elements already inserted (original order preserved).
+        for (int value : nums) {
+            // Legal predecessors live in [value - D, value - 1].
+            int left = Math.max(1, value - D);
+            int right = value - 1;
+
+            int bestPrevious = tree.query(left, right);
+            int current = bestPrevious + 1;
+
+            // Duplicate values: keep the best chain ending exactly at `value`.
+            tree.update(value, current);
+            longest = Math.max(longest, current);
+        }
+
+        return longest;
+    }
+
+    // ------------------------------------------------------------------
+    // Range-max segment tree over the value axis (1..size). O(log size) per op.
+    //   tree[node] = max DP length stored in that node's value range.
+    // ------------------------------------------------------------------
+    private static class SegmentTree {
+        private final int[] tree;
+        private final int size;
+
+        SegmentTree(int size) {
+            this.size = size;
+            this.tree = new int[4 * size];
+        }
+
+        // Max DP length stored in values [queryLeft, queryRight] (0 if empty).
+        int query(int queryLeft, int queryRight) {
+            if (queryLeft > queryRight) {
+                return 0;
+            }
+            return query(1, 1, size, queryLeft, queryRight);
+        }
+
+        private int query(int node, int segLeft, int segRight, int qLeft, int qRight) {
+            if (qRight < segLeft || segRight < qLeft) {      // no overlap
+                return 0;
+            }
+            if (qLeft <= segLeft && segRight <= qRight) {    // full overlap
+                return tree[node];
+            }
+            int mid = segLeft + (segRight - segLeft) / 2;
+            return Math.max(
+                    query(node * 2, segLeft, mid, qLeft, qRight),
+                    query(node * 2 + 1, mid + 1, segRight, qLeft, qRight));
+        }
+
+        // Point update: best length ending exactly at `value`.
+        void update(int value, int newLength) {
+            update(1, 1, size, value, newLength);
+        }
+
+        private void update(int node, int segLeft, int segRight, int value, int newLength) {
+            if (segLeft == segRight) {
+                tree[node] = Math.max(tree[node], newLength);
+                return;
+            }
+            int mid = segLeft + (segRight - segLeft) / 2;
+            if (value <= mid) {
+                update(node * 2, segLeft, mid, value, newLength);
+            } else {
+                update(node * 2 + 1, mid + 1, segRight, value, newLength);
+            }
+            tree[node] = Math.max(tree[node * 2], tree[node * 2 + 1]);   // restore range-max
+        }
+    }
+
+    // ------------------------------------------------------------------
     // Quick self-test.
     // ------------------------------------------------------------------
     public static void main(String[] args) {
@@ -339,5 +441,8 @@ public class LongestSubseqAdjacentDiff {
         int[] f = {4, 4, 5, 6};                              // duplicate 4; still values 4,5,6
         System.out.println(sol.indicesDiffOneOptimal(f));   // [0, 2, 3]  (values 4,5,6)
         System.out.println(sol.indicesDiffOneOptimalV2(f)); // [0, 2, 3]  (values 4,5,6)
+
+        int[] g = {4, 2, 1, 4, 3, 4, 5, 8, 15};              // diff<=D, O(n log M) segment tree
+        System.out.println(sol.lengthDiffAtMostDOptimal(g, 3)); // 5  (1,3,4,5,8)
     }
 }
