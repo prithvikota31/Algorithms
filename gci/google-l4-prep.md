@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 14 / 56 solved.**
+**Progress (Phase 1): 17 / 56 solved.**
 
 ---
 
