@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 17 / 56 solved.**
+**Progress (Phase 1): 18 / 56 solved.**
 
 ---
 
@@ -29,7 +29,7 @@
 | 15 | ☑ | Interval progression: determine whether two intervals overlap; follow-ups: whether any pair overlaps, count overlaps, insert an interval, and merge overlaps. → [overlap](15-interval-overlap/IntervalOverlap.java), [any-pair](15-interval-overlap/AnyPairOverlap.java), [max-simultaneous](15-interval-overlap/MaxSimultaneousOverlap.java), [insert](15-interval-overlap/InsertInterval.java), [merge](15-interval-overlap/MergeIntervals.java) |
 | 16 | ☑ | Design a stream data structure supporting `add(x)` and querying a product, mean, or statistic over the last K values; follow-up: dynamic K. → [fixed-K](16-product-last-k-stream/LastKProduct.java), [dynamic-K](16-product-last-k-stream/ProductOfNumbers.java) |
 | 17 | ☐ | Evaluate arithmetic expressions represented in infix or postfix form using stacks; follow-ups may modify the supported grammar. |
-| 18 | ☐ | Merge two trees or N-ary trees by recursively combining children with matching names while following value-conflict rules. → [base solution](18-merge-nary-trees/MergeNaryTrees.java). **Follow-ups (priority order):** (1) pluggable conflict-resolution rule — replace `v1+v2` with `mergeValue(a,b)` (sum / max / latest-timestamp / tree-2-wins / conflict-list); (2) immutable inputs — deep-copy on attach instead of reusing input nodes; (3) huge trees — keep children sorted by name and two-pointer merge (no per-level HashMap), O(1) extra/level; (4) cycle detection — track `visited` nodes/paths so recursion terminates; (5) build-from-paths — parse paths into a trie, then merge; (6) parallelize — child merges are independent (ForkJoinPool). |
+| 18 | ☑ | Merge two trees or N-ary trees by recursively combining children with matching names while following value-conflict rules. → [base solution](18-merge-nary-trees/MergeNaryTrees.java). **Follow-ups:** (1) pluggable conflict resolver → [MergeTreesConfigurable.java](18-merge-nary-trees/MergeTreesConfigurable.java); (2) immutable inputs / deep-copy → [MergeTreesImmutable.java](18-merge-nary-trees/MergeTreesImmutable.java); (3)–(6) huge/streaming trees, cycles/graphs, build-from-paths, merge-N-trees → [design-notes.md](18-merge-nary-trees/design-notes.md). |
 | 19 | ☐ | Process tree leaves based on maximum ancestor values, root-to-leaf properties, or iterative leaf removal. |
 | 20 | ☐ | Given a binary tree whose nodes contain 0 or 1, count connected components of 1 nodes or find the largest such component. |
 | 21 | ☐ | Maintain points on a 2D plane; determine whether rectangles exist and follow up by finding the maximum rectangle area. |
