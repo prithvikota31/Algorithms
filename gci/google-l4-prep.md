@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 20 / 56 solved.**
+**Progress (Phase 1): 22 / 56 solved.**
 
 ---
 
@@ -33,9 +33,9 @@
 | 19 | ☐ | Process tree leaves based on maximum ancestor values, root-to-leaf properties, or iterative leaf removal. |
 | 20 | ☑ | Given a binary tree whose nodes contain 0 or 1, count connected components of 1 nodes or find the largest such component. → [base + largest-component-nodes](20-connected-components-binary-tree/ConnectedOneComponents.java), [all-components](20-connected-components-binary-tree/AllConnectedComponents.java), [longest-1-path-length](20-connected-components-binary-tree/LongestOnePath.java), [longest-1-path-nodes](20-connected-components-binary-tree/LongestOnePathNodes.java), [max-weighted-component](20-connected-components-binary-tree/MaxWeightedComponent.java), [graph-with-cycles](20-connected-components-binary-tree/ConnectedComponentsGraph.java) |
 | 21 | ☑ | Maintain points on a 2D plane; determine whether rectangles exist and follow up by finding the maximum rectangle area. → [base](21-rectangle-points/RectangleExists.java), [O(1)-query-follow-up](21-rectangle-points/RectangleExistsIncremental.java), [max-area-follow-up](21-rectangle-points/MaxRectangleArea.java) |
-| 22 | ☐ | Given rectangles on a plane, find a vertical line that divides their total area equally; variation: rectangles may overlap. |
+| 22 | ☑ | Given rectangles on a plane, find a vertical line that divides their total area equally; variation: rectangles may overlap. → [base (non-overlapping)](22-rectangle-area-split/VerticalAreaSplit.java). **<span style="color:red">Overlap follow-up marked optional/conceptual only (not implemented): needs sweep-line + coordinate compression + segment tree tracking active y-coverage — niche geometry technique, low reuse across other L4 problems. Know the one-liner: "can't just add areas; sweep x-events, maintain active y-coverage via segment tree."</span>** |
 | 23 | ☑ | Find the longest non-decreasing contiguous subarray; follow-up: change one value arbitrarily to maximize the result. → [solution](23-longest-non-decreasing-subarray/LongestNonDecreasingSubarray.java) |
-| 24 | ☐ | Remove adjacent invalid character pairs, such as the same letter in opposite cases; follow-up: solve without an explicit stack. |
+| 24 | ☑ | Remove adjacent invalid character pairs, such as the same letter in opposite cases; follow-up: solve without an explicit stack. → [stack (StringBuilder)](24-remove-adjacent-char-pairs/RemoveAdjacentPairs.java), [in-place follow-up](24-remove-adjacent-char-pairs/RemoveAdjacentPairsInPlace.java) |
 | 25 | ☐ | Given a dictionary of special words, determine whether qualifying subsequences of an input string belong to the dictionary. |
 | 26 | ☐ | Given an array, from index i either skip or take the element; taking it adds a score and jumps according to `arr[i]`; maximize total score. |
 | 27 | ☐ | Find arithmetic subarrays where every adjacent difference is exactly +1 or exactly -1. |
