@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 19 / 56 solved.**
+**Progress (Phase 1): 20 / 56 solved.**
 
 ---
 
@@ -32,7 +32,7 @@
 | 18 | ☑ | Merge two trees or N-ary trees by recursively combining children with matching names while following value-conflict rules. → [base solution](18-merge-nary-trees/MergeNaryTrees.java). **Follow-ups:** (1) pluggable conflict resolver → [MergeTreesConfigurable.java](18-merge-nary-trees/MergeTreesConfigurable.java); (2) immutable inputs / deep-copy → [MergeTreesImmutable.java](18-merge-nary-trees/MergeTreesImmutable.java); (3)–(6) huge/streaming trees, cycles/graphs, build-from-paths, merge-N-trees → [design-notes.md](18-merge-nary-trees/design-notes.md). |
 | 19 | ☐ | Process tree leaves based on maximum ancestor values, root-to-leaf properties, or iterative leaf removal. |
 | 20 | ☑ | Given a binary tree whose nodes contain 0 or 1, count connected components of 1 nodes or find the largest such component. → [base + largest-component-nodes](20-connected-components-binary-tree/ConnectedOneComponents.java), [all-components](20-connected-components-binary-tree/AllConnectedComponents.java), [longest-1-path-length](20-connected-components-binary-tree/LongestOnePath.java), [longest-1-path-nodes](20-connected-components-binary-tree/LongestOnePathNodes.java), [max-weighted-component](20-connected-components-binary-tree/MaxWeightedComponent.java), [graph-with-cycles](20-connected-components-binary-tree/ConnectedComponentsGraph.java) |
-| 21 | ☐ | Maintain points on a 2D plane; determine whether rectangles exist and follow up by finding the maximum rectangle area. |
+| 21 | ☑ | Maintain points on a 2D plane; determine whether rectangles exist and follow up by finding the maximum rectangle area. → [base](21-rectangle-points/RectangleExists.java), [O(1)-query-follow-up](21-rectangle-points/RectangleExistsIncremental.java), [max-area-follow-up](21-rectangle-points/MaxRectangleArea.java) |
 | 22 | ☐ | Given rectangles on a plane, find a vertical line that divides their total area equally; variation: rectangles may overlap. |
 | 23 | ☑ | Find the longest non-decreasing contiguous subarray; follow-up: change one value arbitrarily to maximize the result. → [solution](23-longest-non-decreasing-subarray/LongestNonDecreasingSubarray.java) |
 | 24 | ☐ | Remove adjacent invalid character pairs, such as the same letter in opposite cases; follow-up: solve without an explicit stack. |
