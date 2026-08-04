@@ -32,6 +32,11 @@
  *   Space O(H), where H is the tree height, for the recursion stack.
  * ============================================================================
  */
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class ConnectedOneComponents {
 
     static class TreeNode {
@@ -51,30 +56,104 @@ public class ConnectedOneComponents {
         componentCount = 0;
         largestComponentSize = 0;
 
-        connectedSize(root, false);
+        dfs(root, false);
         return new int[] {componentCount, largestComponentSize};
     }
 
-    private int connectedSize(TreeNode node, boolean parentIsOne) {
-        if (node == null) {
+    // Returns the size of the connected 1-component that `node` belongs to
+    // (0 if node itself is a 0, since a 0-node can't be part of any component).
+    private int dfs(TreeNode node, boolean parentIsOne) {
+        if(node == null)
+        {
             return 0;
         }
 
         boolean nodeIsOne = node.val == 1;
-        if (nodeIsOne && !parentIsOne) {
+
+        if(nodeIsOne && !parentIsOne)
+        {
             componentCount++;
         }
 
-        int leftSize = connectedSize(node.left, nodeIsOne);
-        int rightSize = connectedSize(node.right, nodeIsOne);
-
-        if (!nodeIsOne) {
+        int leftSize = dfs(node.left, nodeIsOne);
+        int rightSize = dfs(node.right, nodeIsOne);
+        if(!nodeIsOne)
+        {
             return 0;
         }
 
         int currentSize = 1 + leftSize + rightSize;
         largestComponentSize = Math.max(largestComponentSize, currentSize);
         return currentSize;
+    }
+
+    /*
+     * ============================================================================
+     * FOLLOW-UP 1 (gci #20) - Return the largest component's NODES, not just size.
+     * ============================================================================
+     *
+     * INTUITION
+     *   Building a new list at every node and merging children into it (via
+     *   addAll) recopies each node once per ancestor above it -> O(N log N) for
+     *   balanced trees, O(N^2) worst case for a skewed tree. Avoid that by
+     *   splitting into two O(N) passes: first find WHICH node roots the
+     *   largest component using plain ints (no lists), then collect nodes
+     *   from just that one subtree.
+     *
+     * ALGORITHM
+     *   1. sizeDfs: same size computation as the base problem, but remember
+     *      the node (bestRoot) whenever a new largest size is seen.
+     *   2. collect: one more DFS, run only from bestRoot, appending every
+     *      node in that component (stops at any 0-node boundary).
+     *
+     * COMPLEXITY
+     *   Time O(N): pass 1 touches every node once with O(1) work each; pass 2
+     *   touches only the winning component once.
+     *   Space O(N) worst case, for the returned node list.
+     * ============================================================================
+     */
+    private int bestSize;
+    private TreeNode bestRoot;
+
+    public List<TreeNode> findLargestComponentNodes(TreeNode root) {
+        bestSize = 0;
+        bestRoot = null;
+        sizeDfs(root);
+        List<TreeNode> largestComponentList = new ArrayList<>();
+        collect(bestRoot, largestComponentList);
+        return largestComponentList;
+    }
+
+    private int sizeDfs(TreeNode node) {
+        if(node == null)
+        {
+            return 0;
+        }
+
+        int leftSize = sizeDfs(node.left);
+        int rightSize = sizeDfs(node.right);
+
+        if(node.val == 0)
+        {
+            return 0;
+        }
+        int size = 1 + leftSize + rightSize;
+        if(size > bestSize)
+        {
+            bestSize = size;
+            bestRoot = node;
+        }
+        return size;
+    }
+
+    private void collect(TreeNode node, List<TreeNode> out) {
+        if(node == null || node.val == 0)
+        {
+            return;
+        }
+        out.add(node);
+        collect(node.left, out);
+        collect(node.right, out);
     }
 
     public static void main(String[] args) {
@@ -100,6 +179,17 @@ public class ConnectedOneComponents {
         check("all zeros", solution.findComponents(allZeros), 0, 0);
 
         check("empty", solution.findComponents(null), 0, 0);
+
+        // Follow-up 1: largest component's nodes (values, in DFS order).
+        checkNodes("largest component nodes", solution.findLargestComponentNodes(root),
+                Arrays.asList(1, 1, 1));
+        checkNodes("largest component nodes (all ones)",
+                solution.findLargestComponentNodes(allOnes), Arrays.asList(1, 1, 1));
+        checkNodes("largest component nodes (all zeros)",
+                solution.findLargestComponentNodes(allZeros), Collections.emptyList());
+        checkNodes("largest component nodes (empty)",
+                solution.findLargestComponentNodes(null), Collections.emptyList());
+
         System.out.println("all passed");
     }
 
@@ -112,5 +202,17 @@ public class ConnectedOneComponents {
         }
         System.out.println("pass " + name + " -> count=" + actual[0]
                 + ", largest=" + actual[1]);
+    }
+
+    private static void checkNodes(String name, List<TreeNode> actual, List<Integer> expectedValues) {
+        List<Integer> actualValues = new ArrayList<>();
+        for (TreeNode node : actual) {
+            actualValues.add(node.val);
+        }
+        if (!actualValues.equals(expectedValues)) {
+            throw new AssertionError("FAIL " + name + ": got " + actualValues
+                    + " want " + expectedValues);
+        }
+        System.out.println("pass " + name + " -> " + actualValues);
     }
 }
