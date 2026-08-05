@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 23 / 56 solved.**
+**Progress (Phase 1): 24 / 56 solved.**
 
 ---
 
@@ -37,7 +37,7 @@
 | 23 | ☑ | Find the longest non-decreasing contiguous subarray; follow-up: change one value arbitrarily to maximize the result. → [solution](23-longest-non-decreasing-subarray/LongestNonDecreasingSubarray.java) |
 | 24 | ☑ | Remove adjacent invalid character pairs, such as the same letter in opposite cases; follow-up: solve without an explicit stack. → [stack (StringBuilder)](24-remove-adjacent-char-pairs/RemoveAdjacentPairs.java), [in-place follow-up](24-remove-adjacent-char-pairs/RemoveAdjacentPairsInPlace.java) |
 | 25 | ☑ | Given a dictionary of special words, determine whether qualifying subsequences of an input string belong to the dictionary. → [base solution](25-subsequence-dictionary-match/SubsequenceDictionaryMatch.java). **Follow-ups:** (1) longest matching word, tie-broken lexicographically → [LongestSubsequenceDictionaryWord.java](25-subsequence-dictionary-match/LongestSubsequenceDictionaryWord.java); (2) Trie-based optimization for huge dictionaries with shared prefixes → [TrieDictionarySubsequenceMatch.java](25-subsequence-dictionary-match/TrieDictionarySubsequenceMatch.java). |
-| 26 | ☐ | Given an array, from index i either skip or take the element; taking it adds a score and jumps according to `arr[i]`; maximize total score. |
+| 26 | ☑ | Given an array, from index i either skip or take the element; taking it adds a score and jumps according to `arr[i]`; maximize total score. → [base solution](26-array-jump-take-or-skip/ArrayJumpMaxScore.java). **Follow-up:** return the selected indices, not just the score → `maxScoreIndices` in the same file. |
 | 27 | ☐ | Find arithmetic subarrays where every adjacent difference is exactly +1 or exactly -1. |
 | 28 | ☐ | Given three sorted arrays, find triples containing one value from each array such that every pairwise difference is at most D. |
 | 29 | ☐ | Logger rate limiter: suppress duplicate messages that occur again within a specified time window. |
