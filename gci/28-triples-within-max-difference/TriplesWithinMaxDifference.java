@@ -28,11 +28,16 @@ import java.util.List;
  * ----------------------------------------------------------------------------
  * MENTAL MAP  (the part to remember)
  * ----------------------------------------------------------------------------
- * Pattern: DESIGNATED-MINIMUM ANCHOR + BINARY-SEARCH RANGE COUNTING.
+ * Pattern: DESIGNATED-MINIMUM ANCHOR + MONOTONIC TWO-POINTER RANGE COUNTING.
  *
  * Fix one array's value x as the triple's minimum. The other two values must
- * then lie in [x, x+D] (both arrays are sorted, so that's a contiguous range
- * found via binary search: count = upperBound(x+D) - lowerBound(x)).
+ * then lie in [x, x+D]. Because ALL THREE arrays are sorted, as x increases
+ * while scanning the anchor array left to right, both range boundaries (x
+ * and x+D) only increase too — so the pointers marking "first index >= x"
+ * and "first index > x+D" in the other arrays only ever move FORWARD across
+ * the whole scan. No binary search needed: each pointer crosses its array at
+ * most once in total, giving O(arrayLength) per pass instead of O(log n)
+ * per anchor.
  *
  * PROBLEM: multiple arrays can tie at the same minimum value, which would
  * double-count the same value combination as "anchored by A" AND "anchored
@@ -46,12 +51,16 @@ import java.util.List;
  * three values comes first in A > B > C priority among the tied minima).
  *
  * APPROACHES
- *   Brute force : try every (i, j, k) triple directly. O(a*b*c) time.
- *   Optimal     : for each value, binary-search the valid range in the other
- *                 two arrays (below). O((a+b+c) log max(a,b,c)) time.
+ *   Brute force  : try every (i, j, k) triple directly. O(a*b*c) time.
+ *   Binary search: per anchor value, binary-search the valid range in the
+ *                  other two arrays. O((a+b+c) log max(a,b,c)) time — a
+ *                  simpler fallback if the two-pointer bookkeeping is fuzzy.
+ *   Optimal      : three synchronized monotonic pointers (below), since the
+ *                  anchor scan AND the range bounds are both non-decreasing.
+ *                  O(a+b+c) time.
  *
  * COMPLEXITY
- *   Time O((a+b+c) log(max(a,b,c)))   Space O(1) beyond the output
+ *   Time O(a + b + c)   Space O(1) beyond the output
  * ----------------------------------------------------------------------------
  */
 public class TriplesWithinMaxDifference {
@@ -65,23 +74,45 @@ public class TriplesWithinMaxDifference {
 
         long total = 0;
 
-        // A anchors the minimum: B and C may equal it.
+        // A anchors the minimum: B and C may equal it. bLo/cLo mark the
+        // first index >= the anchor; bHi/cHi mark the first index > the
+        // anchor + D. All four only move forward as `a[i]` increases.
+        int bLo = 0, bHi = 0, cLo = 0, cHi = 0;
         for (int valueA : a) {
             long hi = (long) valueA + maxDifference;
-            total += countClosed(b, valueA, hi) * countClosed(c, valueA, hi);
+            while (bLo < b.length && b[bLo] < valueA) bLo++;
+            while (bHi < b.length && b[bHi] <= hi) bHi++;
+            while (cLo < c.length && c[cLo] < valueA) cLo++;
+            while (cHi < c.length && c[cHi] <= hi) cHi++;
+            total += (long) Math.max(0, bHi - bLo) * Math.max(0, cHi - cLo);
         }
 
         // B anchors the minimum: A must be strictly greater (else it was
         // already counted under A), C may still equal it.
+        int aLo = 0, aHi = 0;
+        cLo = 0;
+        cHi = 0;
         for (int valueB : b) {
             long hi = (long) valueB + maxDifference;
-            total += countOpenClosed(a, valueB, hi) * countClosed(c, valueB, hi);
+            while (aLo < a.length && a[aLo] <= valueB) aLo++;
+            while (aHi < a.length && a[aHi] <= hi) aHi++;
+            while (cLo < c.length && c[cLo] < valueB) cLo++;
+            while (cHi < c.length && c[cHi] <= hi) cHi++;
+            total += (long) Math.max(0, aHi - aLo) * Math.max(0, cHi - cLo);
         }
 
         // C anchors the minimum: both A and B must be strictly greater.
+        aLo = 0;
+        aHi = 0;
+        bLo = 0;
+        bHi = 0;
         for (int valueC : c) {
             long hi = (long) valueC + maxDifference;
-            total += countOpenClosed(a, valueC, hi) * countOpenClosed(b, valueC, hi);
+            while (aLo < a.length && a[aLo] <= valueC) aLo++;
+            while (aHi < a.length && a[aHi] <= hi) aHi++;
+            while (bLo < b.length && b[bLo] <= valueC) bLo++;
+            while (bHi < b.length && b[bHi] <= hi) bHi++;
+            total += (long) Math.max(0, aHi - aLo) * Math.max(0, bHi - bLo);
         }
 
         return total;
@@ -90,10 +121,12 @@ public class TriplesWithinMaxDifference {
     /*
      * ------------------------------------------------------------------------
      * FOLLOW-UP (must prepare): return the actual triples, not just the count.
+     * Output size itself can be huge (up to a.length*b.length*c.length), so
+     * this is inherently O(output size) on top of the O(a+b+c) pointer scan.
      *
      * MENTAL MAP
-     *   Same three-pass anchor scan, but instead of multiplying range sizes,
-     *   walk both ranges and emit every (i, j, k) combination.
+     *   Same three-pass monotonic-pointer scan, but instead of multiplying
+     *   range sizes, walk both ranges and emit every (i, j, k) combination.
      * ------------------------------------------------------------------------
      */
     public List<int[]> findValidTriples(int[] a, int[] b, int[] c, int maxDifference) {
@@ -104,12 +137,14 @@ public class TriplesWithinMaxDifference {
             return triples;
         }
 
+        // A anchors the minimum: B and C may equal it.
+        int bLo = 0, bHi = 0, cLo = 0, cHi = 0;
         for (int i = 0; i < a.length; i++) {
             long hi = (long) a[i] + maxDifference;
-            int bLo = lowerBound(b, a[i]);
-            int bHi = upperBound(b, hi);
-            int cLo = lowerBound(c, a[i]);
-            int cHi = upperBound(c, hi);
+            while (bLo < b.length && b[bLo] < a[i]) bLo++;
+            while (bHi < b.length && b[bHi] <= hi) bHi++;
+            while (cLo < c.length && c[cLo] < a[i]) cLo++;
+            while (cHi < c.length && c[cHi] <= hi) cHi++;
             for (int j = bLo; j < bHi; j++) {
                 for (int k = cLo; k < cHi; k++) {
                     triples.add(new int[] { i, j, k });
@@ -117,12 +152,16 @@ public class TriplesWithinMaxDifference {
             }
         }
 
+        // B anchors the minimum: A must be strictly greater, C may equal it.
+        int aLo = 0, aHi = 0;
+        cLo = 0;
+        cHi = 0;
         for (int j = 0; j < b.length; j++) {
             long hi = (long) b[j] + maxDifference;
-            int aLo = upperBound(a, b[j]);
-            int aHi = upperBound(a, hi);
-            int cLo = lowerBound(c, b[j]);
-            int cHi = upperBound(c, hi);
+            while (aLo < a.length && a[aLo] <= b[j]) aLo++;
+            while (aHi < a.length && a[aHi] <= hi) aHi++;
+            while (cLo < c.length && c[cLo] < b[j]) cLo++;
+            while (cHi < c.length && c[cHi] <= hi) cHi++;
             for (int i = aLo; i < aHi; i++) {
                 for (int k = cLo; k < cHi; k++) {
                     triples.add(new int[] { i, j, k });
@@ -130,12 +169,17 @@ public class TriplesWithinMaxDifference {
             }
         }
 
+        // C anchors the minimum: both A and B must be strictly greater.
+        aLo = 0;
+        aHi = 0;
+        bLo = 0;
+        bHi = 0;
         for (int k = 0; k < c.length; k++) {
             long hi = (long) c[k] + maxDifference;
-            int aLo = upperBound(a, c[k]);
-            int aHi = upperBound(a, hi);
-            int bLo = upperBound(b, c[k]);
-            int bHi = upperBound(b, hi);
+            while (aLo < a.length && a[aLo] <= c[k]) aLo++;
+            while (aHi < a.length && a[aHi] <= hi) aHi++;
+            while (bLo < b.length && b[bLo] <= c[k]) bLo++;
+            while (bHi < b.length && b[bHi] <= hi) bHi++;
             for (int i = aLo; i < aHi; i++) {
                 for (int j = bLo; j < bHi; j++) {
                     triples.add(new int[] { i, j, k });
@@ -144,46 +188,6 @@ public class TriplesWithinMaxDifference {
         }
 
         return triples;
-    }
-
-    // Counts values satisfying low <= value <= high.
-    private static long countClosed(int[] array, long low, long high) {
-        return upperBound(array, high) - lowerBound(array, low);
-    }
-
-    // Counts values satisfying low < value <= high.
-    private static long countOpenClosed(int[] array, long low, long high) {
-        return upperBound(array, high) - upperBound(array, low);
-    }
-
-    // Returns the first index whose value is >= target.
-    private static int lowerBound(int[] array, long target) {
-        int left = 0;
-        int right = array.length;
-        while (left < right) {
-            int middle = left + (right - left) / 2;
-            if (array[middle] >= target) {
-                right = middle;
-            } else {
-                left = middle + 1;
-            }
-        }
-        return left;
-    }
-
-    // Returns the first index whose value is > target.
-    private static int upperBound(int[] array, long target) {
-        int left = 0;
-        int right = array.length;
-        while (left < right) {
-            int middle = left + (right - left) / 2;
-            if (array[middle] > target) {
-                right = middle;
-            } else {
-                left = middle + 1;
-            }
-        }
-        return left;
     }
 
     public static void main(String[] args) {
