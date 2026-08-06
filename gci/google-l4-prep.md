@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 25 / 56 solved.**
+**Progress (Phase 1): 26 / 56 solved.**
 
 ---
 
@@ -39,7 +39,7 @@
 | 25 | ☑ | Given a dictionary of special words, determine whether qualifying subsequences of an input string belong to the dictionary. → [base solution](25-subsequence-dictionary-match/SubsequenceDictionaryMatch.java). **Follow-ups:** (1) longest matching word, tie-broken lexicographically → [LongestSubsequenceDictionaryWord.java](25-subsequence-dictionary-match/LongestSubsequenceDictionaryWord.java); (2) Trie-based optimization for huge dictionaries with shared prefixes → [TrieDictionarySubsequenceMatch.java](25-subsequence-dictionary-match/TrieDictionarySubsequenceMatch.java). |
 | 26 | ☑ | Given an array, from index i either skip or take the element; taking it adds a score and jumps according to `arr[i]`; maximize total score. → [base solution](26-array-jump-take-or-skip/ArrayJumpMaxScore.java). **Follow-up:** return the selected indices, not just the score → `maxScoreIndices` in the same file. |
 | 27 | ☑ | Find arithmetic subarrays where every adjacent difference is exactly +1 or exactly -1. → [solution](27-arithmetic-adjacent-diff-subarrays/ArithmeticAdjacentDiffSubarrays.java). **Follow-up:** return the longest valid subarray's indices → `longestArithmeticSubarray` in the same file. |
-| 28 | ☐ | Given three sorted arrays, find triples containing one value from each array such that every pairwise difference is at most D. |
+| 28 | ☑ | Given three sorted arrays, find triples containing one value from each array such that every pairwise difference is at most D. → [base solution](28-triples-within-max-difference/TriplesWithinMaxDifference.java). **Follow-up:** return the actual triples → `findValidTriples` in the same file. |
 | 29 | ☐ | Logger rate limiter: suppress duplicate messages that occur again within a specified time window. |
 | 30 | ☐ | Design a random music shuffler where no song may repeat within the previous K plays while maintaining correct random selection. |
 | 31 | ☑ | Given friends located on graph nodes and cafés on other nodes, choose the café minimizing the maximum distance traveled by any friend. → [solution](31-best-cafe-for-friends/FindBestCafe.java) |
