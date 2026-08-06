@@ -90,9 +90,10 @@ public class ArithmeticAdjacentDiffSubarrays {
      * not just the total count.
      *
      * MENTAL MAP
-     *   Same one-pass scan, but track WHERE the current run started
-     *   (runStart) instead of just its length. Whenever the run's length
-     *   beats the best seen so far, remember [runStart, i] as the new best.
+     *   Reuses the exact same streak/previousDifference recurrence as
+     *   countArithmeticSubarrays. streak already IS the run length in edges,
+     *   so the run's start index is always recoverable as (i - streak) —
+     *   no separate runStart bookkeeping needed.
      * ------------------------------------------------------------------------
      */
     public int[] longestArithmeticSubarray(int[] arr) {
@@ -100,37 +101,31 @@ public class ArithmeticAdjacentDiffSubarrays {
             return new int[0];
         }
 
-        int runStart = 0;
+        int streak = 0;
         int previousDifference = 0;
-        int bestStart = 0;
-        int bestEnd = 0;
-        int bestLength = 1;
+        int bestStreak = 0;
+        int bestEndIndex = 0;
 
         for (int i = 1; i < arr.length; i++) {
             long difference = (long) arr[i] - arr[i - 1];
 
             if (difference != 1 && difference != -1) {
-                runStart = i;
+                streak = 0;
                 previousDifference = 0;
-                continue;
-            }
-
-            if (difference == previousDifference) {
-                // Run continues; runStart stays where it was.
+            } else if (difference == previousDifference) {
+                streak++;
             } else {
-                runStart = i - 1;
+                streak = 1;
                 previousDifference = (int) difference;
             }
 
-            int currentLength = i - runStart + 1;
-            if (currentLength > bestLength) {
-                bestLength = currentLength;
-                bestStart = runStart;
-                bestEnd = i;
+            if (streak > bestStreak) {
+                bestStreak = streak;
+                bestEndIndex = i;
             }
         }
 
-        return bestLength < 2 ? new int[0] : new int[] { bestStart, bestEnd };
+        return bestStreak < 1 ? new int[0] : new int[] { bestEndIndex - bestStreak, bestEndIndex };
     }
 
     public static void main(String[] args) {
