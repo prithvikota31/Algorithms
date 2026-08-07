@@ -49,7 +49,7 @@
 | 35 | ☑ | Determine how broadcast signals can propagate through a network of connected or reachable transmitters. → [solution](35-broadcast-signal-propagation/BroadcastSignalPropagation.java). **Follow-up:** return the actual reachable transmitters from a given start → `reachableTransmitters` in the same file. |
 | 36 | ☐ | Given an issue-blocker or dependency graph, find all dependency cycles. **<span style="color:red">TODO (must learn first): don't know Kosaraju's algorithm (SCC detection) yet — study it before attempting this one.</span>** |
 | 37 | ☑ | Given recipes, required ingredients, and available supplies, determine which recipes can eventually be produced. → [solution](37-recipes-from-supplies/RecipesFromSupplies.java) (topological BFS; production order and cycle/missing-ingredient exclusion both fall out of the base algorithm with no extra code). |
-| 38 | ☐ | Given pairs of similar sentences or words, determine similarity using transitive relationships. |
+| 38 | ☑ | Given pairs of similar sentences or words, determine similarity using transitive relationships. → [solution](38-sentence-similarity-transitive/SentenceSimilarityTwo.java) (union-find with **union by size** + path compression; `size[root]` also answers "how many words are similar to X?" for free). |
 | 39 | ☐ | Given multiple subsequences describing ordering constraints, determine whether a target sequence is uniquely reconstructible. |
 | 40 | ☐ | Build a translator using mappings or dependency relationships between language tokens. |
 | 41 | ☐ | Given parent-child relationships, construct the corresponding tree. |
