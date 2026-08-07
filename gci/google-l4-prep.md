@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 36 / 56 solved.**
+**Progress (Phase 1): 37 / 56 solved.**
 
 ---
 
@@ -52,7 +52,7 @@
 | 38 | ☑ | Given pairs of similar sentences or words, determine similarity using transitive relationships. → [solution](38-sentence-similarity-transitive/SentenceSimilarityTwo.java) (union-find with **union by size** + path compression; `size[root]` also answers "how many words are similar to X?" for free). |
 | 39 | ☑ | Given multiple subsequences describing ordering constraints, determine whether a target sequence is uniquely reconstructible. → [solution](39-sequence-reconstruction/SequenceReconstruction.java) (Kahn's BFS; uniqueness = exactly one zero-indegree node at every step, so `queue.size() != 1` decides it). |
 | 40 | ☑ | Build a translator using mappings or dependency relationships between language tokens. → [solution](40-token-translator/Translator.java) (transitive mappings = graph reachability; BFS with `visited` so mapping cycles terminate). **Follow-up:** return the actual translation chain → `translationPath` in the same file. **<span style="color:red">Weighted mappings (cost/confidence) follow-up marked conceptual only (not implemented): same adjacency list, swap the queue for a priority queue ⇒ Dijkstra; maximise a product of confidences via -log weights.</span>** |
-| 41 | ☐ | Given parent-child relationships, construct the corresponding tree. |
+| 41 | ☑ | Given parent-child relationships, construct the corresponding tree. → [solution](41-build-tree-from-parent-child/TreeBuilder.java) (value→node map so out-of-order pairs resolve to the same object; root = the only value never seen as a child). **<span style="color:red">Invalid-input follow-up marked conceptual only (not implemented): multiple parents silently duplicate a subtree, a cycle returns null, and a FOREST returns a non-deterministic root — collect all non-child values and assert exactly one.</span>** |
 | 42 | ☐ | Merge two N-ary trees while resolving matching children and field conflicts according to specified rules. |
 | 43 | ☐ | Repeatedly delete leaves from a multi-tree according to the required deletion process. |
 | 44 | ☐ | Return tree leaves grouped by the round in which they would be removed. |
