@@ -91,13 +91,13 @@ public class Translator {
 
         // Build the translation graph:
         // graph[token] = tokens directly reachable from it.
-        Map<String, List<String>> graph = new HashMap<>();
+        Map<String, Set<String>> graph = new HashMap<>();
 
         for (List<String> mapping : mappings) {
             String from = mapping.get(0);
             String to = mapping.get(1);
 
-            graph.computeIfAbsent(from, key -> new ArrayList<>())
+            graph.computeIfAbsent(from, key -> new HashSet<>())
                  .add(to);
         }
 
@@ -113,7 +113,7 @@ public class Translator {
             String current = queue.poll();
 
             for (String neighbor :
-                    graph.getOrDefault(current, Collections.emptyList())) {
+                    graph.getOrDefault(current, Collections.emptySet())) {
 
                 if (neighbor.equals(target)) {
                     return true;
@@ -142,7 +142,7 @@ public class Translator {
             return List.of(source);
         }
 
-        Map<String, List<String>> graph = buildGraph(mappings);
+        Map<String, Set<String>> graph = buildGraph(mappings);
 
         // parent doubles as the visited set; source maps to null.
         Map<String, String> parent = new HashMap<>();
@@ -156,7 +156,7 @@ public class Translator {
             String current = queue.poll();
 
             for (String neighbor :
-                    graph.getOrDefault(current, Collections.emptyList())) {
+                    graph.getOrDefault(current, Collections.emptySet())) {
 
                 if (parent.containsKey(neighbor)) {
                     continue;
@@ -175,11 +175,11 @@ public class Translator {
         return List.of();
     }
 
-    private Map<String, List<String>> buildGraph(List<List<String>> mappings) {
-        Map<String, List<String>> graph = new HashMap<>();
+    private Map<String, Set<String>> buildGraph(List<List<String>> mappings) {
+        Map<String, Set<String>> graph = new HashMap<>();
 
         for (List<String> mapping : mappings) {
-            graph.computeIfAbsent(mapping.get(0), key -> new ArrayList<>())
+            graph.computeIfAbsent(mapping.get(0), key -> new HashSet<>())
                  .add(mapping.get(1));
         }
 
