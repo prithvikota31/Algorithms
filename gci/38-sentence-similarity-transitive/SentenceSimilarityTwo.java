@@ -76,32 +76,39 @@ import java.util.Map;
  */
 public class SentenceSimilarityTwo {
 
-    public boolean areSentencesSimilarTwo(String[] sentence1, String[] sentence2,
+    private final Map<String, String> parent = new HashMap<>();
+    private final Map<String, Integer> size = new HashMap<>();
+
+    public boolean areSentencesSimilarTwo(
+            String[] sentence1,
+            String[] sentence2,
             List<List<String>> similarPairs) {
+
         if (sentence1.length != sentence2.length) {
             return false;
         }
 
-        DisjointSet similarity = new DisjointSet();
+        // Build similarity components.
         for (List<String> pair : similarPairs) {
-            similarity.union(pair.get(0), pair.get(1));
+            union(pair.get(0), pair.get(1));
         }
 
+        // Corresponding words must be identical
+        // or belong to the same connected component.
         for (int i = 0; i < sentence1.length; i++) {
+
             String word1 = sentence1[i];
             String word2 = sentence2[i];
 
-            // Reflexivity: identical words match even if no pair ever named them.
             if (word1.equals(word2)) {
                 continue;
             }
 
-            // A word absent from every pair is alone in its own component.
-            if (!similarity.contains(word1) || !similarity.contains(word2)) {
+            if (!parent.containsKey(word1) || !parent.containsKey(word2)) {
                 return false;
             }
 
-            if (!similarity.find(word1).equals(similarity.find(word2))) {
+            if (!find(word1).equals(find(word2))) {
                 return false;
             }
         }
@@ -109,62 +116,43 @@ public class SentenceSimilarityTwo {
         return true;
     }
 
-    /** Union-find over word names: UNION BY SIZE + path compression. */
-    private static final class DisjointSet {
+    private void union(String word1, String word2) {
 
-        private final Map<String, String> parent = new HashMap<>();
-        private final Map<String, Integer> size = new HashMap<>();
+        // A new word starts as its own component of size 1.
+        parent.putIfAbsent(word1, word1);
+        parent.putIfAbsent(word2, word2);
 
-        boolean contains(String word) {
-            return parent.containsKey(word);
+        size.putIfAbsent(word1, 1);
+        size.putIfAbsent(word2, 1);
+
+        String root1 = find(word1);
+        String root2 = find(word2);
+
+        if (root1.equals(root2)) {
+            return;
         }
 
-        /** Number of words similar to `word`, including itself. */
-        int componentSize(String word) {
-            return size.get(find(word));
-        }
-
-        void union(String word1, String word2) {
-            add(word1);
-            add(word2);
-
-            String root1 = find(word1);
-            String root2 = find(word2);
-            if (root1.equals(root2)) {
-                return;
-            }
-
-            // Make root1 the larger component, then hang the smaller one under it.
-            if (size.get(root1) < size.get(root2)) {
-                String smaller = root1;
-                root1 = root2;
-                root2 = smaller;
-            }
-
+        // Attach the smaller component under the larger component.
+        if (size.get(root1) < size.get(root2)) {
+            parent.put(root1, root2);
+            size.put(root2, size.get(root2) + size.get(root1));
+        } else {
             parent.put(root2, root1);
             size.put(root1, size.get(root1) + size.get(root2));
         }
+    }
 
-        String find(String word) {
-            String next = parent.get(word);
-            if (next.equals(word)) {
-                return word;
-            }
+    private String find(String word) {
 
-            String root = find(next);
-            parent.put(word, root); // Path compression.
-            return root;
+        // Path compression.
+        if (!parent.get(word).equals(word)) {
+            parent.put(word, find(parent.get(word)));
         }
 
-        /** A brand-new word starts as its own root, in a component of size 1. */
-        private void add(String word) {
-            parent.putIfAbsent(word, word);
-            size.putIfAbsent(word, 1);
-        }
+        return parent.get(word);
     }
 
     public static void main(String[] args) {
-        SentenceSimilarityTwo solution = new SentenceSimilarityTwo();
 
         List<List<String>> pairs = List.of(
                 List.of("great", "good"),
@@ -174,7 +162,7 @@ public class SentenceSimilarityTwo {
 
         // great—good—fine is one component, so great ~ fine transitively.
         check("transitive match through a shared neighbour",
-                solution.areSentencesSimilarTwo(
+                new SentenceSimilarityTwo().areSentencesSimilarTwo(
                         new String[] { "great", "acting", "skills" },
                         new String[] { "fine", "drama", "talent" },
                         pairs),
@@ -182,47 +170,49 @@ public class SentenceSimilarityTwo {
 
         // "painting" appears in no pair -> its component is just itself.
         check("word missing from all pairs",
-                solution.areSentencesSimilarTwo(
+                new SentenceSimilarityTwo().areSentencesSimilarTwo(
                         new String[] { "great", "acting", "skills" },
                         new String[] { "fine", "painting", "talent" },
                         pairs),
                 false);
 
         check("length mismatch short-circuits",
-                solution.areSentencesSimilarTwo(
+                new SentenceSimilarityTwo().areSentencesSimilarTwo(
                         new String[] { "great" },
                         new String[] { "fine", "good" },
                         pairs),
                 false);
 
         check("identical words are similar with no pairs at all",
-                solution.areSentencesSimilarTwo(
+                new SentenceSimilarityTwo().areSentencesSimilarTwo(
                         new String[] { "cat", "dog" },
                         new String[] { "cat", "dog" },
                         List.of()),
                 true);
 
         check("two empty sentences",
-                solution.areSentencesSimilarTwo(new String[] {}, new String[] {}, List.of()),
+                new SentenceSimilarityTwo().areSentencesSimilarTwo(
+                        new String[] {}, new String[] {}, List.of()),
                 true);
 
         // Both known words, but they live in different components.
         check("known words in different components",
-                solution.areSentencesSimilarTwo(
+                new SentenceSimilarityTwo().areSentencesSimilarTwo(
                         new String[] { "great" },
                         new String[] { "talent" },
                         pairs),
                 false);
 
-        // Follow-up freebie that union BY SIZE gives away for free.
-        DisjointSet set = new DisjointSet();
+        // Follow-up freebie that union BY SIZE gives away: component population.
+        SentenceSimilarityTwo counter = new SentenceSimilarityTwo();
         for (List<String> pair : pairs) {
-            set.union(pair.get(0), pair.get(1));
+            counter.union(pair.get(0), pair.get(1));
         }
-        if (set.componentSize("great") != 3) {
-            throw new AssertionError("FAIL componentSize: got " + set.componentSize("great"));
+        int greatComponent = counter.size.get(counter.find("great"));
+        if (greatComponent != 3) {
+            throw new AssertionError("FAIL componentSize: got " + greatComponent);
         }
-        System.out.println("pass componentSize(great) -> 3 {great, good, fine}");
+        System.out.println("pass size[find(great)] -> 3 {great, good, fine}");
 
         System.out.println("all passed");
     }
