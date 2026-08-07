@@ -86,17 +86,22 @@ public class NaryTreeLeafRemoval {
                     childRound + 1);
         }
 
-        // Postorder traversal discovers rounds in order: before a node can be
-        // assigned to round r, one of its descendants has already created all
-        // buckets from 0 through r - 1.
-        if (removalRounds.size() == round) {
-            removalRounds.add(new ArrayList<>());
-        }
+        ensureRoundExists(removalRounds, round);
 
         // Place this node into its computed round, then tell its parent when
         // this subtree's root disappears.
         removalRounds.get(round).add(node.value);
         return round;
+    }
+
+    private void ensureRoundExists(
+            List<List<Integer>> removalRounds,
+            int round) {
+
+        // A round can be accessed only after its bucket has been created.
+        while (removalRounds.size() < round + 1) {
+            removalRounds.add(new ArrayList<>());
+        }
     }
 
     public static void main(String[] args) {
