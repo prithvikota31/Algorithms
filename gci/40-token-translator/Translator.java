@@ -187,9 +187,11 @@ public class Translator {
 
     private List<String> rebuildChain(Map<String, String> parent, String target) {
         List<String> chain = new ArrayList<>();
+        String current = target;
 
-        for (String token = target; token != null; token = parent.get(token)) {
-            chain.add(token);
+        while (current != null) {
+            chain.add(current);
+            current = parent.get(current);
         }
 
         Collections.reverse(chain);
