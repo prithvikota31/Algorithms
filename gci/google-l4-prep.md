@@ -61,7 +61,7 @@
 | 45 | ☑ | Count connected components of 1-valued nodes in a tree. → **[ConnectedOneComponents.java](20-connected-components-binary-tree/ConnectedOneComponents.java)** (same problem as #20: count each component once at its highest `1` node). |
 | 46 | ☑ | Find the largest connected component of 1-valued nodes in a tree. → **[ConnectedOneComponents.java](20-connected-components-binary-tree/ConnectedOneComponents.java)** (already implemented with the #20 base solution by returning each connected `1`-subtree size). |
 | 47 | ☑ | Given an undirected tree where node degree is bounded, choose the best root so the rooted structure satisfies binary-tree constraints. → **[BestRootForBinaryTree.java](47-best-root-binary-tree/BestRootForBinaryTree.java)** (degree reasoning: root degree ≤ 2 and every non-root degree ≤ 3; includes the minimum-height valid-root follow-up via diameter endpoints). |
-| 48 | ☐ | Reroot a tree while satisfying alternating node-color constraints by level. |
+| 48 | ☐ | Reroot a tree while satisfying alternating node-color constraints by level. **<span style="color:red">Skip for Google L4 prep: niche rerooting + coloring constraint with low reusable value compared with standard tree DFS/BFS, reroot DP, or tree-center problems.</span>** |
 | 49 | ☐ | A mouse moves from index i to a later index j and earns `(j - i) * nums[j]`; maximize the total score to reach the end. |
 | 50 | ☐ | Given F1 tyres with initial lap time and degradation factor, find the minimum race time using one tyre. |
 | 51 | ☐ | Extend the F1 tyre problem by allowing tyre changes with a fixed replacement cost; minimize total race time. |
