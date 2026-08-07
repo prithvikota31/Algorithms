@@ -78,23 +78,36 @@ public class VerticalAreaSplit {
         double activeHeight = 0;
         double previousX = events[0][0];
 
-        int i = 0;
-        while (i < events.length) {
-            double currentX = events[i][0];
-            double stripArea = (currentX - previousX) * activeHeight;
+        int eventIndex = 0;
+        while (eventIndex < events.length) {
+            // No rectangle starts or ends between these two x-coordinates,
+            // so their combined height is constant throughout this strip.
+            double stripStartX = previousX;
+            double stripEndX = events[eventIndex][0];
+            double stripWidth = stripEndX - stripStartX;
+            double areaInStrip = stripWidth * activeHeight;
 
-            // activeHeight is constant across the strip, so area grows
-            // linearly and the crossing point is a direct division.
-            if (activeHeight > 0 && currentArea + stripArea >= targetArea) {
-                return previousX + (targetArea - currentArea) / activeHeight;
+            // If half the total area falls inside this strip, determine how
+            // far into the strip we must travel to collect the missing area.
+            if (activeHeight > 0
+                    && currentArea + areaInStrip >= targetArea) {
+                double remainingAreaNeeded = targetArea - currentArea;
+                double distanceIntoStrip = remainingAreaNeeded / activeHeight;
+                return stripStartX + distanceIntoStrip;
             }
-            currentArea += stripArea;
 
-            while (i < events.length && events[i][0] == currentX) {
-                activeHeight += events[i][1];
-                i++;
+            // The cut was not in this strip, so include its entire area.
+            currentArea += areaInStrip;
+
+            // Apply every rectangle start/end event at this boundary. The
+            // resulting height will be used for the next strip.
+            while (eventIndex < events.length
+                    && events[eventIndex][0] == stripEndX) {
+                activeHeight += events[eventIndex][1];
+                eventIndex++;
             }
-            previousX = currentX;
+
+            previousX = stripEndX;
         }
 
         return previousX;
