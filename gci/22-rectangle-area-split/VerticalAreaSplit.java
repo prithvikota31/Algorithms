@@ -1,98 +1,98 @@
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Random;
 
 /*
  * ============================================================================
- * Problem 22 (Google L4 prep) - Vertical line splitting rectangle area equally.
+ * Problem 22 (Google L4 prep) - Vertical line splitting rectangle area equally
  * ============================================================================
  *
  * PROMPT
- *   Given a set of axis-aligned rectangles, find a vertical line x = k such
- *   that the total rectangle area to the left of the line equals the total
- *   area to the right.
+ * ------
+ * Given axis-aligned rectangles [x1, y1, x2, y2], find a vertical line x = k
+ * such that the rectangle area left of the line equals the area to its right.
+ * Rectangles may overlap; overlapping area is counted once per rectangle
+ * (areas simply add -- this is not a union-area problem).
  *
- *   Overlapping rectangle area is counted separately. Each rectangle always
- *   contributes its full area, even where it overlaps another rectangle.
- *
- * EXAMPLE
- *   Rectangles [0,0,2,2] and [2,0,4,2] each have area 4, so the cut is x = 2.
- *   Rectangles [0,0,4,2] and [0,0,2,2] have total area 12. Their combined
- *   active height is 4 from x = 0 to x = 2, so the cut is x = 1.5.
+ * EXAMPLES
+ * --------
+ * [[0,0,2,2], [2,0,4,2]] -> 2.0  (4 + 4, cut on the shared boundary)
+ * [[0,0,2,2], [1,0,3,2]] -> 1.5  (overlapped strip counted twice)
+ * [[0,0,2,2], [5,0,7,2]] -> 2.0  (the gap contributes nothing)
  *
  * INTUITION
- *   Turn each rectangle into two x-events: add its height at x1 and remove
- *   its height at x2. Between consecutive event coordinates, the sum of
- *   active heights is constant, so area grows linearly at that rate. Once
- *   the target falls in a strip, solve directly for the exact x-coordinate.
+ * ---------
+ * Sweep a vertical line left to right. A rectangle influences how fast area
+ * accumulates only while the line sits inside its x-range, and it does so at
+ * a constant rate equal to its height. So each rectangle becomes two events:
+ * +height at x1 and -height at x2. Between consecutive event coordinates the
+ * active height is constant, so area grows linearly there and the exact cut
+ * inside a strip can be solved for directly instead of searched for.
+ *
+ * Sorting rectangles by x1 and consuming them one at a time is NOT enough:
+ * rectangles sharing an x-range must contribute their heights simultaneously,
+ * which only the event view captures.
  *
  * ALGORITHM
- *   1. Add events (x1, +height) and (x2, -height) for every rectangle while
- *      summing their areas independently.
- *   2. Sort events by x and set targetArea = totalArea / 2.
- *   3. Sweep each strip using stripArea = width * activeHeight.
- *   4. If the target lies in the strip, divide the remaining area by
- *      activeHeight to find the exact x; otherwise process all events at x.
+ * ---------
+ * 1. Emit events (x1, +height) and (x2, -height); accumulate totalArea.
+ * 2. Sort events by x; targetArea = totalArea / 2.
+ * 3. Walk the events. For the strip [previousX, currentX):
+ *      stripArea = (currentX - previousX) * activeHeight
+ *      if currentArea + stripArea >= targetArea, the cut is inside the strip:
+ *          answer = previousX + (targetArea - currentArea) / activeHeight
+ *      otherwise consume the strip and apply every event at currentX.
+ * 4. All events sharing an x are applied before the next strip is measured.
  *
  * COMPLEXITY
- *   Time:  O(N log N) to sort the 2N events.
- *   Space: O(N) for the events.
- *
- * FOLLOW-UPS
- *   Binary search on x is a simpler O(N log precision) alternative: scan all
- *   rectangles to measure left area for each guess. If overlapping area must
- *   count only once, the sweep must track union length of active y-intervals.
+ * ----------
+ * Time:  O(N log N) to sort 2N events, then O(N) to sweep.
+ * Space: O(N) for the events.
  * ============================================================================
  */
 public class VerticalAreaSplit {
-
-    private static class Event {
-        final double x;
-        final double heightChange;
-
-        Event(double x, double heightChange) {
-            this.x = x;
-            this.heightChange = heightChange;
-        }
-    }
 
     public double findVerticalCut(int[][] rectangles) {
         if (rectangles == null || rectangles.length == 0) {
             return 0;
         }
 
-        List<Event> events = new ArrayList<>(rectangles.length * 2);
+        // Each event is {x, heightChange}.
+        double[][] events = new double[rectangles.length * 2][];
         double totalArea = 0;
-        for (int[] rect : rectangles) {
-            double width = (double) rect[2] - rect[0];
-            double height = (double) rect[3] - rect[1];
+        int next = 0;
 
-            totalArea += width * height;
-            events.add(new Event(rect[0], height));
-            events.add(new Event(rect[2], -height));
+        for (int[] rect : rectangles) {
+            int startX = rect[0];
+            int endX = rect[2];
+            int height = rect[3] - rect[1];
+
+            totalArea += (double) (endX - startX) * height;
+            events[next++] = new double[] {startX, height};
+            events[next++] = new double[] {endX, -height};
         }
 
-        events.sort(Comparator.comparingDouble(event -> event.x));
+        Arrays.sort(events, (a, b) -> Double.compare(a[0], b[0]));
 
         double targetArea = totalArea / 2.0;
         double currentArea = 0;
         double activeHeight = 0;
-        double previousX = events.get(0).x;
+        double previousX = events[0][0];
 
-        int eventIndex = 0;
-        while (eventIndex < events.size()) {
-            double currentX = events.get(eventIndex).x;
+        int i = 0;
+        while (i < events.length) {
+            double currentX = events[i][0];
             double stripArea = (currentX - previousX) * activeHeight;
 
+            // activeHeight is constant across the strip, so area grows
+            // linearly and the crossing point is a direct division.
             if (activeHeight > 0 && currentArea + stripArea >= targetArea) {
                 return previousX + (targetArea - currentArea) / activeHeight;
             }
-
             currentArea += stripArea;
-            while (eventIndex < events.size()
-                    && Double.compare(events.get(eventIndex).x, currentX) == 0) {
-                activeHeight += events.get(eventIndex).heightChange;
-                eventIndex++;
+
+            while (i < events.length && events[i][0] == currentX) {
+                activeHeight += events[i][1];
+                i++;
             }
             previousX = currentX;
         }
@@ -113,15 +113,10 @@ public class VerticalAreaSplit {
                 {0, 0, 4, 2}, {4, 0, 6, 4}
         }), 4.0);
 
-        // Shared x-range: both rectangle heights contribute to the area rate.
-        check("overlapping rectangles count separately", sol.findVerticalCut(new int[][] {
-            {0, 0, 4, 2}, {0, 0, 2, 2}
-        }), 1.5);
-
-        // Overlapping x-projections also work when the y-ranges are disjoint.
-        check("stacked rectangles", sol.findVerticalCut(new int[][] {
-            {0, 0, 4, 2}, {0, 5, 2, 7}
-        }), 1.5);
+        // Three equal-height contiguous rectangles, cut lands mid-rectangle.
+        check("cut lands mid-rectangle", sol.findVerticalCut(new int[][] {
+                {0, 0, 2, 3}, {2, 0, 4, 3}, {4, 0, 6, 3}
+        }), 3.0);
 
         // Unsorted input -- sort step must still find the correct cut.
         check("unsorted input", sol.findVerticalCut(new int[][] {
@@ -133,7 +128,74 @@ public class VerticalAreaSplit {
                 {0, 0, 2, 2}, {5, 0, 7, 2}
         }), 2.0);
 
+        // Identical rectangles: the shared area is counted twice.
+        check("full overlap", sol.findVerticalCut(new int[][] {
+                {0, 0, 4, 2}, {0, 0, 4, 2}
+        }), 2.0);
+
+        // Partial x-overlap; a plain left-to-right rectangle scan answers 2.0.
+        check("partial overlap", sol.findVerticalCut(new int[][] {
+                {0, 0, 2, 2}, {1, 0, 3, 2}
+        }), 1.5);
+
+        // Stacked rectangles share an x-range and contribute heights together.
+        check("stacked same x-range", sol.findVerticalCut(new int[][] {
+                {0, 0, 2, 1}, {0, 1, 2, 3}
+        }), 1.0);
+
+        // A tall rectangle nested inside a wide one pulls the cut left.
+        check("nested x-range", sol.findVerticalCut(new int[][] {
+                {0, 0, 8, 1}, {3, 0, 4, 4}
+        }), 3.6);
+
+        check("negative coordinates", sol.findVerticalCut(new int[][] {
+                {-4, -2, 0, 2}, {0, -2, 4, 2}
+        }), 0.0);
+
+        verifyAreaBalance(sol);
         System.out.println("all passed");
+    }
+
+    /** Checks random inputs by measuring the area left of the reported cut. */
+    private static void verifyAreaBalance(VerticalAreaSplit sol) {
+        Random random = new Random(22);
+
+        for (int trial = 0; trial < 2000; trial++) {
+            int count = 1 + random.nextInt(6);
+            int[][] rectangles = new int[count][];
+
+            for (int i = 0; i < count; i++) {
+                int startX = random.nextInt(21) - 10;
+                int startY = random.nextInt(21) - 10;
+                rectangles[i] = new int[] {
+                    startX, startY,
+                    startX + 1 + random.nextInt(8),
+                    startY + 1 + random.nextInt(8)
+                };
+            }
+
+            double cut = sol.findVerticalCut(rectangles);
+            double leftArea = areaLeftOf(rectangles, cut);
+            double totalArea = areaLeftOf(rectangles, Double.POSITIVE_INFINITY);
+
+            if (Math.abs(leftArea - totalArea / 2.0) > 1e-6) {
+                throw new AssertionError("FAIL random trial: cut " + cut
+                        + " gives left " + leftArea + " want " + totalArea / 2.0
+                        + " for " + Arrays.deepToString(rectangles));
+            }
+        }
+        System.out.println("pass randomized area-balance check");
+    }
+
+    private static double areaLeftOf(int[][] rectangles, double x) {
+        double area = 0;
+        for (int[] rect : rectangles) {
+            double width = Math.min(x, rect[2]) - rect[0];
+            if (width > 0) {
+                area += width * (rect[3] - rect[1]);
+            }
+        }
+        return area;
     }
 
     private static void check(String name, double actual, double expected) {
