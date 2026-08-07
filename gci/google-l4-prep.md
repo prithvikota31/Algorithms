@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 32 / 56 solved.**
+**Progress (Phase 1): 33 / 56 solved.**
 
 ---
 
@@ -47,8 +47,8 @@
 | 33 | ☑ | Find the shortest path through broken teleporters; follow-up: repaired teleporters introduce 0/1 edge costs. → [solution](33-teleporter-shortest-path/TeleporterShortestPath.java). **Follow-up:** partially repaired teleporters (0/1 cost) via 0-1 BFS → `findMinRepairDaysPath` in the same file. |
 | 34 | ☑ | Given currency exchange rates, determine whether an arbitrage cycle exists. → [solution](34-currency-arbitrage/CurrencyArbitrage.java). **Follow-up:** return the actual arbitrage cycle → `findArbitrageCycle` in the same file. |
 | 35 | ☑ | Determine how broadcast signals can propagate through a network of connected or reachable transmitters. → [solution](35-broadcast-signal-propagation/BroadcastSignalPropagation.java). **Follow-up:** return the actual reachable transmitters from a given start → `reachableTransmitters` in the same file. |
-| 36 | ☐ | Given an issue-blocker or dependency graph, find all dependency cycles. |
-| 37 | ☐ | Given recipes, required ingredients, and available supplies, determine which recipes can eventually be produced. |
+| 36 | ☐ | Given an issue-blocker or dependency graph, find all dependency cycles. **<span style="color:red">TODO (must learn first): don't know Kosaraju's algorithm (SCC detection) yet — study it before attempting this one.</span>** |
+| 37 | ☑ | Given recipes, required ingredients, and available supplies, determine which recipes can eventually be produced. → [solution](37-recipes-from-supplies/RecipesFromSupplies.java) (topological BFS; production order and cycle/missing-ingredient exclusion both fall out of the base algorithm with no extra code). |
 | 38 | ☐ | Given pairs of similar sentences or words, determine similarity using transitive relationships. |
 | 39 | ☐ | Given multiple subsequences describing ordering constraints, determine whether a target sequence is uniquely reconstructible. |
 | 40 | ☐ | Build a translator using mappings or dependency relationships between language tokens. |
@@ -124,7 +124,7 @@
 - ☐ Safest Path in a Grid.
 - ☐ Pacific Atlantic-style reverse reachability.
 - ☐ Shortest path after consuming/collecting required objects.
-- ☐ Find all dependency cycles in an issue/blocker relationship graph.
+- ☐ Find all dependency cycles in an issue/blocker relationship graph. **<span style="color:red">TODO (must learn first): don't know Kosaraju's algorithm (SCC detection) yet — study it before attempting this one.</span>**
 - ☐ Find recipes possible from supplies and recipe dependencies.
 - ☐ Sentence Similarity II / equivalence through transitive relationships.
 - ☐ Sequence Reconstruction.
