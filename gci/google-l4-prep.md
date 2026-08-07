@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 45 / 56 solved.**
+**Progress (Phase 1): 47 / 56 solved.**
 
 **Quality gate:** Run `./verify.ps1` from this directory before marking work complete. A checkbox records coverage; the [practice protocol](practice/README.md) measures independent recall, and the [three-year roadmap](../../three-year-engineering-roadmap.md) defines mastery and career evidence.
 
@@ -63,10 +63,10 @@
 | 47 | ☑ | Given an undirected tree where node degree is bounded, choose the best root so the rooted structure satisfies binary-tree constraints. → **[BestRootForBinaryTree.java](47-best-root-binary-tree/BestRootForBinaryTree.java)** (degree reasoning: root degree ≤ 2 and every non-root degree ≤ 3; includes the minimum-height valid-root follow-up via diameter endpoints). |
 | 48 | ☐ | Reroot a tree while satisfying alternating node-color constraints by level. **<span style="color:red">Skip for Google L4 prep: niche rerooting + coloring constraint with low reusable value compared with standard tree DFS/BFS, reroot DP, or tree-center problems.</span>** |
 | 49 | ☑ | A mouse moves from index i to a later index j and earns `(j - i) * nums[j]`; maximize the total score to reach the end. → [solution](49-mouse-jump-max-score/MouseJumpMaxScore.java) (greedy: decompose jumps into unit gaps and assign each gap the maximum landing value in its suffix). |
-| 50 | ☑ | Given F1 tyres with initial lap time and degradation factor, find the minimum race time using one tyre. → [solution](50-f1-single-tyre-race-time/F1SingleTyreRaceTime.java) (simulate each tyre's geometric lap-time growth; prune when its partial total cannot beat the best complete race). |
-| 51 | ☐ | Extend the F1 tyre problem by allowing tyre changes with a fixed replacement cost; minimize total race time. **<span style="color:red">Must prepare: this is the important LC 2188 follow-up and introduces the actual DP.</span>** |
+| 50 | ☑ | Given F1 tyres with initial lap time and degradation factor, find the minimum race time using one tyre. → [solution](50-f1-single-tyre-race-time/F1SingleTyreRaceTime.java) (simulate each tyre's geometric lap-time growth and keep the smallest complete-race total). |
+| 51 | ☑ | Extend the F1 tyre problem by allowing tyre changes with a fixed replacement cost; minimize total race time. → [solution](51-f1-tyre-change-dp/F1TyreChangeDP.java) (precompute the cheapest fresh-tyre stint of each useful length, then DP over partitions of the race into stints). |
 | 52 | ☐ | Given a microwave keypad and target cooking time, choose an input near the target while minimizing keypresses and finger-movement cost. |
-| 53 | ☐ | Given horizontal and vertical line segments, count the number of squares they form. |
+| 53 | ☑ | Given horizontal and vertical line segments, count the number of squares they form. → [solution](53-count-squares-from-segments/CountSquaresFromSegments.java) (merge touching/overlapping intervals on each horizontal and vertical line, then enumerate candidate axis-aligned squares and query continuous side coverage). |
 | 54 | ☐ | Given rectangles, find the vertical line that splits their total area equally. |
 | 55 | ☐ | Maintain a set of 2D points and answer whether a rectangle can be formed from stored points. |
 | 56 | ☐ | Given a set of 2D points, find the maximum-area rectangle that can be formed. |
