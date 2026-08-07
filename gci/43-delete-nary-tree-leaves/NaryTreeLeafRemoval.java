@@ -61,6 +61,7 @@ public class NaryTreeLeafRemoval {
     }
 
     public List<List<Integer>> findLeaves(Node root) {
+        // Index i stores all nodes removed during round i.
         List<List<Integer>> removalRounds = new ArrayList<>();
 
         if (root != null) {
@@ -74,18 +75,26 @@ public class NaryTreeLeafRemoval {
             Node node,
             List<List<Integer>> removalRounds) {
 
+        // A leaf has no children, so its removal round remains 0.
+        // A non-leaf is removed one round after its last surviving child.
         int round = 0;
 
         for (Node child : node.children) {
+            int childRound = findRemovalRound(child, removalRounds);
             round = Math.max(
                     round,
-                    findRemovalRound(child, removalRounds) + 1);
+                    childRound + 1);
         }
 
+        // Postorder traversal discovers rounds in order: before a node can be
+        // assigned to round r, one of its descendants has already created all
+        // buckets from 0 through r - 1.
         if (removalRounds.size() == round) {
             removalRounds.add(new ArrayList<>());
         }
 
+        // Place this node into its computed round, then tell its parent when
+        // this subtree's root disappears.
         removalRounds.get(round).add(node.value);
         return round;
     }
