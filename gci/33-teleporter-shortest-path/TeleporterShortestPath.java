@@ -68,8 +68,12 @@ public class TeleporterShortestPath {
         }
 
         boolean[] visited = new boolean[numberOfTeleporters];
+        // Sentinel: parent[i] == i means "no real parent yet" (only ever
+        // true for the source, since nothing else keeps its self-loop).
         int[] parent = new int[numberOfTeleporters];
-        Arrays.fill(parent, -1);
+        for (int i = 0; i < numberOfTeleporters; i++) {
+            parent[i] = i;
+        }
 
         Queue<Integer> queue = new ArrayDeque<>();
         queue.offer(source);
@@ -77,6 +81,9 @@ public class TeleporterShortestPath {
 
         while (!queue.isEmpty()) {
             int current = queue.poll();
+            if (current == destination) {
+                return buildPath(parent, destination);
+            }
 
             for (int neighbor : connections.get(current)) {
                 if (brokenTeleporters.contains(neighbor) || visited[neighbor]) {
@@ -85,10 +92,6 @@ public class TeleporterShortestPath {
 
                 visited[neighbor] = true;
                 parent[neighbor] = current;
-
-                if (neighbor == destination) {
-                    return buildPath(parent, source, destination);
-                }
                 queue.offer(neighbor);
             }
         }
@@ -134,7 +137,9 @@ public class TeleporterShortestPath {
         int[] dist = new int[numberOfTeleporters];
         Arrays.fill(dist, Integer.MAX_VALUE);
         int[] parent = new int[numberOfTeleporters];
-        Arrays.fill(parent, -1);
+        for (int i = 0; i < numberOfTeleporters; i++) {
+            parent[i] = i;
+        }
         boolean[] finalized = new boolean[numberOfTeleporters];
 
         Deque<Integer> deque = new ArrayDeque<>();
@@ -171,17 +176,17 @@ public class TeleporterShortestPath {
         if (dist[destination] == Integer.MAX_VALUE) {
             return new ArrayList<>();
         }
-        return buildPath(parent, source, destination);
+        return buildPath(parent, destination);
     }
 
     // Reconstructs destination -> ... -> source via parent pointers, then
     // reverses to source -> ... -> destination.
-    private List<Integer> buildPath(int[] parent, int source, int destination) {
+    private List<Integer> buildPath(int[] parent, int destination) {
         List<Integer> path = new ArrayList<>();
         int current = destination;
-        while (current != -1) {
+        while (true) {
             path.add(current);
-            if (current == source) {
+            if (parent[current] == current) {
                 break;
             }
             current = parent[current];
