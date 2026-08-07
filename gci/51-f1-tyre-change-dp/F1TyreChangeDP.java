@@ -24,22 +24,17 @@ import java.util.Arrays;
  * race with DP: if the final stint has length k, everything before it is the
  * already-solved prefix dp[laps - k].
  *
- * A stint need not continue once its next degraded lap costs at least a tyre
- * change plus the fastest fresh lap. Replacing that next lap by a change is no
- * worse, and the fresh tyre also starts no more degraded for later laps.
- *
  * ALGORITHM
  * ---------
- * 1. Find the fastest fresh lap across all tyre types.
- * 2. Simulate each tyre and fill bestStint[k], stopping at the cutoff above.
- * 3. Set dp[0] = -changeTime to cancel the first stint's fake change cost.
- * 4. For each completed-lap count, try every useful final stint length k.
+ * 1. Simulate every tyre for every possible stint length to fill bestStint[k].
+ * 2. Set dp[0] = 0 because completing zero laps costs nothing.
+ * 3. For each completed-lap count, try every possible final stint length k.
+ *    Add a change cost only when there is an earlier stint.
  * Assume all calculated times fit in a long.
  *
  * COMPLEXITY
  * ----------
- * Time: O(T * S + L * S), where T is the tyre count, L is numLaps, and S is
- *       the maximum useful stint length (small when degradation is exponential).
+ * Time: O(T * L + L^2), where T is the tyre count and L is numLaps.
  * Space: O(L).
  * ============================================================================
  */
@@ -53,45 +48,36 @@ public class F1TyreChangeDP {
         }
         validateInput(tires, changeTime);
 
-        long fastestFreshLap = INF;
-        for (int[] tire : tires) {
-            fastestFreshLap = Math.min(fastestFreshLap, tire[0]);
-        }
-
         long[] bestStint = new long[numLaps + 1];
         Arrays.fill(bestStint, INF);
-        int maxUsefulStint = 0;
 
         for (int[] tire : tires) {
             long currentLapTime = tire[0];
             long totalTime = 0;
-            long replaceNextLapCost = changeTime + fastestFreshLap;
 
             for (int stintLength = 1; stintLength <= numLaps; stintLength++) {
                 totalTime += currentLapTime;
                 bestStint[stintLength] = Math.min(bestStint[stintLength], totalTime);
-                maxUsefulStint = Math.max(maxUsefulStint, stintLength);
-
                 currentLapTime *= tire[1];
-
-                // Continuing this worn tyre is pointless when its next lap is
-                // no faster than changing tyres and taking a fresh first lap.
-                if (currentLapTime >= replaceNextLapCost) {
-                    break;
-                }
             }
         }
 
         long[] dp = new long[numLaps + 1];
         Arrays.fill(dp, INF);
-        dp[0] = -changeTime;
+        dp[0] = 0;
 
         for (int lapsCompleted = 1; lapsCompleted <= numLaps; lapsCompleted++) {
-            int longestFinalStint = Math.min(lapsCompleted, maxUsefulStint);
-            for (int stintLength = 1; stintLength <= longestFinalStint; stintLength++) {
-                dp[lapsCompleted] = Math.min(
-                        dp[lapsCompleted],
-                        dp[lapsCompleted - stintLength] + changeTime + bestStint[stintLength]);
+            for (int stintLength = 1; stintLength <= lapsCompleted; stintLength++) {
+                int earlierLaps = lapsCompleted - stintLength;
+                long candidateTime = bestStint[stintLength];
+
+                // If earlier laps exist, append this final stint after a tyre
+                // change. The first stint of the race has no change cost.
+                if (earlierLaps > 0) {
+                    candidateTime += dp[earlierLaps] + changeTime;
+                }
+
+                dp[lapsCompleted] = Math.min(dp[lapsCompleted], candidateTime);
             }
         }
 
@@ -155,7 +141,7 @@ public class F1TyreChangeDP {
     private static long minimumFinishTimeUnpruned(int[][] tires, int changeTime, int numLaps) {
         long[] dp = new long[numLaps + 1];
         Arrays.fill(dp, INF);
-        dp[0] = -changeTime;
+        dp[0] = 0;
 
         for (int lapsCompleted = 1; lapsCompleted <= numLaps; lapsCompleted++) {
             for (int[] tire : tires) {
@@ -164,9 +150,16 @@ public class F1TyreChangeDP {
 
                 for (int stintLength = 1; stintLength <= lapsCompleted; stintLength++) {
                     stintTime += currentLapTime;
+                    int earlierLaps = lapsCompleted - stintLength;
+                    long candidateTime = stintTime;
+
+                    if (earlierLaps > 0) {
+                        candidateTime += dp[earlierLaps] + changeTime;
+                    }
+
                     dp[lapsCompleted] = Math.min(
                             dp[lapsCompleted],
-                            dp[lapsCompleted - stintLength] + changeTime + stintTime);
+                            candidateTime);
                     currentLapTime *= tire[1];
                 }
             }
