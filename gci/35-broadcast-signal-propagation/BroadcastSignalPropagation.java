@@ -1,4 +1,6 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 /*
@@ -146,6 +148,79 @@ public class BroadcastSignalPropagation {
         }
     }
 
+    /*
+     * ALTERNATIVE (equivalent to dfsCount/dfsCollect above): BFS with an
+     * explicit queue instead of the recursion stack. `visited` must be set
+     * at ENQUEUE time (not dequeue time) to avoid pushing the same node
+     * twice; a FIFO queue's dequeue order always matches its enqueue order,
+     * so counting/collecting at either point gives identical results.
+     */
+    public int maximumReachBfs(int[][] transmitters) {
+        int n = transmitters.length;
+        if (n == 0) {
+            return 0;
+        }
+
+        List<List<Integer>> graph = buildReachabilityGraph(transmitters);
+
+        int maxReached = 0;
+        for (int start = 0; start < n; start++) {
+            boolean[] visited = new boolean[n];
+            maxReached = Math.max(maxReached, bfsCount(start, graph, visited));
+        }
+        return maxReached;
+    }
+
+    public List<Integer> reachableTransmittersBfs(int[][] transmitters, int start) {
+        List<Integer> reached = new ArrayList<>();
+        int n = transmitters.length;
+        if (n == 0 || start < 0 || start >= n) {
+            return reached;
+        }
+
+        List<List<Integer>> graph = buildReachabilityGraph(transmitters);
+        boolean[] visited = new boolean[n];
+        bfsCollect(start, graph, visited, reached);
+        return reached;
+    }
+
+    private int bfsCount(int start, List<List<Integer>> graph, boolean[] visited) {
+        Deque<Integer> queue = new ArrayDeque<>();
+        queue.offer(start);
+        visited[start] = true;
+
+        int count = 0;
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            count++;
+            for (int neighbor : graph.get(current)) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    queue.offer(neighbor);
+                }
+            }
+        }
+        return count;
+    }
+
+    private void bfsCollect(int start, List<List<Integer>> graph, boolean[] visited,
+            List<Integer> reached) {
+        Deque<Integer> queue = new ArrayDeque<>();
+        queue.offer(start);
+        visited[start] = true;
+
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            reached.add(current);
+            for (int neighbor : graph.get(current)) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    queue.offer(neighbor);
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) {
         BroadcastSignalPropagation solution = new BroadcastSignalPropagation();
 
@@ -162,6 +237,17 @@ public class BroadcastSignalPropagation {
         check("single transmitter reaches only itself",
                 solution.maximumReach(new int[][] { { 0, 0, 0 } }), 1);
         check("empty transmitters", solution.maximumReach(new int[][] {}), 0);
+
+        // BFS variants must match the DFS versions exactly (same graph, same reachability).
+        check("worked example (BFS)", solution.maximumReachBfs(worked), 2);
+        check("directed chain reaches all three (BFS)", solution.maximumReachBfs(chain), 3);
+        check("chain reachable set from 0 (BFS)",
+                solution.reachableTransmittersBfs(chain, 0), List.of(0, 1, 2));
+        check("chain reachable set from 2 (BFS, dead end)",
+                solution.reachableTransmittersBfs(chain, 2), List.of(2));
+        check("single transmitter reaches only itself (BFS)",
+                solution.maximumReachBfs(new int[][] { { 0, 0, 0 } }), 1);
+        check("empty transmitters (BFS)", solution.maximumReachBfs(new int[][] {}), 0);
 
         System.out.println("all passed");
     }
