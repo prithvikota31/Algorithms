@@ -6,6 +6,8 @@
 
 **Progress (Phase 1): 37 / 56 solved.**
 
+**Quality gate:** Run `./verify.ps1` from this directory before marking work complete. A checkbox records coverage; the [practice protocol](practice/README.md) measures independent recall, and the [three-year roadmap](../../three-year-engineering-roadmap.md) defines mastery and career evidence.
+
 ---
 
 ## Phase 1 — The 56 Priority Problems (solve these first)

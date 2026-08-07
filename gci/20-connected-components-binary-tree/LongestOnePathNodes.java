@@ -126,20 +126,6 @@ public class LongestOnePathNodes {
             cur = (leftLen >= rightLen) ? cur.left : cur.right;
         }
     }
-
-
-    private void walkChain(TreeNode node, List<TreeNode> out) {
-        TreeNode cur = node;
-
-        while(cur != null && downLen.get(cur) > 0)
-        {
-            out.add(cur);
-            int leftLen = cur.left == null? 0: downLen.get(cur.left);
-            int rightlen = cur.right == null? 0: downLen.get(cur.right);
-            cur = leftLen >= rightLen? cur.left: cur.right; 
-        }
-    }
-
     public static void main(String[] args) {
         LongestOnePathNodes solution = new LongestOnePathNodes();
 
