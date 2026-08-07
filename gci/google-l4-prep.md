@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 46 / 56 solved.**
+**Progress (Phase 1): 47 / 56 solved.**
 
 **Quality gate:** Run `./verify.ps1` from this directory before marking work complete. A checkbox records coverage; the [practice protocol](practice/README.md) measures independent recall, and the [three-year roadmap](../../three-year-engineering-roadmap.md) defines mastery and career evidence.
 
@@ -67,7 +67,7 @@
 | 51 | ☑ | Extend the F1 tyre problem by allowing tyre changes with a fixed replacement cost; minimize total race time. → [solution](51-f1-tyre-change-dp/F1TyreChangeDP.java) (precompute the cheapest fresh-tyre stint of each useful length, then DP over partitions of the race into stints). |
 | 52 | ☐ | Given a microwave keypad and target cooking time, choose an input near the target while minimizing keypresses and finger-movement cost. |
 | 53 | ☐ | Given horizontal and vertical line segments, count the number of squares they form. **<span style="color:red">SKIP CODING / UNDERSTAND ONLY: group segments by coordinate → merge touching or overlapping intervals → enumerate candidate axis-aligned squares → verify continuous coverage of all four sides. The full implementation is niche geometry/interval plumbing with low value for limited Google L4 prep time.</span>** → [reference solution](53-count-squares-from-segments/CountSquaresFromSegments.java) |
-| 54 | ☐ | Given rectangles, find the vertical line that splits their total area equally. |
+| 54 | ☑ | Given rectangles, find the vertical line that splits their total area equally. → **[VerticalAreaSplit.java](22-rectangle-area-split/VerticalAreaSplit.java)** (same problem as #22: sweep x-events, keep the active height, solve for the cut inside the strip that crosses half the total area). |
 | 55 | ☐ | Maintain a set of 2D points and answer whether a rectangle can be formed from stored points. |
 | 56 | ☐ | Given a set of 2D points, find the maximum-area rectangle that can be formed. |
 
