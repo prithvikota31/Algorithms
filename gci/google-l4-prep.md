@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 42 / 56 solved.**
+**Progress (Phase 1): 43 / 56 solved.**
 
 **Quality gate:** Run `./verify.ps1` from this directory before marking work complete. A checkbox records coverage; the [practice protocol](practice/README.md) measures independent recall, and the [three-year roadmap](../../three-year-engineering-roadmap.md) defines mastery and career evidence.
 
@@ -60,7 +60,7 @@
 | 44 | ☑ | Return tree leaves grouped by the round in which they would be removed. → [solution](43-delete-nary-tree-leaves/NaryTreeLeafRemoval.java) (same problem as #43: one postorder DFS groups nodes by their zero-based removal round). |
 | 45 | ☑ | Count connected components of 1-valued nodes in a tree. → **[ConnectedOneComponents.java](20-connected-components-binary-tree/ConnectedOneComponents.java)** (same problem as #20: count each component once at its highest `1` node). |
 | 46 | ☑ | Find the largest connected component of 1-valued nodes in a tree. → **[ConnectedOneComponents.java](20-connected-components-binary-tree/ConnectedOneComponents.java)** (already implemented with the #20 base solution by returning each connected `1`-subtree size). |
-| 47 | ☐ | Given an undirected tree where node degree is bounded, choose the best root so the rooted structure satisfies binary-tree constraints. |
+| 47 | ☑ | Given an undirected tree where node degree is bounded, choose the best root so the rooted structure satisfies binary-tree constraints. → **[BestRootForBinaryTree.java](47-best-root-binary-tree/BestRootForBinaryTree.java)** (degree reasoning: root degree ≤ 2 and every non-root degree ≤ 3; includes the minimum-height valid-root follow-up via diameter endpoints). |
 | 48 | ☐ | Reroot a tree while satisfying alternating node-color constraints by level. |
 | 49 | ☐ | A mouse moves from index i to a later index j and earns `(j - i) * nums[j]`; maximize the total score to reach the end. |
 | 50 | ☐ | Given F1 tyres with initial lap time and degradation factor, find the minimum race time using one tyre. |
