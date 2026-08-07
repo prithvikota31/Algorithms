@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 48 / 56 solved.**
+**Progress (Phase 1): 49 / 56 solved.**
 
 **Quality gate:** Run `./verify.ps1` from this directory before marking work complete. A checkbox records coverage; the [practice protocol](practice/README.md) measures independent recall, and the [three-year roadmap](../../three-year-engineering-roadmap.md) defines mastery and career evidence.
 
@@ -69,7 +69,7 @@
 | 53 | ☐ | Given horizontal and vertical line segments, count the number of squares they form. **<span style="color:red">SKIP CODING / UNDERSTAND ONLY: group segments by coordinate → merge touching or overlapping intervals → enumerate candidate axis-aligned squares → verify continuous coverage of all four sides. The full implementation is niche geometry/interval plumbing with low value for limited Google L4 prep time.</span>** → [reference solution](53-count-squares-from-segments/CountSquaresFromSegments.java) |
 | 54 | ☑ | Given rectangles, find the vertical line that splits their total area equally. → **[VerticalAreaSplit.java](22-rectangle-area-split/VerticalAreaSplit.java)** (same problem as #22: sweep x-events, keep the active height, solve for the cut inside the strip that crosses half the total area). |
 | 55 | ☑ | Maintain a set of 2D points and answer whether a rectangle can be formed from stored points. → **[RectangleExistsIncremental.java](21-rectangle-points/RectangleExistsIncremental.java)** (same problem as the #21 follow-up: a rectangle exists exactly when two x-columns share the same pair of y-values, so `addPoint` records each new y-pair against its column and flips an O(1) flag the moment a pair appears at a second x; duplicates are skipped so they cannot fake a pair). |
-| 56 | ☐ | Given a set of 2D points, find the maximum-area rectangle that can be formed. |
+| 56 | ☑ | Given a set of 2D points, find the maximum-area rectangle that can be formed. → **[MaxRectangleArea.java](21-rectangle-points/MaxRectangleArea.java)** (same problem as the #21 follow-up; two forms in one file: batch `MaxRectangleAreaBatch` treats every point pair as a diagonal and checks whether the other two corners `(x1,y2)`/`(x2,y1)` exist — O(N²) time, O(N) space — while the incremental class keeps `yPair -> x list` so `getMaxArea()` stays O(1). Areas use `long`: coordinates near ±10⁹ overflow `int`). **<span style="color:red">Rotated (non-axis-aligned) rectangles marked understand-only: the diagonal-corner trick no longer applies — it becomes a vector/geometry problem.</span>** |
 
 > Note: #54 and #22 describe the same core "split rectangle area with a vertical line" idea; they are kept separate here to preserve the original formulations. Numbering matches the originally selected 56 (the earlier duplicate router-reachability item and the router-activation-time item were dropped; the two point-set rectangle problems are #55–#56).
 

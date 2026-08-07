@@ -48,7 +48,7 @@ public class MaxRectangleArea {
 
     private final Map<Integer, Set<Integer>> xToYs = new HashMap<>();
     private final Map<String, List<Integer>> yPairToXs = new HashMap<>();
-    private int maxArea = 0;
+    private long maxArea = 0;
 
     public void addPoint(int x, int y) {
         if (xToYs.containsKey(x)) {
@@ -56,11 +56,11 @@ public class MaxRectangleArea {
                 int y1 = Math.min(oldY, y);
                 int y2 = Math.max(oldY, y);
                 String key = encode(y1, y2);
-                int height = y2 - y1;
+                long height = y2 - y1;
 
                 if (yPairToXs.containsKey(key)) {
                     for (int previousX : yPairToXs.get(key)) {
-                        int width = Math.abs(x - previousX);
+                        long width = Math.abs((long) x - previousX);
                         maxArea = Math.max(maxArea, width * height);
                     }
                 }
@@ -72,7 +72,7 @@ public class MaxRectangleArea {
         xToYs.computeIfAbsent(x, k -> new HashSet<>()).add(y);
     }
 
-    public int getMaxArea() {
+    public long getMaxArea() {
         return maxArea;
     }
 
@@ -131,6 +131,14 @@ public class MaxRectangleArea {
         check("single point", single.getMaxArea(), 0);
         check("empty plane", new MaxRectangleArea().getMaxArea(), 0);
 
+        // Coordinates near the int limit: the area must not overflow.
+        MaxRectangleArea huge = new MaxRectangleArea();
+        huge.addPoint(-1_000_000_000, -1_000_000_000);
+        huge.addPoint(-1_000_000_000, 1_000_000_000);
+        huge.addPoint(1_000_000_000, -1_000_000_000);
+        huge.addPoint(1_000_000_000, 1_000_000_000);
+        check("large coordinates do not overflow", huge.getMaxArea(), 4_000_000_000_000_000_000L);
+
         // Alternate (batch, diagonal-pairs) approach -- same scenarios, same results.
         check("batch: basic rectangle", MaxRectangleAreaBatch.maxArea(List.of(
                 new int[] {1, 1}, new int[] {5, 1}, new int[] {1, 4}, new int[] {5, 4})), 12);
@@ -139,11 +147,16 @@ public class MaxRectangleArea {
                 new int[] {10, 2}, new int[] {10, 7})), 45);
         check("batch: no rectangle formed", MaxRectangleAreaBatch.maxArea(List.of(
                 new int[] {1, 1}, new int[] {1, 3}, new int[] {3, 1})), 0);
+        check("batch: large coordinates do not overflow", MaxRectangleAreaBatch.maxArea(List.of(
+                new int[] {-1_000_000_000, -1_000_000_000},
+                new int[] {-1_000_000_000, 1_000_000_000},
+                new int[] {1_000_000_000, -1_000_000_000},
+                new int[] {1_000_000_000, 1_000_000_000})), 4_000_000_000_000_000_000L);
 
         System.out.println("all passed");
     }
 
-    private static void check(String name, int actual, int expected) {
+    private static void check(String name, long actual, long expected) {
         if (actual != expected) {
             throw new AssertionError("FAIL " + name + ": got " + actual
                     + " want " + expected);
@@ -165,13 +178,13 @@ public class MaxRectangleArea {
  */
 class MaxRectangleAreaBatch {
 
-    public static int maxArea(List<int[]> points) {
+    public static long maxArea(List<int[]> points) {
         Set<String> pointSet = new HashSet<>();
         for (int[] p : points) {
             pointSet.add(encode(p[0], p[1]));
         }
 
-        int maxArea = 0;
+        long maxArea = 0;
         for (int i = 0; i < points.size(); i++) {
             for (int j = i + 1; j < points.size(); j++) {
                 int x1 = points.get(i)[0];
@@ -184,7 +197,7 @@ class MaxRectangleAreaBatch {
                 }
 
                 if (pointSet.contains(encode(x1, y2)) && pointSet.contains(encode(x2, y1))) {
-                    int area = Math.abs(x2 - x1) * Math.abs(y2 - y1);
+                    long area = Math.abs((long) x2 - x1) * Math.abs((long) y2 - y1);
                     maxArea = Math.max(maxArea, area);
                 }
             }
