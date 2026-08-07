@@ -111,13 +111,12 @@ public class Translator {
         while (!queue.isEmpty()) {
 
             String current = queue.poll();
+            if (current.equals(target)) {
+                return true;
+            }
 
             for (String neighbor :
                     graph.getOrDefault(current, Collections.emptySet())) {
-
-                if (neighbor.equals(target)) {
-                    return true;
-                }
 
                 // Mark when enqueuing so the same token is never queued twice.
                 if (visited.add(neighbor)) {
