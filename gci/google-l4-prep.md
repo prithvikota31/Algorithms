@@ -4,7 +4,7 @@
 
 **Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 39 / 56 solved.**
+**Progress (Phase 1): 40 / 56 solved.**
 
 **Quality gate:** Run `./verify.ps1` from this directory before marking work complete. A checkbox records coverage; the [practice protocol](practice/README.md) measures independent recall, and the [three-year roadmap](../../three-year-engineering-roadmap.md) defines mastery and career evidence.
 
@@ -57,7 +57,7 @@
 | 41 | ☑ | Given parent-child relationships, construct the corresponding tree. → [solution](41-build-tree-from-parent-child/TreeBuilder.java) (value→node map so out-of-order pairs resolve to the same object; root = the only value never seen as a child). **<span style="color:red">Invalid-input follow-up marked conceptual only (not implemented): multiple parents silently duplicate a subtree, a cycle returns null, and a FOREST returns a non-deterministic root — collect all non-child values and assert exactly one.</span>** |
 | 42 | ☑ | Merge two N-ary trees while resolving matching children and field conflicts according to specified rules. → [solution](42-merge-nary-trees/MergeNaryTrees.java) (recursive DFS + `LinkedHashMap` keyed by child name; tree2's value wins for matching nodes while tree1 child order remains stable). |
 | 43 | ☑ | Repeatedly delete leaves from a multi-tree according to the required deletion process. → [solution](43-delete-nary-tree-leaves/NaryTreeLeafRemoval.java) (one postorder DFS; bottom-up height is the zero-based round in which each node becomes a leaf). |
-| 44 | ☐ | Return tree leaves grouped by the round in which they would be removed. |
+| 44 | ☑ | Return tree leaves grouped by the round in which they would be removed. → [solution](43-delete-nary-tree-leaves/NaryTreeLeafRemoval.java) (same problem as #43: one postorder DFS groups nodes by their zero-based removal round). |
 | 45 | ☐ | Count connected components of 1-valued nodes in a tree. |
 | 46 | ☐ | Find the largest connected component of 1-valued nodes in a tree. |
 | 47 | ☐ | Given an undirected tree where node degree is bounded, choose the best root so the rooted structure satisfies binary-tree constraints. |
