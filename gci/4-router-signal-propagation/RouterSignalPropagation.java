@@ -34,8 +34,8 @@
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
-import java.util.Queue;
 
 public class RouterSignalPropagation {
 
@@ -45,61 +45,67 @@ public class RouterSignalPropagation {
             int[] destination,
             int range) {
 
-        int sourceIndex = -1;
-        int destinationIndex = -1;
-
-        // Map the source/destination coordinates to their router indices.
-        for (int index = 0; index < routers.size(); index++) {
-            int[] router = routers.get(index);
-            if (sameCoordinate(router, source)) {
-                sourceIndex = index;
+        int src = -1;
+        int des = -1;
+        for(int i = 0; i < routers.size(); i++)
+        {
+            if(isSame(routers.get(i), source))
+            {
+                src = i;
             }
-            if (sameCoordinate(router, destination)) {
-                destinationIndex = index;
+            if(isSame(routers.get(i), destination))
+            {
+                des = i;
             }
         }
-        if (sourceIndex == -1 || destinationIndex == -1) {
+
+        if(src == -1 || des == -1)
+        {
             return false;
         }
 
-        Queue<Integer> queue = new ArrayDeque<>();
-        boolean[] visited = new boolean[routers.size()];
-
-        queue.offer(sourceIndex);
-        visited[sourceIndex] = true;
+        Deque<int[]> q = new ArrayDeque<>();
+        q.offer(routers.get(src));
+        int n = routers.size();
+        boolean[] visited = new boolean[n];
+        visited[src] = true;
 
         int rangeSquared = range * range;
+        while(!q.isEmpty())
+        {
+            int[] cur = q.poll();
 
-        while (!queue.isEmpty()) {
-            int currentIndex = queue.poll();
-
-            if (currentIndex == destinationIndex) {
+            if(isSame(cur, destination))
+            {
                 return true;
             }
-
-            int[] currentRouter = routers.get(currentIndex);
-            // Every unvisited router within range receives the signal.
-            for (int nextIndex = 0; nextIndex < routers.size(); nextIndex++) {
-                if (!visited[nextIndex]
-                        && isWithinRange(currentRouter, routers.get(nextIndex), rangeSquared)) {
-                    visited[nextIndex] = true;
-                    queue.offer(nextIndex);
+            
+            for(int i = 0; i < n; i++)
+            {
+                if(!visited[i] && isWithinRange(cur, routers.get(i), rangeSquared))
+                {
+                    q.offer(routers.get(i));
+                    visited[i] = true;
                 }
             }
-        }
 
+        }
         return false;
     }
 
-    private boolean sameCoordinate(int[] first, int[] second) {
-        return first[0] == second[0] && first[1] == second[1];
+    private boolean isWithinRange(int[] cur, int[] nei, int r2)
+    {
+        int delX = Math.abs(cur[0] - nei[0]);
+        int delY = Math.abs(cur[1] - nei[1]);
+
+        return delX * delX + delY * delY <= r2;
     }
 
-    private boolean isWithinRange(int[] first, int[] second, int rangeSquared) {
-        int deltaX = first[0] - second[0];
-        int deltaY = first[1] - second[1];
-        return deltaX * deltaX + deltaY * deltaY <= rangeSquared;
+    private boolean isSame(int[] p1, int[] p2)
+    {
+        return p1[0] == p2[0] && p1[1] == p2[1];
     }
+
 
     // ------------------------------------------------------------------
     // Quick self-test.
