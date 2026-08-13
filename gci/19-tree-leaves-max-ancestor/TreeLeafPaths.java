@@ -37,31 +37,44 @@ public class TreeLeafPaths {
     }
 
     public List<List<Integer>> findPaths(TreeNode root) {
+        //carry a temp list always and backtrack
         List<List<Integer>> result = new ArrayList<>();
-        if (root == null) return result;
-        dfs(root, Integer.MIN_VALUE, new ArrayList<>(), result);
+        List<Integer> temp = new ArrayList<>();
+        findPathsHelper(root, result, temp, Integer.MIN_VALUE);
+        
         return result;
     }
 
-    private void dfs(TreeNode node, int maxAncestor,
-                     List<Integer> currentPath, List<List<Integer>> result) {
-        if (node == null) return;
+    private void findPathsHelper(TreeNode node, List<List<Integer>> result, List<Integer> temp, int maxSoFar)
+    {
+        if(node == null)
+        {
+            return;
+        }
 
-        currentPath.add(node.val);
-        int currentMax = Math.max(maxAncestor, node.val);
-
-        if (node.left == null && node.right == null) {
-            if (node.val > maxAncestor) {
-                result.add(new ArrayList<>(currentPath)); // copy, not the live list
+        if(isLeaf(node))
+        {
+            if(node.val > maxSoFar)
+            {
+                temp.add(node.val);
+                result.add(new ArrayList<>(temp));
+                temp.remove(temp.size() - 1);
+                return;
             }
         }
 
-        dfs(node.left, currentMax, currentPath, result);
-        dfs(node.right, currentMax, currentPath, result);
-
-        currentPath.remove(currentPath.size() - 1); // backtrack
+        temp.add(node.val);
+        int newMax = Math.max(node.val, maxSoFar);
+        findPathsHelper(node.left, result, temp, newMax);
+        findPathsHelper(node.right, result, temp, newMax);
+        temp.remove(temp.size() - 1);
+    }
+    private boolean isLeaf(TreeNode node)
+    {
+        return node.left == null && node.right == null;
     }
 
+  
     // ---- self-test -------------------------------------------------------
     public static void main(String[] args) {
         TreeLeafPaths s = new TreeLeafPaths();
