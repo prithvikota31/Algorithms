@@ -76,15 +76,17 @@ public class CharacterOrderFromPairs {
 
         for(char[] pair: pairs)
         {
-            graph.computeIfAbsent(pair[0], k -> new HashSet<>()).add(pair[1]);
-            inDegree.put(pair[1], inDegree.getOrDefault(pair[1], 0) + 1);
+            // add() is false on a repeated pair, so the counter stays in step with the stored edges.
+            if(graph.computeIfAbsent(pair[0], k -> new HashSet<>()).add(pair[1]))
+            {
+                inDegree.put(pair[1], inDegree.getOrDefault(pair[1], 0) + 1);
+            }
             inDegree.putIfAbsent(pair[0], 0);
         }
         // we got graph and inDegree 
 
         StringBuilder sb = new StringBuilder();
         Deque<Character> q = new ArrayDeque<>();
-        Set<Character> visited= new HashSet<>();
 
         for(Map.Entry<Character, Integer> entry: inDegree.entrySet())
         {
@@ -93,7 +95,6 @@ public class CharacterOrderFromPairs {
             if(value == 0)
             {
                 q.offer(ch);
-                visited.add(ch);
             }
         }
         
@@ -107,9 +108,8 @@ public class CharacterOrderFromPairs {
             {
                 inDegree.put(nei, inDegree.get(nei) - 1);
 
-                if(!visited.contains(nei) && inDegree.get(nei) == 0)
+                if(inDegree.get(nei) == 0)
                 {
-                    visited.add(nei);
                     q.offer(nei);
                 }
             }
@@ -138,5 +138,9 @@ public class CharacterOrderFromPairs {
                 .isEmpty() ? "(impossible)" : "unexpected");
         System.out.println(sol.reconstructOrder(
                 new char[][]{{'b', 'a'}, {'d', 'c'}}));            // e.g. bdac
+
+        // Repeated pair must not inflate in-degree into a false cycle.
+        System.out.println(sol.reconstructOrder(
+                new char[][]{{'a', 'b'}, {'a', 'b'}}));            // ab
     }
 }
