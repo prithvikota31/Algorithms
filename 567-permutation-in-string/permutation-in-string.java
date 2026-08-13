@@ -7,35 +7,37 @@ class Solution {
 
         int[] freq = new int[26];
         int checksNeeded = 0;
-        for(char ch: s1.toCharArray())
+        for(int i = 0; i < m; i++)
         {
-            freq[ch - 'a']++;
+            freq[s1.charAt(i) - 'a']++;
             checksNeeded++;
         }
 
         int start = 0;
-        for(int end = 0; end < n; end++)
+        for(int end = 0; end < s2.length(); end++)
         {
-            if(freq[s2.charAt(end) - 'a'] > 0)
+            int ch = s2.charAt(end) - 'a';
+            freq[ch]--;
+            if(freq[ch] >= 0)
             {
                 checksNeeded--;
             }
-            freq[s2.charAt(end) - 'a']--;
-
-            if(end - start + 1 > m) //substring length - make it m
+            if(end - start + 1 > m)
             {
-                if(freq[s2.charAt(start) - 'a'] >= 0)
+                //move start
+                freq[s2.charAt(start) - 'a']++;
+                if(freq[s2.charAt(start) - 'a'] > 0)
                 {
                     checksNeeded++;
                 }
-                freq[s2.charAt(start) - 'a']++;
                 start++;
             }
 
-            if(checksNeeded == 0)   return true;
-
+            if(checksNeeded == 0)
+            {
+                return true;
+            }
         }
-
         return false;
     }
 }

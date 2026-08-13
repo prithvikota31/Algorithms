@@ -24,61 +24,57 @@ class Solution {
             addWord(s);
         }
 
+        Set<String> result = new HashSet<>();
+        // we already have a trie with words
+        
+        //from each position on matrix try to traverse whole matrix and see if that word is present in trie
         int m = board.length;
         int n = board[0].length;
-        
-        int[] delRow = {0, 1, 0, -1};
-        int[] delCol = {-1, 0, 1, 0};
 
-        Set<String> ans = new HashSet<>();
         for(int i = 0; i < m; i++)
         {
             for(int j = 0; j < n; j++)
             {
-                dfs(board, ans, i, j, root, delRow, delCol);
+                dfs(board, root, i, j, result);
             }
         }
+        return new ArrayList<>(result);
 
-        return new ArrayList<>(ans);
+
     }
 
-    public void dfs(char[][] board, Set<String> ans, int row, int col, Node node,
-                int[] delRow, int[] delCol) {
-
+    private void dfs(char[][] board, Node node, int row, int col, Set<String> result)
+    {
         char ch = board[row][col];
-
-        // If current board char is not a valid next trie path, stop.
-        if (!node.containsKey(ch)) {
+        if(!node.containsKey(ch))
+        {
             return;
         }
 
-        // Move trie pointer to the node representing this board character.
         node = node.getKey(ch);
 
-        // If a word ends here, collect it.
-        if (node.word != null) {
-            ans.add(node.word);
+        if(node.word != null)
+        {
+            result.add(node.word);
         }
-
-        // Mark visited so same cell is not reused in this DFS path.
-        board[row][col] = '#';
-
-        for (int i = 0; i < 4; i++) {
+        //still continue;
+        int[] delRow = {0, 1, 0, -1};
+        int[] delCol = {1, 0, -1, 0};
+        board[row][col] = '*';
+        for(int i = 0; i < 4; i++)
+        {
             int nRow = row + delRow[i];
             int nCol = col + delCol[i];
 
-            if (nRow >= 0 && nRow < board.length &&
-                nCol >= 0 && nCol < board[0].length &&
-                board[nRow][nCol] != '#') {
-
-                dfs(board, ans, nRow, nCol, node, delRow, delCol);
+            if(nRow >= 0 && nRow < board.length && nCol >= 0 && nCol < board[0].length && board[nRow][nCol] != '*')
+            {
+                dfs(board, node, nRow, nCol, result);
             }
         }
-
-        // Restore board for other DFS paths.
         board[row][col] = ch;
     }
-}
+
+   
 
 class Node{
     Node[] links = new Node[26];
@@ -99,5 +95,5 @@ class Node{
         links[ch - 'a'] = node;
     }
 
-
+}
 }

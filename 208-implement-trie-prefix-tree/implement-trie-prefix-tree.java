@@ -5,58 +5,63 @@ class Trie {
     }
     
     public void insert(String word) {
-        Node node = root;
+        Node cur = root;
+
         for(int i = 0; i < word.length(); i++)
         {
             char ch = word.charAt(i);
-            if(!node.containsKey(ch))
+            if(!cur.containsKey(ch))
             {
-                node.setKey(ch, new Node());
+                cur.setKey(ch);
             }
-
-            node = node.getKey(ch);
+            cur = cur.getNode(ch);
         }
-
-        //now last node (n + 1), flag should be set, so far 'n' length path is traversed
-        node.setFlag();
+        cur.setEnd();
     }
     
     public boolean search(String word) {
-        Node node = root;
+        Node cur = root;
+
         for(int i = 0; i < word.length(); i++)
         {
             char ch = word.charAt(i);
-            if(!node.containsKey(ch))
+            if(!cur.containsKey(ch))
             {
                 return false;
             }
-            node = node.getKey(ch);
+            cur = cur.getNode(ch);
         }
-
-        return node.isEnd();
+        return cur.isEndWord();
     }
     
     public boolean startsWith(String prefix) {
-        Node node = root;
+        Node cur = root;
+
         for(int i = 0; i < prefix.length(); i++)
         {
             char ch = prefix.charAt(i);
-            if(!node.containsKey(ch))
+            if(!cur.containsKey(ch))
             {
                 return false;
             }
-            node = node.getKey(ch);
+            cur = cur.getNode(ch);
         }
-
         return true;
     }
 }
 
 class Node{
     Node[] links = new Node[26];
-    boolean flag;
+    boolean isEnd = false;
 
-    public Node(){
+    public Node getNode(char ch)
+    {
+        return links[ch - 'a'];
+    }
+
+    public void setKey(char ch)
+    {
+        links[ch - 'a'] = new Node();
     }
 
     public boolean containsKey(char ch)
@@ -64,24 +69,16 @@ class Node{
         return links[ch - 'a'] != null;
     }
 
-    public void setKey(char ch, Node node)
+    public void setEnd()
     {
-        links[ch - 'a'] = node;
+        isEnd = true;
     }
 
-    public Node getKey(char ch)
+    public boolean isEndWord()
     {
-        return links[ch - 'a'];
+        return isEnd;
     }
 
-    public void setFlag()
-    {
-        flag = true;
-    }
-    public boolean isEnd()
-    {
-        return flag;
-    }
 }
 
 /**
