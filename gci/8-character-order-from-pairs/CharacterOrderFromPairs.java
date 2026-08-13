@@ -125,9 +125,78 @@ public class CharacterOrderFromPairs {
            
     }
 
+    /**
+     * Follow-up: determine whether the constraints produce exactly one order.
+     *
+     * @param pairs list of relationships; pair {x, y} means x before y
+     * @return true only when a valid ordering exists and is unique
+     */
+    public boolean hasUniqueOrder(char[][] pairs) {
+        Map<Character, Set<Character>> graph = new HashMap<>();
+        Map<Character, Integer> inDegree = new HashMap<>();
+
+        for (char[] pair : pairs) {
+            if (graph.computeIfAbsent(pair[0], key -> new HashSet<>()).add(pair[1])) {
+                inDegree.put(pair[1], inDegree.getOrDefault(pair[1], 0) + 1);
+            }
+            if(!inDegree.containsKey(pair[0]))
+            {
+                inDegree.put(pair[0], 0);
+            }
+        }
+
+        Deque<Character> queue = new ArrayDeque<>();
+        for (Map.Entry<Character, Integer> entry : inDegree.entrySet()) {
+            if (entry.getValue() == 0) {
+                queue.offer(entry.getKey());
+            }
+        }
+
+        int processed = 0;
+
+        while(!queue.isEmpty())
+        {
+            if(queue.size() > 1)
+            {
+                return false;
+            }
+
+            char cur = queue.poll();
+            processed++;
+            if(!graph.containsKey(cur))
+            {
+                continue;
+            }
+            for(char nei: graph.get(cur))
+            {
+                inDegree.put(nei, inDegree.getOrDefault(nei, 0) - 1);
+
+                if(inDegree.get(nei) == 0)
+                {
+                    queue.offer(nei);
+                }
+            }
+        }
+
+        return processed == inDegree.size();
+    }
+
     // ---------------------------------------------------------------------
     // Quick self-test.
     // ---------------------------------------------------------------------
+    private static void verifyUniqueOrder(
+            CharacterOrderFromPairs solution,
+            String name,
+            char[][] pairs,
+            boolean expected) {
+        boolean actual = solution.hasUniqueOrder(pairs);
+        if (actual != expected) {
+            throw new AssertionError(
+                    name + ": expected " + expected + ", but got " + actual);
+        }
+        System.out.println("PASS: " + name);
+    }
+
     public static void main(String[] args) {
         CharacterOrderFromPairs sol = new CharacterOrderFromPairs();
 
@@ -142,5 +211,25 @@ public class CharacterOrderFromPairs {
         // Repeated pair must not inflate in-degree into a false cycle.
         System.out.println(sol.reconstructOrder(
                 new char[][]{{'a', 'b'}, {'a', 'b'}}));            // ab
+
+        System.out.println("\nUnique-order follow-up tests:");
+        verifyUniqueOrder(sol, "linear chain is unique",
+            new char[][]{{'a', 'b'}, {'b', 'c'}}, true);
+        verifyUniqueOrder(sol, "single relationship is unique",
+            new char[][]{{'a', 'b'}}, true);
+        verifyUniqueOrder(sol, "two initial choices are ambiguous",
+            new char[][]{{'a', 'c'}, {'b', 'c'}}, false);
+        verifyUniqueOrder(sol, "branching choices are ambiguous",
+            new char[][]{{'a', 'b'}, {'a', 'c'}}, false);
+        verifyUniqueOrder(sol, "disconnected constraints are ambiguous",
+            new char[][]{{'a', 'b'}, {'c', 'd'}}, false);
+        verifyUniqueOrder(sol, "cycle has no valid order",
+            new char[][]{{'a', 'b'}, {'b', 'c'}, {'c', 'a'}}, false);
+        verifyUniqueOrder(sol, "self-loop has no valid order",
+            new char[][]{{'a', 'a'}}, false);
+        verifyUniqueOrder(sol, "duplicate edges preserve uniqueness",
+            new char[][]{{'a', 'b'}, {'a', 'b'}, {'b', 'c'}}, true);
+        verifyUniqueOrder(sol, "redundant transitive edge remains unique",
+            new char[][]{{'a', 'b'}, {'b', 'c'}, {'a', 'c'}}, true);
     }
 }
