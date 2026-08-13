@@ -1,84 +1,76 @@
 class WordDictionary {
+    //. makes the problem search all nodes below it, so like a graph traversal 
     Node root;
     public WordDictionary() {
         root = new Node();
     }
     
     public void addWord(String word) {
-        Node node = root;
+        Node cur = root;
         for(int i = 0; i < word.length(); i++)
         {
             char ch = word.charAt(i);
-            if(!node.containsKey(ch))
+            if(!cur.containsKey(ch))
             {
-                node.setKey(ch, new Node());
+                cur.setKey(ch);
             }
-
-            node = node.getKey(ch);
+            cur = cur.getKey(ch);
         }
-
-        node.setEnd();
+        cur.setEnd();
     }
     
     public boolean search(String word) {
-        return dfs(0, word, root);
+        //it may contain .
+        //if it contains . we have iterate over all the nodes
+        Node cur = root;
+        return searchRecursion(word, 0, cur);
     }
 
-    private boolean dfs(int index, String word, Node node)
+    private boolean searchRecursion(String word, int index, Node cur)
     {
         if(index == word.length())
         {
-            return node.isEnd();
+            return cur.isEnd();
         }
-
-        char currentChar = word.charAt(index);
-        if(currentChar != '.') 
+        char ch = word.charAt(index);
+        if(ch != '.')
         {
-            if(node.containsKey(currentChar))
+            if(cur.containsKey(ch))
             {
-                return dfs(index + 1, word, node.getKey(currentChar));
+                return searchRecursion(word, index + 1, cur.getKey(ch));
             }
             else
             {
                 return false;
-            }
+            }       
         }
-        else //loop all possibilites
+        else
         {
-            for(Node nextNode: node.links)
+            boolean found = false;
+            for(char c = 'a'; c < 'a' + cur.links.length; c++)
             {
-                if(nextNode != null)
+                if(cur.containsKey(c))
                 {
-                    if(dfs(index + 1, word, nextNode))
-                    {
-                        return true;
-                    }
+                    found = found | searchRecursion(word, index + 1, cur.getKey(c));
                 }
             }
+            return found;
         }
-
-        return false;
     }
 }
 
 class Node{
     Node[] links = new Node[26];
-    boolean flag;
-
+    boolean isEnd;
 
     public boolean containsKey(char ch)
     {
         return links[ch - 'a'] != null;
     }
 
-    public void setKey(char ch, Node node)
+    public void setKey(char ch)
     {
-        links[ch - 'a'] = node;
-    }
-
-    public void setEnd()
-    {
-        flag = true;
+        links[ch - 'a'] = new Node();
     }
 
     public Node getKey(char ch)
@@ -86,10 +78,17 @@ class Node{
         return links[ch - 'a'];
     }
 
+    public void setEnd()
+    {
+        isEnd = true;
+    }
+
     public boolean isEnd()
     {
-        return flag;
+        return isEnd;
     }
+
+
 }
 
 /**
