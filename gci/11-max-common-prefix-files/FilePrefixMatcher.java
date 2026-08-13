@@ -52,45 +52,76 @@
 import java.util.*;
 
 public class FilePrefixMatcher {
+    static class TrieNode
+    {
+        Map<String, TrieNode> links = new HashMap<>();
+        boolean isEnd = false;
 
-    private static class TrieNode {
-        // Each edge represents one complete line.
-        Map<String, TrieNode> children = new HashMap<>();
+        public boolean isEnd()
+        {
+            return isEnd;
+        }
+
+        public void setEnd()
+        {
+            isEnd = true;
+        }
+
+        public boolean containsKey(String s)
+        {
+            if(links.containsKey(s))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void setKey(String s)
+        {
+            links.put(s, new TrieNode());
+        }
+
+        public TrieNode getKey(String s)
+        {
+            return links.get(s);
+        }
+
+    }
+    private static TrieNode root = new TrieNode();
+
+    private static int addFile(String[] file) //returns count till what depth it matched for exisiting trie
+    {
+        TrieNode cur = root;
+        int lineCount = 0;
+        for(int i = 0; i < file.length; i++)
+        {
+            String cLine = file[i];
+            if(cur.containsKey(cLine))
+            {
+                lineCount++;
+            }
+            else
+            {
+                cur.setKey(cLine);
+            }
+            cur = cur.getKey(cLine);
+        }
+        cur.setEnd();
+        return lineCount;
     }
 
-    public static int maxCommonPrefix(List<String[]> files) {
-        if (files == null || files.size() < 2) {
-            return 0;
+
+    public static int maxCommonPrefix(List<String[]> files) 
+    {
+        int maxCount = 0;
+        for(int i = 0; i < files.size(); i++)
+        {
+            maxCount = Math.max(maxCount, addFile(files.get(i)));
         }
-
-        TrieNode root = new TrieNode();
-        int maxPrefix = 0;
-
-        for (String[] file : files) {
-            TrieNode current = root;
-            int existingPrefixLength = 0;
-
-            /*
-             * Follow the file's lines through the Trie.
-             * Existing nodes represent a prefix shared with an earlier file.
-             */
-            for (String line : file) {
-                TrieNode next = current.children.get(line);
-
-                if (next == null) {
-                    next = new TrieNode();
-                    current.children.put(line, next);
-                } else {
-                    existingPrefixLength++;
-                }
-
-                current = next;
-            }
-
-            maxPrefix = Math.max(maxPrefix, existingPrefixLength);
-        }
-
-        return maxPrefix;
+        return maxCount;
     }
 
     public static void main(String[] args) {

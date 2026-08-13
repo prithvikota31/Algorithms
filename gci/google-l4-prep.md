@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 4 / 56.**
+**Revised: 5 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -93,7 +93,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 8 | ☑ | Character order from pairs |
 | 9 | ☐ | Recursive placeholder substitution |
 | 10 | ☐ | Filesystem / path hierarchy |
-| 11 | ☐ | Max common prefix across files |
+| 11 | ☑ | Max common prefix across files |
 | 12 | ☐ | Longest increasing subsequence, adjacent diff |
 | 13 | ☐ | Top K from a stream |
 | 14 | ☐ | Move pieces to string (`L`/`R`/`_`) |
