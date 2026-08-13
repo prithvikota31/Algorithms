@@ -65,52 +65,64 @@ public class CharacterOrderFromPairs {
      * @return one valid ordering (greatest -> least), or "" if impossible
      */
     public String reconstructOrder(char[][] pairs) {
-        // adjacency list: node -> nodes that must come AFTER it
-        Map<Character, List<Character>> graph = new HashMap<>();
+        //Each pair {x, y} means  x > y  (x comes BEFORE y).
+        // x-> y
+
+        //build a graph
+        Map<Character, Set<Character>> graph = new HashMap<>();
+        //indegree list
         Map<Character, Integer> inDegree = new HashMap<>();
 
-        // 1. Register every distinct character (isolated chars matter too).
-        for (char[] p : pairs) {
-            graph.putIfAbsent(p[0], new ArrayList<>());
-            graph.putIfAbsent(p[1], new ArrayList<>());
-            inDegree.putIfAbsent(p[0], 0);
-            inDegree.putIfAbsent(p[1], 0);
-        }
 
-        // 1b. Build edges x -> y and count in-degrees.
-        //     Skip duplicate pairs so in-degree isn't inflated.
-        Set<String> seen = new HashSet<>();
-        for (char[] p : pairs) {
-            String key = "" + p[0] + p[1];
-            if (seen.contains(key)) continue;   // duplicate edge, skip
-            seen.add(key);
-            graph.get(p[0]).add(p[1]);
-            inDegree.put(p[1], inDegree.get(p[1])    + 1);
+        for(char[] pair: pairs)
+        {
+            graph.computeIfAbsent(pair[0], k -> new HashSet<>()).add(pair[1]);
+            inDegree.put(pair[1], inDegree.getOrDefault(pair[1], 0) + 1);
+            inDegree.putIfAbsent(pair[0], 0);
         }
+        // we got graph and inDegree 
 
-        // 2. Seed queue with all in-degree-0 nodes (the "greatest" ones).
-        Queue<Character> queue = new LinkedList<>();
-        for (char c : inDegree.keySet()) {
-            if (inDegree.get(c) == 0) {
-                queue.add(c);
+        StringBuilder sb = new StringBuilder();
+        Deque<Character> q = new ArrayDeque<>();
+        Set<Character> visited= new HashSet<>();
+
+        for(Map.Entry<Character, Integer> entry: inDegree.entrySet())
+        {
+            int value = entry.getValue();
+            char ch = entry.getKey();
+            if(value == 0)
+            {
+                q.offer(ch);
+                visited.add(ch);
             }
         }
+        
 
-        // 3. BFS emit.
-        StringBuilder order = new StringBuilder();
-        while (!queue.isEmpty()) {
-            char node = queue.poll();
-            order.append(node);
-            for (char next : graph.get(node)) {
-                inDegree.put(next, inDegree.get(next) - 1);
-                if (inDegree.get(next) == 0) {
-                    queue.add(next);
+        while(!q.isEmpty())
+        {
+            char cur = q.poll();
+            sb.append(cur);
+
+            for(char nei: graph.getOrDefault(cur, Collections.emptySet()))
+            {
+                inDegree.put(nei, inDegree.get(nei) - 1);
+
+                if(!visited.contains(nei) && inDegree.get(nei) == 0)
+                {
+                    visited.add(nei);
+                    q.offer(nei);
                 }
             }
         }
 
-        // 4. All emitted? valid order : cycle.
-        return order.length() == graph.size() ? order.toString() : "";
+        if(sb.length() == inDegree.size())
+        {
+            return sb.toString();
+        }
+        else{
+            return "";
+        }
+           
     }
 
     // ---------------------------------------------------------------------

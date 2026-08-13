@@ -75,6 +75,73 @@
 
 ---
 
+## Revision Tracker (Phase 1)
+
+Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
+
+**Revised: 2 / 56.**
+
+| # | Revised | Problem |
+|---|---------|---------|
+| 1 | ☐ | Nested function expression evaluation |
+| 2 | ☑ | Grid source-to-target reachability |
+| 3 | ☑ | Multi-source BFS — distance to nearest source |
+| 4 | ☐ | Router signal propagation |
+| 5 | ☐ | Time-aware flight / package routing |
+| 6 | ☐ | Shared-route meeting point |
+| 7 | ☐ | Merge orderings via topological sort |
+| 8 | ☐ | Character order from pairs |
+| 9 | ☐ | Recursive placeholder substitution |
+| 10 | ☐ | Filesystem / path hierarchy |
+| 11 | ☐ | Max common prefix across files |
+| 12 | ☐ | Longest increasing subsequence, adjacent diff |
+| 13 | ☐ | Top K from a stream |
+| 14 | ☐ | Move pieces to string (`L`/`R`/`_`) |
+| 15 | ☐ | Interval overlap progression |
+| 16 | ☐ | Product over last K of a stream |
+| 17 | ☐ | Infix / postfix expression evaluation |
+| 18 | ☐ | Merge two N-ary trees |
+| 19 | ☐ | Tree leaves with max ancestor |
+| 20 | ☐ | Connected components of 1-nodes in a binary tree |
+| 21 | ☐ | Rectangle from 2D points |
+| 22 | ☐ | Vertical line splitting rectangle area |
+| 23 | ☐ | Longest non-decreasing subarray |
+| 24 | ☐ | Remove adjacent character pairs |
+| 25 | ☐ | Subsequence dictionary match |
+| 26 | ☐ | Array jump — take or skip |
+| 27 | ☐ | Arithmetic adjacent-diff subarrays |
+| 28 | ☐ | Triples within max difference |
+| 29 | ☐ | Logger rate limiter |
+| 30 | ☐ | Music shuffler with no repeat in K |
+| 31 | ☐ | Best café for friends |
+| 32 | ☐ | Movie similarity Top N |
+| 33 | ☐ | Teleporter shortest path |
+| 34 | ☐ | Currency arbitrage |
+| 35 | ☐ | Broadcast signal propagation |
+| 36 | ☐ | Dependency cycles (SCC) |
+| 37 | ☐ | Recipes from supplies |
+| 38 | ☐ | Sentence similarity (transitive) |
+| 39 | ☐ | Sequence reconstruction |
+| 40 | ☐ | Token translator |
+| 41 | ☐ | Build tree from parent-child pairs |
+| 42 | ☐ | Merge N-ary trees with conflict rules |
+| 43 | ☐ | Delete N-ary tree leaves |
+| 44 | ☐ | Leaves grouped by removal round |
+| 45 | ☐ | Count connected 1-components |
+| 46 | ☐ | Largest connected 1-component |
+| 47 | ☐ | Best root for a binary tree |
+| 48 | ☐ | Reroot tree with color constraints |
+| 49 | ☐ | Mouse jump max score |
+| 50 | ☐ | F1 single-tyre race time |
+| 51 | ☐ | F1 tyre-change DP |
+| 52 | ☐ | Microwave keypad target time |
+| 53 | ☐ | Count squares from segments |
+| 54 | ☐ | Vertical area split |
+| 55 | ☐ | Rectangle exists (incremental) |
+| 56 | ☐ | Max rectangle area |
+
+---
+
 ## Phase 2 — Remaining Problems (after the 56)
 
 ### Tier 1 — Highest priority / recurring concrete formulations
