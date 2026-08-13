@@ -35,68 +35,73 @@
  */
 
 import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.Deque;
 
 public class RouterRadiusReachability {
 
     // routers[i] = {x, y, transmissionRadius}; source/destination = {x, y}.
     public boolean canReach(int[][] routers, int[] source, int[] destination) {
-        int sourceIndex = -1;
-        int destinationIndex = -1;
+        int src = -1;
+        int dst = -1;
 
-        for (int index = 0; index < routers.length; index++) {
-            if (sameCoordinates(routers[index], source)) {
-                sourceIndex = index;
+        for(int i = 0; i < routers.length; i++)
+        {
+            if(isSameCoordinate(routers[i], source))
+            {
+                src = i;
             }
-            if (sameCoordinates(routers[index], destination)) {
-                destinationIndex = index;
+            if(isSameCoordinate(routers[i], destination))
+            {
+                dst = i;
             }
         }
-        if (sourceIndex == -1 || destinationIndex == -1) {
+
+        if(src == -1 || dst == -1)
+        {
             return false;
         }
 
-        Queue<Integer> queue = new ArrayDeque<>();
-        boolean[] visited = new boolean[routers.length];
-
-        queue.offer(sourceIndex);
-        visited[sourceIndex] = true;
-
-        while (!queue.isEmpty()) {
-            int currentIndex = queue.poll();
-
-            if (currentIndex == destinationIndex) {
+        Deque<Integer> q = new ArrayDeque<>(); // it contains indices of routers
+        q.offer(src);
+        int n = routers.length;
+        int[] visited = new int[n];
+        visited[src] = 1;
+        while(!q.isEmpty())
+        {
+            int cur = q.poll();
+            if(cur == dst)
+            {
                 return true;
             }
 
-            int[] currentRouter = routers[currentIndex];
-            // Reachable set uses the CURRENT router's radius -> directed edges.
-            for (int nextIndex = 0; nextIndex < routers.length; nextIndex++) {
-                if (!visited[nextIndex] && canTransmit(currentRouter, routers[nextIndex])) {
-                    visited[nextIndex] = true;
-                    queue.offer(nextIndex);
+            for(int i = 0; i < n; i++)
+            {
+                int nei = i;
+                if(visited[nei] == 0 && canBeReached(routers[cur], routers[nei]))
+                {
+                    visited[nei] = 1;
+                    q.offer(nei);
                 }
             }
         }
-
         return false;
     }
 
-    private boolean sameCoordinates(int[] router, int[] coordinate) {
-        return router[0] == coordinate[0] && router[1] == coordinate[1];
+    private boolean canBeReached(int[] src, int[] router)
+    {
+        int delX = Math.abs(src[0] - router[0]);
+        int delY = Math.abs(src[1] - router[1]);
+        int radiusSquare = src[2] * src[2];
+
+        return delX * delX + delY * delY <= radiusSquare;
     }
 
-    private boolean canTransmit(int[] current, int[] next) {
-        // long math to avoid overflow when squaring.
-        long deltaX = (long) current[0] - next[0];
-        long deltaY = (long) current[1] - next[1];
-        long distanceSquared = deltaX * deltaX + deltaY * deltaY;
-
-        long currentRadius = current[2];
-        long radiusSquared = currentRadius * currentRadius;
-
-        return distanceSquared <= radiusSquared;
+    private boolean isSameCoordinate(int[] router, int[] p)  
+    {
+        return router[0] == p[0] && router[1] == p[1];
     }
+
+
 
     // ------------------------------------------------------------------
     // Quick self-test.
