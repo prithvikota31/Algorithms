@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 2 / 56.**
+**Revised: 3 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -90,7 +90,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 5 | ☐ | Time-aware flight / package routing |
 | 6 | ☐ | Shared-route meeting point |
 | 7 | ☐ | Merge orderings via topological sort |
-| 8 | ☐ | Character order from pairs |
+| 8 | ☑ | Character order from pairs |
 | 9 | ☐ | Recursive placeholder substitution |
 | 10 | ☐ | Filesystem / path hierarchy |
 | 11 | ☐ | Max common prefix across files |
@@ -139,6 +139,25 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 54 | ☐ | Vertical area split |
 | 55 | ☐ | Rectangle exists (incremental) |
 | 56 | ☐ | Max rectangle area |
+
+### Revision notes
+
+**#8 — Character order from pairs (Kahn's topological sort)**
+
+Mistakes made:
+- Only registered `pair[1]` in the in-degree map, so source-only characters never existed as keys, nothing had in-degree 0, the queue never seeded, and every input returned `""`.
+- Called `graph.get(cur)` directly in the BFS; sink nodes have no adjacency entry, so the first sink threw a `NullPointerException`.
+- Compared `sb.length()` against `graph.size()`, which counts only nodes **with outgoing edges**, not all distinct characters.
+- Incremented in-degree on every pair while the adjacency `Set` silently deduped, so a repeated pair made a node unreachable and reported a false cycle.
+
+What's correct:
+- `x > y` is a directed edge `x -> y`; one valid total order = one topological sort; a cycle means no order exists.
+- Register **every** endpoint before seeding: targets via the increment, sources via `putIfAbsent(pair[0], 0)` — `putIfAbsent` because a plain `put` would reset a real count to 0 and create a fake root.
+- `inDegree.size()` is the distinct-node count and the only correct denominator for the completeness check.
+- Bump the counter only when `Set.add` returns `true`, so each `+1` has exactly one matching `-1` during traversal.
+- Guard neighbour lookup with `graph.getOrDefault(cur, Collections.emptySet())` for sinks.
+- A `visited` set is unnecessary — in-degree reaches 0 exactly once per node.
+- Complexity: O(V + E) time and space.
 
 ---
 
