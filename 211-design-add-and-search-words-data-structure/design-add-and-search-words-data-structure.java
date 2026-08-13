@@ -52,6 +52,10 @@ class WordDictionary {
                 if(cur.containsKey(c))
                 {
                     found = found | searchRecursion(word, index + 1, cur.getKey(c));
+                    if(found == true)
+                    {
+                        return true;
+                    }
                 }
             }
             return found;
