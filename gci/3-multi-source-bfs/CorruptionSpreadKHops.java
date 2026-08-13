@@ -46,8 +46,8 @@
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
-import java.util.Queue;
 
 public class CorruptionSpreadKHops {
 
@@ -59,71 +59,88 @@ public class CorruptionSpreadKHops {
             int[] corruptedServers,
             int k) {
 
-        // Build the undirected graph.
         List<List<Integer>> graph = new ArrayList<>();
-        for (int node = 0; node < n; node++) {
+        for(int i = 0; i < n; i++)
+        {
             graph.add(new ArrayList<>());
         }
-        for (int[] edge : edges) {
-            graph.get(edge[0]).add(edge[1]);
-            graph.get(edge[1]).add(edge[0]);
+        for(int[] edge: edges)
+        {
+            int u = edge[0];
+            int v = edge[1];
+            graph.get(u).add(v);
+            graph.get(v).add(u);
         }
 
-        // Phase 1: multi-source BFS -> every node within K hops is blocked.
-        // -1 means not yet reached by corruption.
-        int[] dangerDistance = new int[n];
-        Arrays.fill(dangerDistance, -1);
+        Deque<Integer> q = new ArrayDeque<>();
 
-        Queue<Integer> queue = new ArrayDeque<>();
-        for (int corruptedServer : corruptedServers) {
-            if (dangerDistance[corruptedServer] == -1) {
-                dangerDistance[corruptedServer] = 0;
-                queue.offer(corruptedServer);
+        int[] finalCorrupted = new int[n];
+        Arrays.fill(finalCorrupted, -1);
+        //anything which changes from -1 is corrupted
+
+        for(int corrupted: corruptedServers)
+        {
+            q.add(corrupted);
+            finalCorrupted[corrupted] = 0;
+        }
+
+        while(!q.isEmpty())
+        {
+            int cur = q.poll();
+
+            if(finalCorrupted[cur] > k)
+            {
+                break;
             }
-        }
 
-        while (!queue.isEmpty()) {
-            int currentNode = queue.poll();
-
-            // Already K hops out; its neighbours would be K+1 (still safe).
-            if (dangerDistance[currentNode] == k) {
+            if(finalCorrupted[cur] == k)
+            {
                 continue;
             }
-            for (int neighbor : graph.get(currentNode)) {
-                if (dangerDistance[neighbor] == -1) {
-                    dangerDistance[neighbor] = dangerDistance[currentNode] + 1;
-                    queue.offer(neighbor);
+
+            for(int i = 0; i < graph.get(cur).size(); i++)
+            {
+                int nei = graph.get(cur).get(i);
+                if(finalCorrupted[nei] == -1)
+                {
+                    finalCorrupted[nei] = finalCorrupted[cur] + 1;
+                    q.offer(nei);
                 }
             }
         }
-
-        // If source or destination is itself blocked, no safe path exists.
-        if (dangerDistance[source] != -1 || dangerDistance[destination] != -1) {
+        q.clear();
+        
+        if (finalCorrupted[source] != -1 ||
+        finalCorrupted[destination] != -1) {
             return -1;
         }
 
-        // Phase 2: shortest-path BFS through safe nodes only.
         int[] pathDistance = new int[n];
         Arrays.fill(pathDistance, -1);
 
+        q.offer(source);
         pathDistance[source] = 0;
-        queue.offer(source);
+        
 
-        while (!queue.isEmpty()) {
-            int currentNode = queue.poll();
-
-            if (currentNode == destination) {
-                return pathDistance[currentNode];
+        while(!q.isEmpty())
+        {
+            int cur = q.poll();
+            if(cur == destination)
+            {
+                return pathDistance[cur];
             }
-            for (int neighbor : graph.get(currentNode)) {
-                // Enter only safe, unvisited nodes.
-                if (dangerDistance[neighbor] == -1 && pathDistance[neighbor] == -1) {
-                    pathDistance[neighbor] = pathDistance[currentNode] + 1;
-                    queue.offer(neighbor);
+
+            for(int i = 0; i < graph.get(cur).size(); i++)
+            {
+                int nei = graph.get(cur).get(i);
+
+                if(finalCorrupted[nei] == -1 && pathDistance[nei] == -1)
+                {
+                    pathDistance[nei] = pathDistance[cur] + 1;
+                    q.offer(nei);
                 }
             }
         }
-
         return -1;
     }
 
