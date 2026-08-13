@@ -30,37 +30,47 @@ public class TreeLeavesMaxAncestor {
     static class TreeNode {
         int val;
         TreeNode left, right;
-        TreeNode(int val) { this.val = val; }
+        public TreeNode(int val) 
+        { 
+            this.val = val; 
+        }
     }
 
     public List<Integer> findSpecialLeaves(TreeNode root) {
+        //send max along nodes
         List<Integer> result = new ArrayList<>();
-        if(root == null)    return result;
-
-        dfs(root, result, root.val); // send max ancestor along the path
+        if(root == null || isLeaf(root))
+        {
+            return result;
+        }
+        dfs(root, result, Integer.MIN_VALUE);
         return result;
     }
 
-    private void dfs(TreeNode node, List<Integer> result, int maxAncestor)
+    private void dfs(TreeNode node, List<Integer> result, int maxSoFar)
     {
         if(node == null)
         {
             return;
         }
-        if(node.left == null && node.right == null)
+        if(isLeaf(node))
         {
-            if(node.val > maxAncestor)
+            if(node.val > maxSoFar)
             {
                 result.add(node.val);
             }
             return;
         }
 
-        int newMax = Math.max(maxAncestor, node.val);
-        dfs(node.left, result, newMax);
-        dfs(node.right, result, newMax);
-
+        dfs(node.left, result, Math.max(maxSoFar, node.val));
+        dfs(node.right, result, Math.max(maxSoFar, node.val));
     }
+
+    private boolean isLeaf(TreeNode node)
+    {
+        return node.left == null && node.right == null;
+    }
+
 
     // ---- self-test -------------------------------------------------------
     public static void main(String[] args) {
