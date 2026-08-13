@@ -13,7 +13,7 @@
  * Same pattern covers: nearest gate, hospital, boundary, water cell, police
  * station, corrupted server, etc.
  *
- * EXAMPLE
+ * EXAMPLE  
  *   0 1 1        0 1 2
  *   1 1 1   ->   1 2 1
  *   1 1 0        2 1 0
@@ -51,64 +51,58 @@
  * ----------------------------------------------------------------------------
  */
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Queue;
+import java.util.*;
 
 public class MultiSourceBFS {
 
-    public int[][] updateMatrix(int[][] mat) {
-        int rows = mat.length;
-        int cols = mat[0].length;
 
-        int[][] distance = new int[rows][cols];
-        Queue<int[]> queue = new ArrayDeque<>();
+    public int[][] updateMatrix(int[][] mat)
+    {
+        int m = mat.length;
+        int n = mat[0].length;
+        int[][] dist = new int[m][n];
 
-        // Seed every source (0) at distance 0; mark others unvisited with -1.
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                if (mat[row][col] == 0) {
-                    distance[row][col] = 0;
-                    queue.offer(new int[] {row, col});
-                } else {
-                    distance[row][col] = -1;
+        for(int i = 0; i < m; i++)
+        {
+            Arrays.fill(dist[i], -1);
+        }
+
+        Deque<int[]> q = new ArrayDeque<>();
+        for(int i = 0; i < m; i++)
+        {
+            for(int j = 0; j < n; j++)
+            {
+                if(mat[i][j] == 0)
+                {
+                    q.offer(new int[]{i, j});
+                    dist[i][j] = 0;
                 }
             }
         }
+        int[] delRow = {0, 1, 0, -1};
+        int[] delCol = {-1, 0, 1, 0};
 
-        int[][] directions = {
-            {0, 1},
-            {1, 0},
-            {0, -1},
-            {-1, 0}
-        };
+        while(!q.isEmpty())
+        {
+            int[] cur = q.poll();
+            int cRow = cur[0];
+            int cCol = cur[1];
 
-        // Sources expand simultaneously. First arrival = shortest distance.
-        while (!queue.isEmpty()) {
-            int[] current = queue.poll();
-            int currentRow = current[0];
-            int currentCol = current[1];
+            for(int i = 0; i < delRow.length; i++)
+            {
+                int nRow = cRow + delRow[i];
+                int nCol = cCol + delCol[i];
 
-            for (int[] direction : directions) {
-                int nextRow = currentRow + direction[0];
-                int nextCol = currentCol + direction[1];
-
-                if (nextRow < 0 || nextRow >= rows
-                        || nextCol < 0 || nextCol >= cols) {
-                    continue;
+                if(nRow >= 0 && nRow < m && nCol >= 0 && nCol < n && dist[nRow][nCol] == -1)
+                {
+                    q.offer(new int[]{nRow, nCol});
+                    dist[nRow][nCol] = dist[cRow][cCol] + 1;
                 }
-
-                // Already has its shortest distance.
-                if (distance[nextRow][nextCol] != -1) {
-                    continue;
-                }
-
-                distance[nextRow][nextCol] = distance[currentRow][currentCol] + 1;
-                queue.offer(new int[] {nextRow, nextCol});
             }
+
         }
 
-        return distance;
+        return dist;
     }
 
     // ------------------------------------------------------------------
