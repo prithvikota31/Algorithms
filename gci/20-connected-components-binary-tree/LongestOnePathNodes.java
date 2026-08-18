@@ -54,7 +54,7 @@ import java.util.Map;
  */
 public class LongestOnePathNodes {
 
-    static class TreeNode {
+    public static class TreeNode {
         int val;
         TreeNode left;
         TreeNode right;
@@ -64,68 +64,81 @@ public class LongestOnePathNodes {
         }
     }
 
-    private final Map<TreeNode, Integer> downLen = new HashMap<>();
-    private TreeNode bestNode;
-    private int bestLength;
-
+    private TreeNode bestRoot;
+    private int bestPathLength;
+    Map<TreeNode, Integer> bestSingleArmLength; //node -> length
     public List<TreeNode> findLongestPath(TreeNode root) {
-        bestNode = null;
-        bestLength = 0;
-        downLen.clear();
-        computeDownLen(root);
+        bestRoot = null;
+        bestPathLength = 0;
+        bestSingleArmLength = new HashMap<>();
 
-        List<TreeNode> result = new ArrayList<>();
-        if (bestNode == null) {
-            return result;
+        //compute bestRot ad bestArmLength;
+        //along the path fill the map
+        computeBestRoot(root);
+        List<TreeNode> longestPathList = new ArrayList<>();
+
+        if(bestRoot == null)
+        {
+            return longestPathList;
         }
 
-        List<TreeNode> leftChain = new ArrayList<>();
-        walkChain(bestNode.left, leftChain);
-        Collections.reverse(leftChain);
+        //build left path
+        //reverse
+        //build right path
+        build(bestRoot.left, longestPathList);
+        Collections.reverse(longestPathList);
+        longestPathList.add(bestRoot);
+        build(bestRoot.right, longestPathList);
 
-        result.addAll(leftChain);
-        result.add(bestNode);
-        walkChain(bestNode.right, result);
-        return result;
+        return longestPathList;
     }
 
-    // Returns the longest downward chain length of 1s starting at `node`
-    // (0 if node is null or a 0, since it can't extend a chain upward).
-    private int computeDownLen(TreeNode node) {
-        if (node == null) {
+    private void build(TreeNode node, List<TreeNode> longestPathList)
+    {
+        //we have a map to maneuver
+        while(node != null && bestSingleArmLength.get(node) != 0)
+        {
+            longestPathList.add(node);
+            int leftArm = bestSingleArmLength.getOrDefault(node.left, 0);
+            int rightArm = bestSingleArmLength.getOrDefault(node.right, 0);
+            if(leftArm > rightArm)
+            {
+                node = node.left;
+            }
+            else
+            {
+                node = node.right;
+            }
+        }
+    }
+
+    private int computeBestRoot(TreeNode node)
+    {
+        if(node == null)
+        {
             return 0;
         }
 
-        int leftLen = computeDownLen(node.left);
-        int rightLen = computeDownLen(node.right);
+        int left = computeBestRoot(node.left);
+        int right = computeBestRoot(node.right);
 
-        if (node.val == 0) {
-            downLen.put(node, 0);
-            return 0;
+        int currentRootPathLen = 0;
+        if(node.val == 1)
+        {
+            currentRootPathLen = 1 + left + right;
         }
 
-        int pathThroughNode = 1 + leftLen + rightLen;
-        if (pathThroughNode > bestLength) {
-            bestLength = pathThroughNode;
-            bestNode = node;
+        if(currentRootPathLen > bestPathLength)
+        {
+            bestRoot = node;
+            bestPathLength = currentRootPathLen;
         }
 
-        int down = 1 + Math.max(leftLen, rightLen);
-        downLen.put(node, down);
-        return down;
+        int curBestArmLength = (node.val == 0)? 0: 1 + Math.max(left, right);
+        bestSingleArmLength.put(node, curBestArmLength);
+        return curBestArmLength;
     }
 
-    // Appends node, then its child, then its grandchild, ... (top-down),
-    // always following whichever child has the larger memoized downLen.
-    private void walkChain(TreeNode node, List<TreeNode> out) {
-        TreeNode cur = node;
-        while (cur != null && downLen.get(cur) > 0) {
-            out.add(cur);
-            int leftLen = cur.left == null ? 0 : downLen.get(cur.left);
-            int rightLen = cur.right == null ? 0 : downLen.get(cur.right);
-            cur = (leftLen >= rightLen) ? cur.left : cur.right;
-        }
-    }
     public static void main(String[] args) {
         LongestOnePathNodes solution = new LongestOnePathNodes();
 

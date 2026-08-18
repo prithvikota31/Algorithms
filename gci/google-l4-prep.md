@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 9 / 56.**
+**Revised: 11 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -127,8 +127,8 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 42 | ☐ | Merge N-ary trees with conflict rules |
 | 43 | ☐ | Delete N-ary tree leaves |
 | 44 | ☐ | Leaves grouped by removal round |
-| 45 | ☐ | Count connected 1-components |
-| 46 | ☐ | Largest connected 1-component |
+| 45 | ☑ | Count connected 1-components |
+| 46 | ☑ | Largest connected 1-component |
 | 47 | ☐ | Best root for a binary tree |
 | 48 | ☐ | Reroot tree with color constraints |
 | 49 | ☐ | Mouse jump max score |
@@ -214,6 +214,7 @@ What's correct:
 - A `1` node returns `1 + leftSize + rightSize`; a `0` node returns `0`, which breaks connectivity.
 - Track the largest returned size during postorder DFS.
 - To return the largest component's nodes in O(N), first identify its top node using sizes, then collect from only that node while stopping at every `0` boundary.
+- Problems #45 and #46 are duplicate formulations of #20's component-count and largest-component outputs, so the same independent re-solve covers them.
 - Complexity: O(N) time and O(H) recursion space; returning the largest component also needs O(M) output space for M returned nodes.
 
 ---
