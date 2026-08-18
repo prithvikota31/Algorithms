@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 8 / 56.**
+**Revised: 9 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -102,7 +102,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 17 | ☐ | Infix / postfix expression evaluation |
 | 18 | ☐ | Merge two N-ary trees |
 | 19 | ☑ | Tree leaves with max ancestor |
-| 20 | ☐ | Connected components of 1-nodes in a binary tree |
+| 20 | ☑ | Connected components of 1-nodes in a binary tree |
 | 21 | ☐ | Rectangle from 2D points |
 | 22 | ☐ | Vertical line splitting rectangle area |
 | 23 | ☐ | Longest non-decreasing subarray |
@@ -202,6 +202,19 @@ What's correct:
 - For each matched `R`, require `targetIndex >= startIndex`; `R` can move only right.
 - If either pointer is exhausted after skipping blanks, the remaining suffix checks ensure no unmatched piece remains.
 - Complexity: O(n) time and O(1) extra space.
+
+**#20 — Connected components of 1-nodes in a binary tree (DFS)**
+
+Mistakes made:
+- Used a virtual parent value of `-1` while counting a component only when `parent == 0`, so a root-valued `1` was not counted.
+- The largest-component collection pass initially traversed through `0` nodes and included separate `1` components below them.
+
+What's correct:
+- Count a component exactly once at its highest `1` node: the current node is `1` and its parent is not `1`.
+- A `1` node returns `1 + leftSize + rightSize`; a `0` node returns `0`, which breaks connectivity.
+- Track the largest returned size during postorder DFS.
+- To return the largest component's nodes in O(N), first identify its top node using sizes, then collect from only that node while stopping at every `0` boundary.
+- Complexity: O(N) time and O(H) recursion space; returning the largest component also needs O(M) output space for M returned nodes.
 
 ---
 
