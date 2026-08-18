@@ -36,7 +36,7 @@
  */
 public class MaxWeightedComponent {
 
-    static class TreeNode {
+    public static class TreeNode {
         int val;
         TreeNode left;
         TreeNode right;
@@ -56,21 +56,24 @@ public class MaxWeightedComponent {
 
     // Returns the total weight of the positive component rooted downward
     // at `node` (0 if node is null or non-positive, breaking the chain).
-    private int dfs(TreeNode node) {
-        if (node == null) {
+    private int dfs(TreeNode node)
+    {
+        if(node == null)
+        {
             return 0;
         }
-
+        //even if node.val is zero proceed to left and right as nodes below them may contain best values
         int leftSum = dfs(node.left);
         int rightSum = dfs(node.right);
 
-        if (node.val <= 0) {
-            return 0;
+        int currentSum = 0;
+        if(node.val > 0)
+        {
+            currentSum = node.val + leftSum + rightSum;
         }
-
-        int currentSum = node.val + leftSum + rightSum;
         maxComponentSum = Math.max(maxComponentSum, currentSum);
         return currentSum;
+
     }
 
     public static void main(String[] args) {
