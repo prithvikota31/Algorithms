@@ -45,7 +45,7 @@ import java.util.List;
  */
 public class AllConnectedComponents {
 
-    static class TreeNode {
+    public static class TreeNode {
         int val;
         TreeNode left;
         TreeNode right;
@@ -56,42 +56,52 @@ public class AllConnectedComponents {
     }
 
     public List<List<TreeNode>> findAllComponents(TreeNode root) {
+        List<List<TreeNode>> allComponents = new ArrayList<>();
         List<TreeNode> componentRoots = new ArrayList<>();
-        findComponentRoots(root, false, componentRoots);
+        findComponentRoots(root, 0, componentRoots);
 
-        List<List<TreeNode>> components = new ArrayList<>();
-        for (TreeNode componentRoot : componentRoots) {
-            List<TreeNode> component = new ArrayList<>();
-            collectComponent(componentRoot, component);
-            components.add(component);
+        for(TreeNode cRoot: componentRoots)
+        {
+            List<TreeNode> curComponent = new ArrayList<>();
+
+            collectComponent(cRoot, curComponent);
+            allComponents.add(curComponent);
         }
-        return components;
+        return allComponents;
     }
 
-    // A node starts a new component when it's 1 and its parent isn't.
-    private void findComponentRoots(TreeNode node, boolean parentIsOne,
-            List<TreeNode> componentRoots) {
-        if (node == null) {
+    private void findComponentRoots(TreeNode node, int parent, List<TreeNode> componentRoots)
+    {
+        if(node == null)
+        {
             return;
         }
 
-        boolean nodeIsOne = node.val == 1;
-        if (nodeIsOne && !parentIsOne) {
+        if(node.val == 1 && parent == 0)
+        {
             componentRoots.add(node);
         }
-
-        findComponentRoots(node.left, nodeIsOne, componentRoots);
-        findComponentRoots(node.right, nodeIsOne, componentRoots);
+        
+        findComponentRoots(node.left, node.val, componentRoots);
+        findComponentRoots(node.right, node.val, componentRoots);
     }
 
-    private void collectComponent(TreeNode node, List<TreeNode> component) {
-        if (node == null || node.val == 0) {
+    private void collectComponent(TreeNode node, List<TreeNode> componentList)
+    {
+        if(node == null || node.val == 0)
+        {
             return;
         }
-        component.add(node);
-        collectComponent(node.left, component);
-        collectComponent(node.right, component);
+
+        componentList.add(node);
+        collectComponent(node.left, componentList);
+        collectComponent(node.right, componentList);
+
     }
+
+
+
+
 
     public static void main(String[] args) {
         AllConnectedComponents solution = new AllConnectedComponents();

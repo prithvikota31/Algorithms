@@ -38,7 +38,7 @@
  */
 public class LongestOnePath {
 
-    static class TreeNode {
+    public static class TreeNode {
         int val;
         TreeNode left;
         TreeNode right;
@@ -56,25 +56,27 @@ public class LongestOnePath {
         return longestPath;
     }
 
-    // Returns the longest downward chain of 1s starting at `node` (0 if
-    // node is null or a 0, since it can't extend a chain upward).
-    private int dfs(TreeNode node) {
-        if (node == null) {
+    private int dfs(TreeNode node)
+    {
+        if(node == null)
+        {
             return 0;
         }
 
-        int leftChain = dfs(node.left);
-        int rightChain = dfs(node.right);
+        int leftLength = dfs(node.left);
+        int rightLength = dfs(node.right);
 
-        if (node.val == 0) {
-            return 0;
+        int curlengthIncludingNode = 0;
+        if(node.val == 1)
+        {
+            curlengthIncludingNode = 1 + leftLength + rightLength;
         }
 
-        int pathThroughNode = leftChain + 1 + rightChain;
-        longestPath = Math.max(longestPath, pathThroughNode);
-
-        return 1 + Math.max(leftChain, rightChain);
+        //otherwise left it as 0;
+        longestPath = Math.max(longestPath, curlengthIncludingNode);
+        return node.val == 0? 0: 1 + Math.max(leftLength, rightLength);
     }
+
 
     public static void main(String[] args) {
         LongestOnePath solution = new LongestOnePath();
