@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 3 / 56.**
+**Revised: 4 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -96,7 +96,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 11 | ☐ | Max common prefix across files |
 | 12 | ☐ | Longest increasing subsequence, adjacent diff |
 | 13 | ☐ | Top K from a stream |
-| 14 | ☐ | Move pieces to string (`L`/`R`/`_`) |
+| 14 | ☑ | Move pieces to string (`L`/`R`/`_`) |
 | 15 | ☐ | Interval overlap progression |
 | 16 | ☐ | Product over last K of a stream |
 | 17 | ☐ | Infix / postfix expression evaluation |
@@ -158,6 +158,19 @@ What's correct:
 - Guard neighbour lookup with `graph.getOrDefault(cur, Collections.emptySet())` for sinks.
 - A `visited` set is unnecessary — in-degree reaches 0 exactly once per node.
 - Complexity: O(V + E) time and space.
+
+**#14 — Move pieces to string (two pointers)**
+
+Mistakes made:
+- Compared the pointer index itself with `'_'` instead of reading `start.charAt(s)` or `target.charAt(t)`, so blanks were never skipped.
+- Initially used `start.charAt(t)` while advancing the target pointer; each pointer must inspect its own string.
+
+What's correct:
+- Ignore blanks and match the non-blank pieces in order; pieces cannot cross, so their `L`/`R` sequence must be identical.
+- For each matched `L`, require `targetIndex <= startIndex`; `L` can move only left.
+- For each matched `R`, require `targetIndex >= startIndex`; `R` can move only right.
+- If either pointer is exhausted after skipping blanks, the remaining suffix checks ensure no unmatched piece remains.
+- Complexity: O(n) time and O(1) extra space.
 
 ---
 

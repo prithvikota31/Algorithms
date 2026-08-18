@@ -48,44 +48,72 @@
 public class MovePiecesToString {
 
     public boolean canChange(String start, String target) {
-        int n = start.length();
-        int startIndex = 0;
-        int targetIndex = 0;
+        // start = "_L_R_", target = "L___R"  ->  true
 
-        while (startIndex < n || targetIndex < n) {
+        int startLen = start.length();
+        int targetLen = target.length();
 
-            // Blank spaces do not represent pieces, so skip them.
-            while (startIndex < n && start.charAt(startIndex) == '_') {
-                startIndex++;
+        if(startLen != targetLen)
+        {
+            return false;
+        }
+
+        int s = 0;
+        int t = 0;
+        //("_L_R_", "L___R"))
+        while(s < startLen && t < targetLen)
+        {
+            
+            while(s < startLen && start.charAt(s) == '_')
+            {
+                s++;
             }
-            while (targetIndex < n && target.charAt(targetIndex) == '_') {
-                targetIndex++;
+
+            while(t < targetLen && target.charAt(t) == '_')
+            {
+                t++;
             }
 
-            // One string has remaining pieces while the other does not.
-            if (startIndex == n || targetIndex == n) {
-                return startIndex == n && targetIndex == n;
+            
+            if(s == startLen || t == targetLen)
+            {
+                return s == startLen && t == targetLen;
             }
 
-            char piece = start.charAt(startIndex);
+            char startChar = start.charAt(s);
+            char targetChar = target.charAt(t);
 
-            // Corresponding pieces must appear in the same relative order.
-            if (piece != target.charAt(targetIndex)) {
+            if(startChar != targetChar)
+            {
                 return false;
             }
 
-            // L cannot move right.
-            if (piece == 'L' && startIndex < targetIndex) {
+            if((startChar == 'L' && t > s) || (startChar == 'R' && t < s))
+            {
                 return false;
             }
 
-            // R cannot move left.
-            if (piece == 'R' && startIndex > targetIndex) {
+            s++;
+            t++;
+
+        }
+
+        while(s < startLen)
+        {
+            if(start.charAt(s) != '_')
+            {
                 return false;
             }
+            s++;
+        }
 
-            startIndex++;
-            targetIndex++;
+        while(t < targetLen)
+        {
+            if(target.charAt(t) != '_')
+            {
+                return false;
+            }
+            t++;
         }
 
         return true;
