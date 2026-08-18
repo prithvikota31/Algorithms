@@ -46,8 +46,10 @@
  *   Optimal     : resolve(key) helper with a memo, scan input once.
  *
  * COMPLEXITY (optimal)
- *   Let E = total size of all expanded values produced, D = max dependency depth.
- *   Time : O(E + outputLength)     Space : O(E + D)
+ *   Let N = input length, R = total raw length of reachable replacements,
+ *   E = total expanded-cache length, K = reachable keys, D = max depth,
+ *   and L = final output length.
+ *   Time : O(N + R + E + L)   Auxiliary space: O(K + E + D)
  * ----------------------------------------------------------------------------
  */
 
@@ -64,84 +66,72 @@ public class RecursivePlaceholderSubstitution {
      * @return the fully expanded text
      */
     public String substitute(String input, Map<String, String> replacements) {
-        Map<String, String> cache = new HashMap<>();
-        Set<String> currentPath = new HashSet<>();
-        return expand(input, replacements, cache, currentPath);
+        //do dfs from string along with pathvisited, so it detects cycle and also computes 
+        //assume keys are like nodes here
+        Set<String> pathVisitedKeys = new HashSet<>();
+        Map<String, String> keyCache = new HashMap<>(); //key -> final value
+        return dfs(input, replacements, pathVisitedKeys, keyCache);
     }
 
-    /*
-     * Scan the string.
-     * When we find %KEY%, resolve KEY recursively.
-     */
-    private String expand(
-            String text,
-            Map<String, String> replacements,
-            Map<String, String> cache, Set<String> currentPath) {
+    private String dfs(String input, Map<String, String> replacements, 
+        Set<String> pathVisitedKeys, Map<String, String> keyCache)
+    {
+        StringBuilder sb = new StringBuilder();
 
-        StringBuilder result = new StringBuilder();
-
-        for (int i = 0; i < text.length(); i++) {
-
-            // Normal character: copy it.
-            if (text.charAt(i) != '%') {
-                result.append(text.charAt(i));
+        for(int i = 0; i < input.length(); i++)
+        {
+            char ch = input.charAt(i);
+            if(ch != '%')
+            {
+                sb.append(ch);
                 continue;
             }
-
-            // Find the ending '%' of %KEY%.
-            int end = text.indexOf('%', i + 1);
-
-            // No matching '%': treat it as a normal character.
-            if (end == -1) {
-                result.append('%');
+            //found first %
+            int end = input.indexOf('%', i + 1);
+            //assume we always find end//we will write if not later
+            if(end == -1)
+            {
+                sb.append(ch); //% as normal character
                 continue;
             }
-
-            String key = text.substring(i + 1, end);
-
-            if (replacements.containsKey(key)) {
-                result.append(resolve(key, replacements, cache, currentPath));
-            } else {
-                // Unknown placeholder stays unchanged.
-                result.append(text, i, end + 1);
+            String key = input.substring(i + 1, end);
+            //if replacements doesn't contains key, treat it as normal string
+            if(!replacements.containsKey(key))
+            {
+                sb.append(input.substring(i, end + 1));
             }
-
-            // Skip everything inside %KEY%.
+            else
+            {
+                sb.append(dfsHelper(key, replacements, pathVisitedKeys, keyCache));
+            }
             i = end;
         }
-
-        return result.toString();
+        return sb.toString();
     }
 
-    /*
-     * Resolve one key completely.
-     * Example: HOME -> /%USER%/home -> /admin/home
-     */
-    private String resolve(
-            String key,
-            Map<String, String> replacements,
-            Map<String, String> cache, Set<String> currentPath) {
+    private String dfsHelper(String key, Map<String, String> replacements, 
+        Set<String> pathVisitedKeys, Map<String, String> keyCache)
+    {
+        
+        String unchangedValue = replacements.get(key);
 
-        // Reuse previously resolved value.
-        if (cache.containsKey(key)) {
-            return cache.get(key);
-        }
-
-        if(currentPath.contains(key))
+        if(keyCache.containsKey(key))
         {
-            throw new IllegalArgumentException("Cycle detected involving key: " + key);
+            return keyCache.get(key);
         }
+        if(pathVisitedKeys.contains(key))
+        {
+            throw new IllegalArgumentException(
+                        "Cycle detected involving key: " + key);
+        }
+        pathVisitedKeys.add(key);
 
-        currentPath.add(key);
+        String finalValue = dfs(unchangedValue, replacements, pathVisitedKeys, keyCache);
 
-        String rawValue = replacements.get(key);
-
-        // Recursively resolve placeholders inside this value.
-        String resolvedValue = expand(rawValue, replacements, cache, currentPath);
-        currentPath.remove(key);
-
-        cache.put(key, resolvedValue);
-        return resolvedValue;
+        keyCache.put(key, finalValue);
+        
+        pathVisitedKeys.remove(key);
+        return finalValue;
     }
 
     // ---------------------------------------------------------------------

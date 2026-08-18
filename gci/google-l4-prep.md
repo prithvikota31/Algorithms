@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 6 / 56.**
+**Revised: 7 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -91,7 +91,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 6 | ☐ | Shared-route meeting point |
 | 7 | ☐ | Merge orderings via topological sort |
 | 8 | ☑ | Character order from pairs |
-| 9 | ☐ | Recursive placeholder substitution |
+| 9 | ☑ | Recursive placeholder substitution |
 | 10 | ☐ | Filesystem / path hierarchy |
 | 11 | ☑ | Max common prefix across files |
 | 12 | ☐ | Longest increasing subsequence, adjacent diff |
@@ -158,6 +158,21 @@ What's correct:
 - Guard neighbour lookup with `graph.getOrDefault(cur, Collections.emptySet())` for sinks.
 - A `visited` set is unnecessary — in-degree reaches 0 exactly once per node.
 - Complexity: O(V + E) time and space.
+
+**#9 — Recursive placeholder substitution (DFS + memoization)**
+
+Mistakes made:
+- Continued placeholder parsing after copying a normal character, so text without a following `%` reached `substring(..., -1)`.
+- Extracted `substring(i, end)`, which included the opening `%` and omitted the closing one, instead of extracting only the map key with `substring(i + 1, end)`.
+- Appended only the extracted key for an unknown placeholder, dropping its `%` delimiters.
+- Returned the raw replacement on a cache hit instead of the cached, fully expanded value.
+
+What's correct:
+- Treat replacement keys as nodes in an implicit dependency graph and recursively expand each key's raw value.
+- `pathVisitedKeys` contains keys active in the current DFS chain, so seeing one again proves a cycle.
+- `keyCache` contains completed keys and their fully expanded values; it is both the completed-state set and the reusable answer store.
+- Preserve unknown placeholders unchanged, treat an unmatched `%` as ordinary text, and advance past the closing delimiter after processing `%KEY%`.
+- Complexity: O(N + R + E + L) time and O(K + E + D) auxiliary space, where N is input length, R is reachable raw-value length, E is expanded-cache length, L is output length, K is reachable keys, and D is maximum dependency depth.
 
 **#14 — Move pieces to string (two pointers)**
 
