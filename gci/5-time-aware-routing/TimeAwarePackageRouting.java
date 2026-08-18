@@ -10,9 +10,8 @@
  *      flight.departureTime >= currentArrivalTime.
  * Return whether the destination is reachable.
  *
- * Reported Google follow-up (NOT solved here): return the actual sequence of
- * flights/airports used. Not part of this row's stated scope; can be added by
- * storing a parent pointer per airport.
+ * Reported Google follow-up: return the actual sequence of airports used.
+ * This is implemented by storing a parent pointer per airport.
  *
  * >>> FUTURE FOLLOW-UP (NOT solving today) <<<
  *   Reach-before-deadline variant: given a deadline T, return whether the
@@ -46,12 +45,12 @@
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Arrays;
-import java.util.Collections;
 
     // TODO:
     //  1. trivial: if source.equals(destination) return true.
@@ -69,7 +68,7 @@ import java.util.Collections;
     //  6. return false if the heap empties without reaching destination.
 public class TimeAwarePackageRouting {
 
-    static class Flight{
+    public static class Flight{
         String source;
         String dest;
         int arrivalTime;
@@ -84,166 +83,151 @@ public class TimeAwarePackageRouting {
         }
     }
 
-    static class CurrentPos{
-        String source; //to get flights from this loc
-        int packetArrivalTime; //to this souce
-
-        public CurrentPos(String s, int aT)
+    public static class CurrentPos{
+        String airport;
+        int arrivalTime;
+        public CurrentPos(String airport, int arrivalTime)
         {
-            this.source = s;
-            this.packetArrivalTime = aT;
+            this.airport = airport;
+            this.arrivalTime = arrivalTime;
         }
     }
 
-
     //use minHeap in order of arrival times so packet can reach sooner and have more options
     public boolean canReach(String source, String destination, List<Flight> flights) {
-
         if(source.equals(destination))
         {
             return true;
         }
-        
-        //first construct a graph. airports are node
-        //src -> dest
-        //Map<String, List<flights>>
+        //create a graph
+        //airport network
+        //each flight is an edge
+        //Map<String, List<Flights>>
         Map<String, List<Flight>> graph = new HashMap<>();
-
-        //no mutations on graph
+        
         for(Flight flight: flights)
         {
-            graph.putIfAbsent(flight.source, new ArrayList<>());
-            graph.get(flight.source).add(flight);
+            String src = flight.source;
+            String dst = flight.dest;
+            graph.computeIfAbsent(src, k -> new ArrayList<>()).add(flight);
+            graph.computeIfAbsent(dst, k -> new ArrayList<>());
         }
-        //heap to maintain arrival times in order, source 
-        PriorityQueue<CurrentPos> pq = new PriorityQueue<>((a, b) 
-                                        -> Integer.compare(a.packetArrivalTime, b.packetArrivalTime));
+        //lets have a visited set
+        Map<String, Integer> earliestTimes = new HashMap<>(); //airpot -> earliest times
+        
+        //sorted based on earliest arrival time so it have more options to reach destination
+        PriorityQueue<CurrentPos> pq = 
+                new PriorityQueue<>((a, b) -> Integer.compare(a.arrivalTime, b.arrivalTime));
         pq.offer(new CurrentPos(source, 0));
-        //similar to distance array
-        Map<String, Integer> arrivalTimes = new HashMap<>();
-        arrivalTimes.put(source, 0);
+        earliestTimes.put(source, 0);
+
         while(!pq.isEmpty())
         {
-            CurrentPos current = pq.poll();
-            String curAirport = current.source;
-            int curPacketArrivalTime = current.packetArrivalTime;
-
+            CurrentPos cur = pq.poll();
+            String curAirport = cur.airport;
+            int curArrivaltime = cur.arrivalTime;
             if(curAirport.equals(destination))
             {
                 return true;
             }
-
-            if(!graph.containsKey(curAirport))
+            if(earliestTimes.getOrDefault(curAirport, Integer.MAX_VALUE) < curArrivaltime)
             {
                 continue;
             }
+            
 
-            for(Flight nextFlight: graph.get(curAirport))
+            for(Flight nei: graph.getOrDefault(curAirport, Collections.emptyList()))
             {
-                String nextSource = nextFlight.dest;
-                int nextDeparture = nextFlight.departureTime;
-                if(curPacketArrivalTime > nextDeparture)
+                String neiDestination = nei.dest;
+                int neiArrival = nei.arrivalTime;
+                int neiDeparture = nei.departureTime;
+                //only if curArrival time < neiDepaturetime it works
+                if(curArrivaltime <= neiDeparture && neiArrival < earliestTimes.getOrDefault(neiDestination, Integer.MAX_VALUE))
                 {
-                    continue;
+                    earliestTimes.put(neiDestination, neiArrival);
+                    pq.offer(new CurrentPos(neiDestination, neiArrival));
                 }
-
-                int nextPrevBestArrivalTime = arrivalTimes.getOrDefault(nextSource, Integer.MAX_VALUE);
-                if(nextPrevBestArrivalTime > nextFlight.arrivalTime)
-                {
-                    arrivalTimes.put(nextSource, nextFlight.arrivalTime);
-                    pq.offer(new CurrentPos(nextSource, nextFlight.arrivalTime));
-                }
-                      
             }
-        }      
+        }
         return false;
+           
     }
 
-        //use minHeap in order of arrival times so packet can reach sooner and have more options
+     //use minHeap in order of arrival times so packet can reach sooner and have more options
     public List<String> findBestPath(String source, String destination, List<Flight> flights) {
-
         if(source.equals(destination))
         {
             return Arrays.asList(source);
         }
-        
-        //first construct a graph. airports are node
-        //src -> dest
-        //Map<String, List<flights>>
+        //create a graph
+        //airport network
+        //each flight is an edge
+        //Map<String, List<Flights>>
         Map<String, List<Flight>> graph = new HashMap<>();
-
-        //no mutations on graph
+        
         for(Flight flight: flights)
         {
-            graph.putIfAbsent(flight.source, new ArrayList<>());
-            graph.get(flight.source).add(flight);
+            String src = flight.source;
+            String dst = flight.dest;
+            graph.computeIfAbsent(src, k -> new ArrayList<>()).add(flight);
+            graph.computeIfAbsent(dst, k -> new ArrayList<>());
         }
-
-        Map<String, String> parentAirport = new HashMap<>();
-
-        // for(String airport: graph.keySet())
-        // {
-        //     parentAirport.put(airport, airport);
-        // }
-
-        //heap to maintain arrival times in order, source 
-        PriorityQueue<CurrentPos> pq = new PriorityQueue<>((a, b) 
-                                        -> Integer.compare(a.packetArrivalTime, b.packetArrivalTime));
+        //lets have a visited set
+        Map<String, Integer> earliestTimes = new HashMap<>(); //airpot -> earliest times
+        
+        //sorted based on earliest arrival time so it have more options to reach destination
+        PriorityQueue<CurrentPos> pq = 
+                new PriorityQueue<>((a, b) -> Integer.compare(a.arrivalTime, b.arrivalTime));
         pq.offer(new CurrentPos(source, 0));
-        //similar to distance array
-        Map<String, Integer> arrivalTimes = new HashMap<>();
-        arrivalTimes.put(source, 0);
-        parentAirport.put(source, source);
+        earliestTimes.put(source, 0);
+        Map<String, String> parentMap = new HashMap<>(); //child -> parent
+        parentMap.put(source, source);
+
         while(!pq.isEmpty())
         {
-            CurrentPos current = pq.poll();
-            String curAirport = current.source;
-            int curPacketArrivalTime = current.packetArrivalTime;
-
-            // if(curAirport.equals(destination))
-            // {
-            //     return true;
-            // }
-
-            if(!graph.containsKey(curAirport))
+            CurrentPos cur = pq.poll();
+            String curAirport = cur.airport;
+            int curArrivaltime = cur.arrivalTime;
+            if(curAirport.equals(destination))
+            {
+                break;
+            }
+            if(earliestTimes.getOrDefault(curAirport, Integer.MAX_VALUE) < curArrivaltime)
             {
                 continue;
             }
+            
 
-            for(Flight nextFlight: graph.get(curAirport))
+            for(Flight nei: graph.getOrDefault(curAirport, Collections.emptyList()))
             {
-                String nextDest = nextFlight.dest;
-                int nextDeparture = nextFlight.departureTime;
-                if(curPacketArrivalTime > nextDeparture)
+                String neiDestination = nei.dest;
+                int neiArrival = nei.arrivalTime;
+                int neiDeparture = nei.departureTime;
+                //only if curArrival time < neiDepaturetime it works
+                if(curArrivaltime <= neiDeparture && neiArrival < earliestTimes.getOrDefault(neiDestination, Integer.MAX_VALUE))
                 {
-                    continue;
+                    earliestTimes.put(neiDestination, neiArrival);
+                    pq.offer(new CurrentPos(neiDestination, neiArrival));
+                    parentMap.put(neiDestination, curAirport);
                 }
-
-                int nextPrevBestArrivalTime = arrivalTimes.getOrDefault(nextDest, Integer.MAX_VALUE);
-                if(nextPrevBestArrivalTime > nextFlight.arrivalTime)
-                {
-                    arrivalTimes.put(nextDest, nextFlight.arrivalTime);
-                    pq.offer(new CurrentPos(nextDest, nextFlight.arrivalTime));
-                    parentAirport.put(nextDest, curAirport);
-                }
-                      
             }
         }
 
         List<String> path = new ArrayList<>();
 
-        if(!parentAirport.containsKey(destination)) {
-            return new ArrayList<>();   // unreachable, no path
+        String cur = destination;
+        if (!parentMap.containsKey(destination)) {
+            return new ArrayList<>();
         }
 
-        String airport = destination;
-        while(!parentAirport.get(airport).equals(airport))
+        while(!parentMap.get(cur).equals(cur))
         {
-            path.add(airport);
-            airport = parentAirport.get(airport);
+            path.add(cur);
+            cur = parentMap.get(cur);
         }
         path.add(source);
-        Collections.reverse(path); 
+        Collections.reverse(path);
+        
         return path;
     }
     // ------------------------------------------------------------------
