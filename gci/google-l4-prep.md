@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 7 / 56.**
+**Revised: 8 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -87,7 +87,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 2 | ☑ | Grid source-to-target reachability |
 | 3 | ☑ | Multi-source BFS — distance to nearest source |
 | 4 | ☐ | Router signal propagation |
-| 5 | ☐ | Time-aware flight / package routing |
+| 5 | ☑ | Time-aware flight / package routing |
 | 6 | ☐ | Shared-route meeting point |
 | 7 | ☐ | Merge orderings via topological sort |
 | 8 | ☑ | Character order from pairs |
@@ -141,6 +141,22 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 56 | ☐ | Max rectangle area |
 
 ### Revision notes
+
+**#5 — Time-aware flight / package routing (earliest-arrival Dijkstra)**
+
+Mistakes made:
+- Used direct adjacency lookup for the current airport, which could throw when the source had no outgoing flights; use an empty-list default.
+- Initialized an unknown earliest arrival with `Integer.MIN_VALUE`; an unknown minimum should start at infinity (`Integer.MAX_VALUE`).
+- Temporarily mixed old `CurrentPos` field names with the rewritten state object, causing compilation errors.
+- Stored path links as parent-to-child even though reconstruction walks backward from destination; the map must store child-to-parent.
+- Reconstructed without first checking whether the destination was reached and initially omitted the source from the returned path.
+
+What's correct:
+- `earliestTimes[airport]` stores the earliest reachable arrival; arriving earlier dominates arriving later because waiting is allowed.
+- Process states in a min-heap, skip stale entries, and take a flight only when `currentArrival <= departureTime`.
+- Update the earliest-arrival map when offering an improved state so known-worse arrivals are not enqueued again.
+- For path reconstruction, update `parent[destination] = currentAirport` whenever its earliest arrival improves, then walk backward and reverse.
+- Complexity: O((A + F) log F) time and O(A + F) space for A airports and F flights.
 
 **#8 — Character order from pairs (Kahn's topological sort)**
 
