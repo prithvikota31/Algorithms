@@ -32,7 +32,7 @@
 | 16 | ☑ | Design a stream data structure supporting `add(x)` and querying a product, mean, or statistic over the last K values; follow-up: dynamic K. → [fixed-K](16-product-last-k-stream/LastKProduct.java), [dynamic-K](16-product-last-k-stream/ProductOfNumbers.java) |
 | 17 | ☐ | Evaluate arithmetic expressions represented in infix or postfix form using stacks; follow-ups may modify the supported grammar. |
 | 18 | ☑ | Merge two trees or N-ary trees by recursively combining children with matching names while following value-conflict rules. → [base solution](18-merge-nary-trees/MergeNaryTrees.java). **Follow-ups:** (1) pluggable conflict resolver → [MergeTreesConfigurable.java](18-merge-nary-trees/MergeTreesConfigurable.java); (2) immutable inputs / deep-copy → [MergeTreesImmutable.java](18-merge-nary-trees/MergeTreesImmutable.java); (3)–(6) huge/streaming trees, cycles/graphs, build-from-paths, merge-N-trees → [design-notes.md](18-merge-nary-trees/design-notes.md). |
-| 19 | ☐ | Process tree leaves based on maximum ancestor values, root-to-leaf properties, or iterative leaf removal. |
+| 19 | ☑ | Process tree leaves based on maximum ancestor values, root-to-leaf properties, or iterative leaf removal. → [base solution](19-tree-leaves-max-ancestor/TreeLeavesMaxAncestor.java) (DFS carrying `maxSoFar` downward as a summary; a root-only leaf has no ancestors and is excluded). **Follow-up:** return the full root-to-leaf paths → [TreeLeafPaths.java](19-tree-leaves-max-ancestor/TreeLeafPaths.java) (same DFS but also carries the live path as a stack — push on entry, pop on exit, snapshot a copy at a qualifying leaf). Iterative leaf removal is covered by #43/#44. |
 | 20 | ☑ | Given a binary tree whose nodes contain 0 or 1, count connected components of 1 nodes or find the largest such component. → [base + largest-component-nodes](20-connected-components-binary-tree/ConnectedOneComponents.java), [all-components](20-connected-components-binary-tree/AllConnectedComponents.java), [longest-1-path-length](20-connected-components-binary-tree/LongestOnePath.java), [longest-1-path-nodes](20-connected-components-binary-tree/LongestOnePathNodes.java), [max-weighted-component](20-connected-components-binary-tree/MaxWeightedComponent.java), [graph-with-cycles](20-connected-components-binary-tree/ConnectedComponentsGraph.java) |
 | 21 | ☑ | Maintain points on a 2D plane; determine whether rectangles exist and follow up by finding the maximum rectangle area. → [base](21-rectangle-points/RectangleExists.java), [O(1)-query-follow-up](21-rectangle-points/RectangleExistsIncremental.java), [max-area-follow-up](21-rectangle-points/MaxRectangleArea.java) |
 | 22 | ☑ | Given rectangles on a plane, find a vertical line that divides their total area equally; variation: rectangles may overlap. → [sweep line, overlaps counted separately](22-rectangle-area-split/VerticalAreaSplit.java). Each rectangle becomes `+height` at `x1` and `-height` at `x2`; between events the active height is constant so the cut inside a strip is a direct division. **<span style="color:red">Union-area follow-up (overlap counted ONCE) marked optional/conceptual only (not implemented): needs sweep-line + coordinate compression + segment tree tracking active y-coverage — niche geometry technique, low reuse across other L4 problems. Know the one-liner: "can't just add heights; sweep x-events, maintain active y-coverage via segment tree."</span>** |
@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 4 / 56.**
+**Revised: 6 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -93,7 +93,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 8 | ☑ | Character order from pairs |
 | 9 | ☐ | Recursive placeholder substitution |
 | 10 | ☐ | Filesystem / path hierarchy |
-| 11 | ☐ | Max common prefix across files |
+| 11 | ☑ | Max common prefix across files |
 | 12 | ☐ | Longest increasing subsequence, adjacent diff |
 | 13 | ☐ | Top K from a stream |
 | 14 | ☑ | Move pieces to string (`L`/`R`/`_`) |
@@ -101,7 +101,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 16 | ☐ | Product over last K of a stream |
 | 17 | ☐ | Infix / postfix expression evaluation |
 | 18 | ☐ | Merge two N-ary trees |
-| 19 | ☐ | Tree leaves with max ancestor |
+| 19 | ☑ | Tree leaves with max ancestor |
 | 20 | ☐ | Connected components of 1-nodes in a binary tree |
 | 21 | ☐ | Rectangle from 2D points |
 | 22 | ☐ | Vertical line splitting rectangle area |
