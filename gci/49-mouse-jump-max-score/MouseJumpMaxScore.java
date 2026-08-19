@@ -1,3 +1,6 @@
+
+import java.util.Arrays;
+
 /*
  * ============================================================================
  * Problem 49 (Google L4 prep) - Mouse Jump Maximum Score
@@ -40,19 +43,39 @@
 public class MouseJumpMaxScore {
 
     public long maxScore(int[] nums) {
-        if (nums == null || nums.length <= 1) {
+        if(nums == null || nums.length <= 1)
+        {
             return 0;
         }
-
+        int n = nums.length;
         long score = 0;
-        int maxRight = nums[nums.length - 1];
-
-        for (int i = nums.length - 2; i >= 0; i--) {
-            maxRight = Math.max(maxRight, nums[i + 1]);
-            score += maxRight;
+        long maxSoFar = (long)nums[nums.length - 1];
+        for(int i = n - 1; i > 0; i--)
+        {
+            maxSoFar = Math.max(maxSoFar, nums[i]);
+            score = score + maxSoFar;
         }
-
         return score;
+    }
+
+    public long maxScoreDP(int[] nums)
+    {
+        if(nums == null || nums.length <= 1)
+        {
+            return 0;
+        }
+        long[] dp = new long[nums.length];
+        Arrays.fill(dp, Long.MIN_VALUE);
+        //dp[i] represent max score earned at I
+        dp[0] = 0; // as it is also n - 1, 1 element
+        for(int j = 1; j < nums.length; j++)
+        {
+            for(int i = 0; i < j; i++)
+            {
+                dp[j] = Math.max(dp[j], dp[i] + (long)(j - i) * nums[j]);
+            }
+        }
+        return dp[nums.length - 1];
     }
 
     public static void main(String[] args) {

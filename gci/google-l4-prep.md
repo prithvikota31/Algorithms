@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 15 / 56.**
+**Revised: 16 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -131,7 +131,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 46 | ☑ | Largest connected 1-component |
 | 47 | ☑ | Best root for a binary tree |
 | 48 | ☐ | Reroot tree with color constraints |
-| 49 | ☐ | Mouse jump max score |
+| 49 | ☑ | Mouse jump max score |
 | 50 | ☐ | F1 single-tyre race time |
 | 51 | ☐ | F1 tyre-change DP |
 | 52 | ☐ | Microwave keypad target time |
@@ -141,6 +141,21 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 56 | ☐ | Max rectangle area |
 
 ### Revision notes
+
+**#49 — Mouse jump maximum score (quadratic DP + suffix-maximum greedy)**
+
+Mistakes made:
+- The first DP version indexed `nums.length` before guarding null/empty input.
+- Used `int[]` DP state and performed `(j - i) * nums[j]` as `int`, so large valid scores overflowed before the method returned `long`.
+- Renamed the DP API to `maxScoreDP` while the existing tests still called `maxScore`, temporarily making the file fail compilation.
+- The linear greedy version initially accumulated into `int score`, causing the same overflow on large totals.
+
+What's correct:
+- DP state `dp[j]` is the maximum score upon reaching index `j`; try every earlier source `i` and add `(j - i) * nums[j]` using `long` arithmetic.
+- A jump to `j` assigns `nums[j]` to every unit gap it crosses. The best contribution for each gap is therefore the maximum value to its right, and suffix-maximum landing indices make all those choices achievable in one path.
+- The DP solution runs in O(N²) time and O(N) space; the suffix-maximum greedy solution runs in O(N) time and O(1) space.
+- Both APIs handle null, empty, single-element, negative, and overflow-boundary inputs.
+- Verified each API independently with 10 targeted cases, 97,655 exhaustive small arrays, and 10,000 randomized arrays against a quadratic `long` DP oracle.
 
 **#47 — Best root for a binary tree (degree constraints + tree diameter)**
 
