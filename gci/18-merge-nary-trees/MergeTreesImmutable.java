@@ -36,7 +36,7 @@ import java.util.Set;
 
 public class MergeTreesImmutable {
 
-    static class Node {
+    public static class Node {
         String name;
         int value;
         List<Node> children;
@@ -48,46 +48,60 @@ public class MergeTreesImmutable {
         }
     }
 
-    // Deep copy: brand-new node objects all the way down.
-    private Node clone(Node node) {
+    private Node clone(Node node)
+    {
+        if(node == null)
+        {
+            return null;
+        }
         Node copy = new Node(node.name, node.value);
-        for (Node child : node.children) {
+        for(Node child: node.children)
+        {
             copy.children.add(clone(child));
         }
         return copy;
     }
 
     public Node mergeTrees(Node root1, Node root2) {
-        // One side missing: return an independent COPY of the other (not itself).
-        if (root1 == null) return root2 == null ? null : clone(root2);
-        if (root2 == null) return clone(root1);
-
-        // Matched node: fresh object, values combined.
-        Node merged = new Node(root1.name, root1.value + root2.value);
-
-        Map<String, Node> childByName = new HashMap<>();
-        for (Node child1 : root1.children) {
-            childByName.put(child1.name, child1);
+        if(root1 == null)   return clone(root2);
+        if(root2 == null)   return clone(root1);
+        
+        if(!root1.name.equals(root2.name))
+        {
+            return null;
         }
 
-        for (Node child2 : root2.children) {
-            Node child1 = childByName.get(child2.name);
-            if (child1 != null) {
-                // Match -> recurse; recursion returns all-new nodes.
-                merged.children.add(mergeTrees(child1, child2));
-                childByName.remove(child2.name);
-            } else {
-                // Only in root2 -> attach a COPY, never the input node.
-                merged.children.add(clone(child2));
+        Node mergedNode = new Node(root1.name, root1.value + root2.value);
+
+        Map<String, Node> root1ChildMap = new HashMap<>();
+        for(Node root1Child: root1.children)
+        {
+            root1ChildMap.put(root1Child.name, root1Child);
+        }
+
+        //now verify for root2 children if they match with root1's
+        for(Node root2Child: root2.children)
+        {
+            if(root1ChildMap.containsKey(root2Child.name))
+            {
+                Node childMergedNode = 
+                        mergeTrees( root1ChildMap.get(root2Child.name), root2Child);
+                mergedNode.children.add(childMergedNode);
+                root1ChildMap.remove(root2Child.name);
+            }
+            else
+            {
+                mergedNode.children.add(clone(root2Child));
             }
         }
 
-        // Only in root1 -> attach a COPY.
-        for (Node leftover : childByName.values()) {
-            merged.children.add(clone(leftover));
+        for(Node root1Child: root1ChildMap.values())
+        {
+            mergedNode.children.add(clone(root1Child));
         }
 
-        return merged;
+        return mergedNode;
+
     }
 
     // ------------------------------------------------------------------------

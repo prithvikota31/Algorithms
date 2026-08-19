@@ -210,6 +210,7 @@ What's correct:
 - Build a name-to-node map for one node's children, then scan the other node's children: recursively merge matching names and directly retain unmatched children.
 - Remove each matched name from the map so the remaining entries are exactly the children unique to the first tree.
 - Different initial root names return `null` under the chosen contract; throwing an exception would be another valid explicit contract.
+- For an immutable merge, matched nodes are newly constructed and every unmatched or sole-side subtree is deep-cloned, so the output shares no node identity with either input.
 - Problem #42 is the same core N-ary merge formulation with a value-conflict rule, so the #18 independent re-solve covers it.
 - Expected complexity: O(N) time and O(N) space across both trees.
 
