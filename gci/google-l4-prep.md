@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 11 / 56.**
+**Revised: 13 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -100,7 +100,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 15 | ☐ | Interval overlap progression |
 | 16 | ☐ | Product over last K of a stream |
 | 17 | ☐ | Infix / postfix expression evaluation |
-| 18 | ☐ | Merge two N-ary trees |
+| 18 | ☑ | Merge two N-ary trees |
 | 19 | ☑ | Tree leaves with max ancestor |
 | 20 | ☑ | Connected components of 1-nodes in a binary tree |
 | 21 | ☐ | Rectangle from 2D points |
@@ -124,7 +124,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 39 | ☐ | Sequence reconstruction |
 | 40 | ☐ | Token translator |
 | 41 | ☐ | Build tree from parent-child pairs |
-| 42 | ☐ | Merge N-ary trees with conflict rules |
+| 42 | ☑ | Merge N-ary trees with conflict rules |
 | 43 | ☐ | Delete N-ary tree leaves |
 | 44 | ☐ | Leaves grouped by removal round |
 | 45 | ☑ | Count connected 1-components |
@@ -202,6 +202,16 @@ What's correct:
 - For each matched `R`, require `targetIndex >= startIndex`; `R` can move only right.
 - If either pointer is exhausted after skipping blanks, the remaining suffix checks ensure no unmatched piece remains.
 - Complexity: O(n) time and O(1) extra space.
+
+**#18 — Merge two N-ary trees by child name (DFS + map)**
+
+What's correct:
+- The recursive contract is that `mergeTrees(a, b)` merges two nodes representing the same logical name; null checks establish only whether each subtree exists, not whether names match.
+- Build a name-to-node map for one node's children, then scan the other node's children: recursively merge matching names and directly retain unmatched children.
+- Remove each matched name from the map so the remaining entries are exactly the children unique to the first tree.
+- Different initial root names return `null` under the chosen contract; throwing an exception would be another valid explicit contract.
+- Problem #42 is the same core N-ary merge formulation with a value-conflict rule, so the #18 independent re-solve covers it.
+- Expected complexity: O(N) time and O(N) space across both trees.
 
 **#20 — Connected components of 1-nodes in a binary tree (DFS)**
 

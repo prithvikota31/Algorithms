@@ -34,7 +34,7 @@ import java.util.Map;
 public class MergeNaryTrees {
 
     // A tree node: a name (unique among its siblings), a value, and its children.
-    static class Node{
+    public static class Node{
         String name;
         int value;
         List<Node> children;
@@ -58,43 +58,53 @@ public class MergeNaryTrees {
      * Time O(N)  Space O(N), N = total nodes across both trees.
      */
     public Node mergeTrees(Node root1, Node root2) {
-        // If one subtree is missing, the merge is just the other subtree.
-        if(root1 == null)   return root2;
-        if(root2 == null)   return root1;
-
-        // Same node: combine values (conflict rule = sum).
-        Node mergedNode = new Node(root1.name, root1.value + root2.value);
-
-        // Index root1's children by name for O(1) matching against root2's children.
-        Map<String, Node> map = new HashMap<>();
-        for(Node node1: root1.children)
+        if(root1 == null)
         {
-            map.put(node1.name, node1);
+            return root2;
+        }
+        if(root2 == null)
+        {
+            return root1;
         }
 
-        // Walk root2's children: matched name -> merge recursively; new name -> attach.
-        for(Node node2: root2.children)
+        if(!root1.name.equals(root2.name))
         {
-            if(map.containsKey(node2.name))
+            return null;
+        }
+        //mergeTrees
+        Node mergedNode = new Node(root1.name, root1.value + root2.value);
+
+        //put root1 nodes in a map string -> nodes
+        Map<String, Node> map = new HashMap<>();
+
+        for(Node child: root1.children)
+        {
+            map.put(child.name, child);
+        }
+
+        //now for root2 traverse the child, if matched, call recursion
+        //if not just add as mergedNode children
+        for(Node root2Child: root2.children)
+        {
+            if(map.containsKey(root2Child.name))
             {
-                Node mergedChildNode = mergeTrees(map.get(node2.name), node2);
-                mergedNode.children.add(mergedChildNode);
-                // Remove so it isn't re-added in the leftover pass below.
-                map.remove(node2.name);
+                Node childMergedNode = mergeTrees(root2Child, map.get(root2Child.name));
+                mergedNode.children.add(childMergedNode);
             }
             else
             {
-                mergedNode.children.add(node2);
+                mergedNode.children.add(root2Child);
             }
+            map.remove(root2Child.name); //so rest of them can be added as children
         }
 
-        // Whatever remains in the map existed ONLY in root1 -> attach unchanged.
-        for(Node node1: map.values())
+        for(Node root1Child: map.values())
         {
-            mergedNode.children.add(node1);
+            mergedNode.children.add(root1Child);
         }
 
         return mergedNode;
+
     }
 
     // ------------------------------------------------------------------------
