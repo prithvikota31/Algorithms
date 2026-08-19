@@ -36,58 +36,75 @@ public class MergeOrderingsTopoSort {
 
     // Build one global order respecting every input ordering; empty list on cycle.
     public List<String> buildGlobalOrder(List<List<String>> orderings) {
-
-        // Adjacency as a Set to avoid double-counting duplicate edges.
-        Map<String, Set<String>> graph = new HashMap<>();
-        Map<String, Integer> indegree = new HashMap<>();
-
-        // Register every item first, including items that have no edges.
-        for (List<String> ordering : orderings) {
-            for (String item : ordering) {
-                graph.putIfAbsent(item, new HashSet<>());
-                indegree.putIfAbsent(item, 0);
+        List<String> result = new ArrayList<>();
+        //A, B, C, D
+        Map<String, List<String>> graph = new HashMap<>();
+        Map<String, Integer> inDegree = new HashMap<>();
+        buildGraph(graph, inDegree,  orderings);
+        //now we have graph and inDegree
+        // with all possible string as nodes in both
+        //kahns
+        Deque<String> q = new ArrayDeque<>();
+        for(Map.Entry<String, Integer> entry: inDegree.entrySet())
+        {
+            if(entry.getValue() == 0)
+            {
+                q.offer(entry.getKey());
             }
         }
 
-        // Each adjacent pair is a direct ordering constraint before -> after.
-        for (List<String> ordering : orderings) {
-            for (int i = 0; i < ordering.size() - 1; i++) {
-                String before = ordering.get(i);
-                String after = ordering.get(i + 1);
-                // Bump indegree only when this edge is genuinely new.
-                if (graph.get(before).add(after)) {
-                    indegree.put(after, indegree.get(after) + 1);
+        while(!q.isEmpty())
+        {
+            String cur = q.poll();
+            result.add(cur);
+            //adj nodes
+            for(String nei: graph.get(cur))
+            {
+                inDegree.put(nei, inDegree.get(nei) - 1);
+                int neiInDegree = inDegree.get(nei);
+                if(neiInDegree == 0)
+                {
+                    q.offer(nei);
                 }
             }
         }
-
-        // Start from every item with no unmet prerequisites.
-        Queue<String> available = new ArrayDeque<>();
-        for (String item : indegree.keySet()) {
-            if (indegree.get(item) == 0) {
-                available.offer(item);
-            }
+        //verify if we had a cycle
+        if(result.size() == inDegree.size())
+        {
+            return result;
         }
-
-        List<String> globalOrder = new ArrayList<>();
-        while (!available.isEmpty()) {
-            String current = available.poll();
-            globalOrder.add(current);
-
-            // Removing current satisfies one prerequisite for each neighbor.
-            for (String next : graph.get(current)) {
-                indegree.put(next, indegree.get(next) - 1);
-                if (indegree.get(next) == 0) {
-                    available.offer(next);
-                }
-            }
-        }
-
-        // Some node never reached indegree 0 -> a cycle exists.
-        if (globalOrder.size() != indegree.size()) {
+        else
+        {
             return new ArrayList<>();
         }
-        return globalOrder;
+
+    }
+
+    private void buildGraph(Map<String, List<String>> graph,
+        Map<String, Integer> inDegree, List<List<String>> orderings)
+    {
+        //A, B, C, d
+        //orderings.get(i) - list of string
+        for(int i = 0; i < orderings.size(); i++)
+        {
+            List<String> curList = orderings.get(i);
+
+            for (String item : curList) {
+                graph.putIfAbsent(item, new ArrayList<>());
+                inDegree.putIfAbsent(item, 0);
+            }
+            for(int j = 0; j < curList.size(); j++)
+            {
+                if(j == 0)  continue;
+                //A, b
+                // A-> b
+                //x -> y
+                String x = curList.get(j - 1);
+                String y = curList.get(j);
+                graph.get(x).add(y);
+                inDegree.put(y, inDegree.get(y) + 1);
+            }
+        }
     }
 
     // ------------------------------------------------------------------

@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 13 / 56.**
+**Revised: 14 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -89,7 +89,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 4 | ☐ | Router signal propagation |
 | 5 | ☑ | Time-aware flight / package routing |
 | 6 | ☐ | Shared-route meeting point |
-| 7 | ☐ | Merge orderings via topological sort |
+| 7 | ☑ | Merge orderings via topological sort |
 | 8 | ☑ | Character order from pairs |
 | 9 | ☑ | Recursive placeholder substitution |
 | 10 | ☐ | Filesystem / path hierarchy |
@@ -141,6 +141,21 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 56 | ☐ | Max rectangle area |
 
 ### Revision notes
+
+**#7 — Merge multiple orderings (Kahn's topological sort)**
+
+Mistakes made:
+- Initially built every iteration from a new empty list instead of `orderings.get(i)`, so no nodes or edges were registered and every input returned `[]`.
+- Registered nodes only while processing adjacent pairs, which omitted singleton orderings such as `[A]` from the result.
+- Temporarily incremented `x` for an edge `x -> y`; the dependent node `y` gains the prerequisite, so `inDegree[y]` must increase.
+
+What's correct:
+- Register every item before adding edges so isolated and singleton nodes participate in the global order.
+- Convert each adjacent pair in an ordering into an edge; Kahn's queue contains exactly the nodes whose prerequisites have all been emitted.
+- A `List` adjacency is correct here because duplicate edges are retained and receive matching in-degree increments and decrements; using a `Set` would instead require incrementing only when `add` succeeds.
+- If the result contains fewer nodes than the in-degree map, unprocessed nodes are trapped in a cycle, so return `[]`.
+- Verified with 7 targeted cases and 5,000 randomized cases checked against a brute-force permutation oracle.
+- Complexity: O(V + E) time and O(V + E) space, where E counts all adjacent constraints, including duplicates.
 
 **#5 — Time-aware flight / package routing (earliest-arrival Dijkstra)**
 
