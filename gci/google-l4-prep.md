@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 14 / 56.**
+**Revised: 15 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -129,7 +129,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 44 | ☐ | Leaves grouped by removal round |
 | 45 | ☑ | Count connected 1-components |
 | 46 | ☑ | Largest connected 1-component |
-| 47 | ☐ | Best root for a binary tree |
+| 47 | ☑ | Best root for a binary tree |
 | 48 | ☐ | Reroot tree with color constraints |
 | 49 | ☐ | Mouse jump max score |
 | 50 | ☐ | F1 single-tyre race time |
@@ -141,6 +141,21 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 56 | ☐ | Max rectangle area |
 
 ### Revision notes
+
+**#47 — Best root for a binary tree (degree constraints + tree diameter)**
+
+Mistakes made:
+- In the minimum-height follow-up, initially selected a better root without updating `minHeight`, so nearly every subsequent node appeared better and the method returned the last candidate.
+- Initially considered nodes with degree greater than 2 as roots even though all of a root's incident edges become child edges.
+- Initially omitted the impossible-tree check for a node with degree greater than 3 and the empty-tree guard before starting BFS from node 0.
+
+What's correct:
+- For any non-root node, one incident edge becomes its parent edge, so it has `degree - 1` children; therefore every node must have degree at most 3.
+- A root has no parent edge, so only nodes with degree at most 2 are valid root candidates.
+- For the minimum-height follow-up, two BFS sweeps find diameter endpoints `A` and `B`; any node's height is `max(distanceToA, distanceToB)`.
+- Choose the valid root candidate with the smallest computed height.
+- Verified `findRoot` with 7 targeted cases and 10,000 randomized trees; verified `findMinimumHeightRoot` separately with 7 targeted cases and 10,000 randomized trees against brute-force all-roots BFS oracles.
+- Complexity: O(N) time and O(N) space because a tree has N - 1 edges and each degree/BFS pass is linear.
 
 **#7 — Merge multiple orderings (Kahn's topological sort)**
 

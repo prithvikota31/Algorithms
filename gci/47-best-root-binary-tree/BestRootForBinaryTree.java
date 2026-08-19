@@ -31,31 +31,50 @@
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
-import java.util.Queue;
 
 public class BestRootForBinaryTree {
 
     public int findRoot(int nodeCount, int[][] edges) {
-        if (nodeCount == 0) {
+        // no nodes no root
+        if(nodeCount == 0)
+        {
             return -1;
         }
 
-        int[] degree = degrees(nodeCount, edges);
+        int[] degrees = findDegree(nodeCount, edges);
 
-        for (int node = 0; node < nodeCount; node++) {
-            if (degree[node] > 3) {
+        for(int i = 0; i < degrees.length; i++)
+        {
+            if(degrees[i] > 3)
+            {
                 return -1;
             }
         }
 
-        for (int node = 0; node < nodeCount; node++) {
-            if (degree[node] <= 2) {
-                return node;
+        for(int i = 0; i < degrees.length; i++)
+        {
+            if(degrees[i] <= 2)
+            {
+                return i;
             }
         }
 
         return -1;
+
+    }
+    private int[] findDegree(int nodeCount, int[][] edges)
+    {
+        int[] degree = new int[nodeCount];
+        for(int[] edge: edges)
+        {
+            int x = edge[0];
+            int y = edge[1];
+            degree[x]++;
+            degree[y]++;
+        }
+        return degree;
     }
 
     /*
@@ -64,108 +83,106 @@ public class BestRootForBinaryTree {
      * the tree's diameter. Compute those two distance arrays, then choose the
      * valid root with minimum maximum distance.
      */
+    public static class BfsResult{
+        int farthestNode;
+        int[] distance;
+    }
     public int findMinimumHeightRoot(int nodeCount, int[][] edges) {
+        //find one farthest Node
+        List<List<Integer>> graph = new ArrayList<>();
+        buildgraph(graph, edges, nodeCount);
+        //do bfs from any end to find farthest node, which will one end of diameter
+        //from there if we find farthest we get another end of diameter
         if (nodeCount == 0) {
             return -1;
         }
 
-        List<List<Integer>> graph = buildGraph(nodeCount, edges);
-
-        for (int node = 0; node < nodeCount; node++) {
-            if (graph.get(node).size() > 3) {
+        for (List<Integer> neighbors : graph) {
+            if (neighbors.size() > 3) {
                 return -1;
             }
         }
 
-        BfsResult firstSearch = bfs(graph, 0);
-        BfsResult fromFirstEndpoint = bfs(graph, firstSearch.farthestNode);
-        BfsResult fromSecondEndpoint = bfs(graph, fromFirstEndpoint.farthestNode);
+        BfsResult rFromRandomSource = bfs(graph, 0);
+        BfsResult rDiameterFirstEnd = bfs(graph, rFromRandomSource.farthestNode);
+        BfsResult rDiameterSecondEnd = bfs(graph, rDiameterFirstEnd.farthestNode);
 
+        //first end and secodnend results have distances from each diameter end
         int bestRoot = -1;
-        int minimumHeight = Integer.MAX_VALUE;
+        int minHeight = Integer.MAX_VALUE;
 
-        for (int node = 0; node < nodeCount; node++) {
-            if (graph.get(node).size() > 2) {
+        for(int i = 0; i < nodeCount; i++)
+        {
+            if (graph.get(i).size() > 2) {
                 continue;
             }
-
-            int height = Math.max(
-                    fromFirstEndpoint.distance[node],
-                    fromSecondEndpoint.distance[node]);
-
-            if (height < minimumHeight) {
-                minimumHeight = height;
-                bestRoot = node;
+            int heightFromNode = Math.max(rDiameterFirstEnd.distance[i], rDiameterSecondEnd.distance[i]);
+            if(heightFromNode < minHeight)
+            {
+                minHeight = heightFromNode;
+                bestRoot = i;
             }
         }
 
         return bestRoot;
+
     }
 
-    private int[] degrees(int nodeCount, int[][] edges) {
-        int[] degree = new int[nodeCount];
+    private BfsResult bfs(List<List<Integer>> graph, int source)
+    {
+        int n = graph.size();
+        int[] distance = new int[n];
+        Arrays.fill(distance, -1);
 
-        for (int[] edge : edges) {
-            degree[edge[0]]++;
-            degree[edge[1]]++;
+        Deque<Integer> q = new ArrayDeque<>();
+
+        q.offer(source);
+        distance[source] = 0;
+        int farthest = source;
+
+        while(!q.isEmpty())
+        {
+            int cur = q.poll();
+            if(distance[cur] > distance[farthest])
+            {
+                farthest = cur;
+            }
+            for(int nei: graph.get(cur))
+            {
+                if(distance[nei] == -1)
+                {
+                    distance[nei] = 1 + distance[cur];
+                    q.offer(nei);
+                }
+            }
         }
+        BfsResult result = new BfsResult();
+        result.distance = distance;
+        result.farthestNode = farthest;
 
-        return degree;
+        return result;
     }
 
-    private List<List<Integer>> buildGraph(int nodeCount, int[][] edges) {
-        List<List<Integer>> graph = new ArrayList<>();
 
-        for (int node = 0; node < nodeCount; node++) {
+
+    private void buildgraph(List<List<Integer>> graph, int[][] edges, int nodeCount)
+    {
+        for(int i = 0; i < nodeCount; i++)
+        {
             graph.add(new ArrayList<>());
         }
 
-        for (int[] edge : edges) {
-            graph.get(edge[0]).add(edge[1]);
-            graph.get(edge[1]).add(edge[0]);
-        }
-
-        return graph;
-    }
-
-    private BfsResult bfs(List<List<Integer>> graph, int start) {
-        int[] distance = new int[graph.size()];
-        Arrays.fill(distance, -1);
-
-        Queue<Integer> queue = new ArrayDeque<>();
-        queue.offer(start);
-        distance[start] = 0;
-        int farthestNode = start;
-
-        while (!queue.isEmpty()) {
-            int node = queue.poll();
-
-            if (distance[node] > distance[farthestNode]) {
-                farthestNode = node;
-            }
-
-            for (int neighbor : graph.get(node)) {
-                if (distance[neighbor] != -1) {
-                    continue;
-                }
-
-                distance[neighbor] = distance[node] + 1;
-                queue.offer(neighbor);
-            }
-        }
-
-        return new BfsResult(farthestNode, distance);
-    }
-
-    private static class BfsResult {
-        final int farthestNode;
-        final int[] distance;
-
-        BfsResult(int farthestNode, int[] distance) {
-            this.farthestNode = farthestNode;
-            this.distance = distance;
+        for(int[] edge: edges)
+        {
+            int u = edge[0];
+            int v = edge[1];
+            graph.get(u).add(v);
+            graph.get(v).add(u);
         }
     }
+
+
+
 
     public static void main(String[] args) {
         BestRootForBinaryTree solution = new BestRootForBinaryTree();
