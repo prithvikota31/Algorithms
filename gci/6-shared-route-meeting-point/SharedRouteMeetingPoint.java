@@ -60,60 +60,66 @@ public class SharedRouteMeetingPoint {
     // `destination`, sharing edges where possible. Returns -1 if impossible.
     public int minimumDistinctEdges(int n, int[][] edges,
                                     int alice, int bob, int destination) {
-        //construct graph
+        //construct graph from edges
         List<List<Integer>> graph = new ArrayList<>();
-    
         for(int i = 0; i < n; i++)
         {
             graph.add(new ArrayList<>());
         }
-
-        for(int i = 0; i < edges.length; i++)
+        for(int[] edge : edges)
         {
-            int u = edges[i][0];
-            int v = edges[i][1];
+            int u = edge[0];
+            int v = edge[1];
             graph.get(u).add(v);
             graph.get(v).add(u);
         }
-        int[] distA = bfs(alice, graph);
-        int[] distB = bfs(bob, graph);
-        int[] distD = bfs(destination, graph);
-        int ans = Integer.MAX_VALUE;
+
+        //find distance of each ndoe from alice, bob and destination
+        //then for each node, find the sum of didtances to each of them 
+        //minimize the distance (the node will be kind of meeting point)
+        int[] distanceFromAlice = bfs(graph, alice);
+        int[] distanceFromBob = bfs(graph, bob);
+        int[] distanceFromDest = bfs(graph, destination);
+
+        int minDistinct = Integer.MAX_VALUE;
+
         for(int i = 0; i < n; i++)
         {
-            if(distA[i] != (int)1e9 && distB[i] != (int)1e9 && distD[i] != (int)1e9)
+            if(distanceFromAlice[i] != -1 && distanceFromBob[i] != -1 && distanceFromDest[i] != -1)
             {
-                ans = Math.min(ans, distA[i] + distB[i] + distD[i]);
+                int d = distanceFromAlice[i] + distanceFromBob[i] + distanceFromDest[i];
+                minDistinct = Math.min(minDistinct, d);
             }
         }
 
-        return ans == Integer.MAX_VALUE? -1: ans;
+        return minDistinct == Integer.MAX_VALUE? -1: minDistinct;
     }
 
-    // BFS shortest distance from `source` to every node; -1 if unreachable.
-    private int[] bfs(int source, List<List<Integer>> graph) {
+    public int[] bfs(List<List<Integer>> graph, int src)
+    {
         int n = graph.size();
+        int[] distance = new int[n];
+        Arrays.fill(distance, -1);
+
+        distance[src] = 0;
         Deque<Integer> q = new ArrayDeque<>();
-        q.offer(source);
-        int[] dist = new int[n];
-        Arrays.fill(dist, (int)1e9);
-        dist[source] = 0;
+        q.offer(src);
         while(!q.isEmpty())
         {
             int cur = q.poll();
-            for(int nei: graph.get(cur))
+            for(int nei : graph.get(cur))
             {
-                if(dist[nei] == (int)1e9)
+                if(distance[nei] == -1)
                 {
-                    dist[nei] = dist[cur] + 1;
+                    distance[nei] = 1 + distance[cur];
                     q.offer(nei);
                 }
             }
         }
 
-        return dist;
-
+        return distance;
     }
+
 
     // ------------------------------------------------------------------
     // Quick self-test.
