@@ -56,23 +56,28 @@ import java.util.List;
 public class ArrayJumpMaxScore {
 
     public long maxScore(int[] arr) {
-        if (arr == null || arr.length == 0) {
+        //lets assume dp[i] = maximum score achievable starting from index i
+        //so see ith value
+        //if we take ith value, max score will be arr[i] + dp[i + arr[i]]
+        // if we do not take dp[i + 1]
+        if(arr == null || arr.length == 0)
+        {
             return 0;
         }
-
+        // at any i, we need next index value of i, so lets start iteration from end
         int n = arr.length;
+        long[] dp = new long[n];
+        dp[n - 1] = arr[n - 1]; // don't take doesn't contibute anything and all values are +ve
 
-        // dp[i] = max score starting at index i. dp[n] = outside the array = 0.
-        long[] dp = new long[n + 1];
-
-        for (int i = n - 1; i >= 0; i--) {
-            long skipScore = dp[i + 1];
-
-            int jumpIndex = i + arr[i];
-            long scoreAfterJump = jumpIndex < n ? dp[jumpIndex] : 0;
-            long takeScore = arr[i] + scoreAfterJump;
-
-            dp[i] = Math.max(skipScore, takeScore);
+        for(int i = n - 2; i >= 0; i--)
+        {
+            //do not tae
+            long dontTake = dp[i + 1];
+            //if we take
+            long jumpIndex = (long) i + arr[i];
+            long onlyJumpAddedScore = jumpIndex < n? dp[(int) jumpIndex]: 0;
+            long take = arr[i] + onlyJumpAddedScore;
+            dp[i] = Math.max(dontTake, take);
         }
 
         return dp[0];
@@ -92,42 +97,58 @@ public class ArrayJumpMaxScore {
      * ------------------------------------------------------------------------
      */
     public List<Integer> maxScoreIndices(int[] arr) {
-        List<Integer> takenIndices = new ArrayList<>();
-        if (arr == null || arr.length == 0) {
-            return takenIndices;
+        List<Integer> takeIndices = new ArrayList<>();
+        if(arr == null || arr.length == 0)
+        {
+            return takeIndices;
         }
-
         int n = arr.length;
-        long[] dp = new long[n + 1];
+        long[] dp = new long[n];
+        //dp[i] represent maxscore starting from i
+        dp[n - 1] = arr[n - 1];
+
         boolean[] took = new boolean[n];
+        took[n - 1] = true;
+        for(int i = n - 2; i >= 0; i--)
+        {
+            long dontTake = dp[i + 1];
+            //figure out take score
+            long jumpIndex = (long) i + arr[i];
+            long jumpScore = jumpIndex < n ? dp[(int) jumpIndex] : 0;
 
-        for (int i = n - 1; i >= 0; i--) {
-            long skipScore = dp[i + 1];
+            long take = arr[i] + jumpScore;
 
-            int jumpIndex = i + arr[i];
-            long scoreAfterJump = jumpIndex < n ? dp[jumpIndex] : 0;
-            long takeScore = arr[i] + scoreAfterJump;
-
-            if (takeScore >= skipScore) {
-                dp[i] = takeScore;
+            if(take >= dontTake)
+            {
+                dp[i] = take;
                 took[i] = true;
-            } else {
-                dp[i] = skipScore;
+            }
+            else
+            {
+                dp[i] = dontTake;
                 took[i] = false;
             }
         }
 
+        //build indices forward
         int i = 0;
-        while (i < n) {
-            if (took[i]) {
-                takenIndices.add(i);
-                i += arr[i];
-            } else {
-                i += 1;
+        while(i < n)
+        {
+            if(took[i])
+            {
+                takeIndices.add(i);
+                long jumpIndex = (long) i + arr[i];
+                if (jumpIndex >= n) {
+                    break;
+                }
+                i = (int) jumpIndex;
+            }
+            else
+            {
+                i++;
             }
         }
-
-        return takenIndices;
+        return takeIndices;
     }
 
     public static void main(String[] args) {

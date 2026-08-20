@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 19 / 56.**
+**Revised: 20 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -108,7 +108,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 23 | ☐ | Longest non-decreasing subarray |
 | 24 | ☐ | Remove adjacent character pairs |
 | 25 | ☐ | Subsequence dictionary match |
-| 26 | ☐ | Array jump — take or skip |
+| 26 | ☑ | Array jump — take or skip |
 | 27 | ☐ | Arithmetic adjacent-diff subarrays |
 | 28 | ☐ | Triples within max difference |
 | 29 | ☐ | Logger rate limiter |
@@ -317,6 +317,25 @@ What's correct:
 - To return the largest component's nodes in O(N), first identify its top node using sizes, then collect from only that node while stopping at every `0` boundary.
 - Problems #45 and #46 are duplicate formulations of #20's component-count and largest-component outputs, so the same independent re-solve covers them.
 - Complexity: O(N) time and O(H) recursion space; returning the largest component also needs O(M) output space for M returned nodes.
+
+**#26 — Array jump: take or skip (bottom-up DP + path reconstruction)**
+
+Mistakes made:
+- Initially allocated `dp` with length N but iterated from N - 1 while reading `dp[i + 1]`, so the first iteration accessed `dp[N]`; either use an N + 1 sentinel or seed the last state and start at N - 2.
+- Initially used `arr[jumpIndex]` after taking, which adds only the next raw value instead of the best future score stored in `dp[jumpIndex]`.
+- Temporarily removed the null/empty guard and indexed the final element before checking the input, so an empty array failed.
+- Kept accumulated scores and `i + arr[i]` in `int`; returning `long` does not repair overflow that already happened inside the method.
+- In path reconstruction, initially declared the decision array as `int[]` while storing booleans and wrote an invalid ternary expression, so the method did not compile.
+- Reconstructed a taken jump with `i += arr[i]` in `int`; a very large jump could wrap negative instead of leaving the array.
+
+What's correct:
+- Define `dp[i]` as the maximum score starting at index i: skip gives `dp[i + 1]`, while take gives `arr[i] + dp[i + arr[i]]` when the landing index remains inside the array.
+- All values are positive, so both choices move right. Compute the states from right to left because every needed future state is already known.
+- Record `took[i]` when choosing `dp[i]`, then reconstruct from index 0: skip moves by one; take records the index and jumps. Remember: compute the best value backward, then replay the winning choices forward.
+- `take >= dontTake` deliberately chooses take on a tie; either tied path is optimal, but a fixed rule makes reconstruction deterministic.
+- Keep scores and jump addition in `long`. Cast a jump back to `int` only after proving it is still inside the array.
+- Both APIs run in O(N) time and O(N) space; returning the selected indices also uses O(K) output space.
+- Verified `maxScore` with 4 targeted cases and 10,000 randomized arrays against an independent brute-force oracle. Verified `maxScoreIndices` with null, empty, ordinary, and overflow-boundary cases plus 20,000 randomized arrays, checking both path legality and optimal score against exhaustive search.
 
 ---
 
