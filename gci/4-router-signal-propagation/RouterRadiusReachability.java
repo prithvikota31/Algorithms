@@ -89,11 +89,11 @@ public class RouterRadiusReachability {
 
     private boolean canBeReached(int[] src, int[] router)
     {
-        int delX = Math.abs(src[0] - router[0]);
-        int delY = Math.abs(src[1] - router[1]);
-        int radiusSquare = src[2] * src[2];
+        long delX = (long) src[0] - router[0];
+        long delY = (long) src[1] - router[1];
+        long radius = src[2];
 
-        return delX * delX + delY * delY <= radiusSquare;
+        return delX * delX + delY * delY <= radius * radius;
     }
 
     private boolean isSameCoordinate(int[] router, int[] p)  

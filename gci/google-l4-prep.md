@@ -79,14 +79,14 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 17 / 56.**
+**Revised: 18 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
 | 1 | ☐ | Nested function expression evaluation |
 | 2 | ☑ | Grid source-to-target reachability |
 | 3 | ☑ | Multi-source BFS — distance to nearest source |
-| 4 | ☐ | Router signal propagation |
+| 4 | ☑ | Router signal propagation |
 | 5 | ☑ | Time-aware flight / package routing |
 | 6 | ☐ | Shared-route meeting point |
 | 7 | ☑ | Merge orderings via topological sort |
@@ -141,6 +141,21 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 56 | ☐ | Max rectangle area |
 
 ### Revision notes
+
+**#4 — Router signal propagation (uniform and per-router radius)**
+
+Mistakes made:
+- In the base rewrite, initially used `else if` while locating the endpoints, so source equal to destination left the destination index unset.
+- Enqueued neighbours without marking them visited, which could repeatedly cycle between reached routers when the destination was unreachable.
+- Initially squared coordinates and the radius as `int` in both variants, so large distances could overflow and create false edges.
+- The base rewrite materializes the adjacency list, making its worst-case space O(N²), while its original O(N)-space claim described on-demand neighbour discovery.
+
+What's correct:
+- Uniform range creates an undirected graph; per-router radii create directed edges because `u -> v` uses only `u`'s radius.
+- Mark every router visited when it is enqueued. This prevents duplicate queue entries and automatically skips the current router when the neighbour loop scans all indices.
+- Compare squared distances with `long` arithmetic to avoid square roots and ordinary `int` overflow.
+- The base adjacency-list implementation runs in O(N²) time and O(N²) worst-case space. The follow-up discovers neighbours during BFS, retaining O(N²) time with O(N) auxiliary space.
+- Verified the base with 12 targeted and 20,000 randomized cases, and the directed-radius follow-up with 14 targeted and 20,000 randomized cases, each against an independent exact-distance BFS oracle.
 
 **#13 — Top K from a stream (min-heap + frequency rankings)**
 
