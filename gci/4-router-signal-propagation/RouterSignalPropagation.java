@@ -22,17 +22,18 @@
  *      dx*dx + dy*dy <= range*range
  * Mark visited on enqueue so each router is processed once.
  *
- * APPROACHES
- *   Optimal (uniform range): BFS over routers, neighbours = all within range.
- *     Time O(V^2) (each pair checked) / Space O(V). For dense range checks V^2
- *     is unavoidable without spatial indexing (grid/k-d tree) — a valid
- *     optimization to mention if V is large.
+ * APPROACH
+ *   Build the undirected graph, then run BFS from source to destination.
+ *     Time O(V^2) (each pair checked) / Space O(V + E), which is O(V^2) in
+ *     the worst case. Neighbours can instead be scanned during BFS for O(V)
+ *     auxiliary space, or spatially indexed when V is large.
  *
  * CAVEAT: assumes no two routers share the exact same coordinates.
  * ----------------------------------------------------------------------------
  */
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
@@ -45,65 +46,87 @@ public class RouterSignalPropagation {
             int[] destination,
             int range) {
 
+        //build a graph
+        //assume each indice as a vertice,
+        // so we have vertices from 0 to n - 1
+        int n = routers.size();
+        List<List<Integer>> graph = new ArrayList<>();
         int src = -1;
         int des = -1;
-        for(int i = 0; i < routers.size(); i++)
+        for(int i = 0; i < n; i++)
         {
-            if(isSame(routers.get(i), source))
+            graph.add(new ArrayList<>());
+            if(isSame(source, routers.get(i)))
             {
                 src = i;
             }
-            if(isSame(routers.get(i), destination))
+            if(isSame(destination, routers.get(i)))
             {
                 des = i;
             }
         }
 
-        if(src == -1 || des == -1)
-        {
+        if (src == -1 || des == -1) {
             return false;
         }
+        if(src == des)
+        {
+            return true;
+        }
 
-        Deque<int[]> q = new ArrayDeque<>();
-        q.offer(routers.get(src));
-        int n = routers.size();
-        boolean[] visited = new boolean[n];
-        visited[src] = true;
-
-        int rangeSquared = range * range;
+        //build graph
+        //graph node is represented by indice
+        for(int i = 0 ; i < n; i++)
+        {
+            int[] u = routers.get(i);
+            for(int j = i + 1; j < n; j++)
+            {
+                int[] v = routers.get(j);
+                if(isWithInRange(u, v, range))
+                {
+                    graph.get(i).add(j);
+                    graph.get(j).add(i);
+                }
+            }
+        }
+        //lets start bfs and see if we can reach destination
+        Deque<Integer> q = new ArrayDeque<>();
+        int[] visited = new int[n];
+        visited[src] = 1;
+        q.offer(src);
         while(!q.isEmpty())
         {
-            int[] cur = q.poll();
-
-            if(isSame(cur, destination))
+            int cur = q.poll();
+            if(cur == des)
             {
                 return true;
             }
-            
-            for(int i = 0; i < n; i++)
+            for(int nei: graph.get(cur))
             {
-                if(!visited[i] && isWithinRange(cur, routers.get(i), rangeSquared))
+                if(visited[nei] == 0)
                 {
-                    q.offer(routers.get(i));
-                    visited[i] = true;
+                    visited[nei] = 1;
+                    q.offer(nei);
                 }
             }
-
         }
+
         return false;
+
     }
 
-    private boolean isWithinRange(int[] cur, int[] nei, int r2)
-    {
-        int delX = Math.abs(cur[0] - nei[0]);
-        int delY = Math.abs(cur[1] - nei[1]);
-
-        return delX * delX + delY * delY <= r2;
-    }
 
     private boolean isSame(int[] p1, int[] p2)
     {
         return p1[0] == p2[0] && p1[1] == p2[1];
+    }
+
+    private boolean isWithInRange(int[] p1, int[] p2, int radius)
+    {
+        long delX = (long)p1[0] - p2[0];
+        long delY = (long)p1[1] - p2[1];
+
+        return delX * delX + delY * delY <= (long)radius * radius;
     }
 
 
