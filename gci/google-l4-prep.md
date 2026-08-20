@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 16 / 56.**
+**Revised: 17 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -95,7 +95,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 10 | ☐ | Filesystem / path hierarchy |
 | 11 | ☑ | Max common prefix across files |
 | 12 | ☐ | Longest increasing subsequence, adjacent diff |
-| 13 | ☐ | Top K from a stream |
+| 13 | ☑ | Top K from a stream |
 | 14 | ☑ | Move pieces to string (`L`/`R`/`_`) |
 | 15 | ☐ | Interval overlap progression |
 | 16 | ☐ | Product over last K of a stream |
@@ -141,6 +141,22 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 56 | ☐ | Max rectangle area |
 
 ### Revision notes
+
+**#13 — Top K from a stream (min-heap + frequency rankings)**
+
+Mistakes made:
+- While rewriting the continuous-frequency follow-up, initially used invalid comparator syntax and returned a boolean for the username tie-break; a Java comparator must return a negative, zero, or positive `int`.
+- Initially mixed the batch follow-up's `User` type with the continuous follow-up's `UserCount` type.
+- In `getTopK`, initially added an entry before checking the limit without guarding `k <= 0`, so zero or negative K returned every user.
+
+What's correct:
+- Base stream: keep a min-heap of at most K values; its root is the weakest current member and therefore the K-th largest. `add` is O(log K), `getTopK` is O(K log K), and space is O(K).
+- Batch frequency follow-up: count all users first, then run a size-K min-heap over the U unique users. Counts cannot be discarded early because later messages may change the ranking. Time is O(N + U log K), space is O(U + K).
+- Continuous frequency follow-up needs two indexes: a map for O(1) user-to-count lookup and a `TreeSet` for ranked iteration. Remove the old `(user, count)` entry before updating, then reinsert the new immutable ranking key.
+- The `TreeSet` comparator orders count descending and username ascending; comparator result zero means same count and same username, which also lets removal use a newly constructed `UserCount`.
+- The batch heap is temporary and may be drained to build a result; the continuous `TreeSet` is persistent state, so queries iterate without removing entries.
+- Continuous updates cost O(log U), Top K queries cost O(K), and space is O(U).
+- Verified the base API over 5,000 randomized streams, batch frequency over 10,000 randomized cases, and continuous frequency over 5,000 randomized streams containing 376,503 live updates with repeated queries after every update.
 
 **#49 — Mouse jump maximum score (quadratic DP + suffix-maximum greedy)**
 
