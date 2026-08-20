@@ -82,7 +82,7 @@ public class TopKFromStream {
     public List<Integer> getTopK() {
         // Heap order is not fully sorted, so copy and sort for presentation.
         List<Integer> result = new ArrayList<>(minHeap);
-        result.sort(Collections.reverseOrder()); //klogk
+        Collections.sort(result, (a, b) -> Integer.compare(b, a));
         return result;
     }
 
@@ -101,38 +101,52 @@ public class TopKFromStream {
     static class TopKChatUsers {
 
         public List<String> topKUsers(List<String[]> messages, int k) {
-            if (k <= 0) {
-                return Collections.emptyList();
+            //String[] format -> user, message
+            if(k <= 0)
+            {
+                throw new IllegalArgumentException("k should be positive");
             }
 
-            Map<String, Integer> frequency = new HashMap<>();
+            PriorityQueue<User> minHeap =
+                     new PriorityQueue<>((a, b) -> Integer.compare(a.count, b.count));
 
-            // First count how many messages each user sent.
-            for (String[] message : messages) {
-                String username = message[0];
-                frequency.put(username, frequency.getOrDefault(username, 0) + 1);
+            Map<String, User> map = new HashMap<>();
+
+            for(String[] message: messages)
+            {
+                map.putIfAbsent(message[0], new User(message[0], 0));
+                map.get(message[0]).count += 1;
             }
 
-            // Root is the weakest user (smallest count) currently in the Top K.
-            // Heap holds usernames; the comparator looks up each user's count.
-            PriorityQueue<String> minHeap =
-                new PriorityQueue<>((a, b) -> Integer.compare(frequency.get(a), frequency.get(b)));
-
-            // Apply Top K over the unique users, not over every message.
-            for (String user : frequency.keySet()) {
+            for(User user: map.values())
+            {
                 minHeap.offer(user);
-                if (minHeap.size() > k) {
+                if(minHeap.size() > k)
+                {
                     minHeap.poll();
                 }
             }
 
-            // Heap pops weakest-first, so collect then reverse -> strongest first.
             List<String> result = new ArrayList<>();
-            while (!minHeap.isEmpty()) {
-                result.add(minHeap.poll());
+            while(!minHeap.isEmpty())
+            {
+                result.add(minHeap.poll().username);
             }
+
             Collections.reverse(result);
+
             return result;
+        }
+
+        public static class User
+        {
+            String username;
+            int count;
+            public User(String username, int count)
+            {
+                this.username = username;
+                this.count = count;
+            }
         }
     }
 
