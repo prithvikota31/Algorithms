@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 18 / 56.**
+**Revised: 19 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -88,7 +88,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 3 | ☑ | Multi-source BFS — distance to nearest source |
 | 4 | ☑ | Router signal propagation |
 | 5 | ☑ | Time-aware flight / package routing |
-| 6 | ☐ | Shared-route meeting point |
+| 6 | ☑ | Shared-route meeting point |
 | 7 | ☑ | Merge orderings via topological sort |
 | 8 | ☑ | Character order from pairs |
 | 9 | ☑ | Recursive placeholder substitution |
@@ -156,6 +156,20 @@ What's correct:
 - Compare squared distances with `long` arithmetic to avoid square roots and ordinary `int` overflow.
 - The base adjacency-list implementation runs in O(N²) time and O(N²) worst-case space. The follow-up discovers neighbours during BFS, retaining O(N²) time with O(N) auxiliary space.
 - Verified the base with 12 targeted and 20,000 randomized cases, and the directed-radius follow-up with 14 targeted and 20,000 randomized cases, each against an independent exact-distance BFS oracle.
+
+**#6 — Shared-route meeting point (unweighted BFS + weighted Dijkstra)**
+
+Mistakes made:
+- In the weighted rewrite, initially enqueued priority-queue entries as `(node, distance)` even though polling interpreted them as `(distance, node)`, causing an out-of-bounds node access.
+- After correcting that order, kept queue distances and `currentDistance` as `int` and cast each computed `long` distance back to `int`; a valid 3,000,000,000-cost path overflowed to a negative result.
+- Used `1e12` as infinity, which incorrectly classified valid paths whose cost reached or exceeded that arbitrary sentinel as unreachable.
+
+What's correct:
+- The optimal union for two sources and one destination is a tree with one branch node M, so minimizing `dist(A,M) + dist(B,M) + dist(D,M)` over every M gives the minimum distinct-edge cost.
+- Use three BFS runs for an unweighted graph and three Dijkstra runs for an undirected graph with positive weights.
+- Weighted queue entries are `(long distance, node)`. Skip stale entries, keep relaxation arithmetic in `long`, and use one shared unreachable sentinel with overflow-safe addition.
+- Both variants run in O((V + E) log V) or better: O(V + E) for the unweighted BFS version and O((V + E) log V) for the weighted Dijkstra version, with O(V + E) space.
+- Verified the unweighted solution over 137,341 cases against a brute-force selected-edge-subset oracle. Verified the weighted solution over 13,669 targeted, exhaustive, and randomized cases against an independent minimum-cost selected-edge-subset oracle, including costs above `Integer.MAX_VALUE` and the old `1e12` sentinel.
 
 **#13 — Top K from a stream (min-heap + frequency rankings)**
 

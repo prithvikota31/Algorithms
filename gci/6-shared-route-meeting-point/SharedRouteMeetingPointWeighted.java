@@ -29,78 +29,99 @@ import java.util.*;
 
 public class SharedRouteMeetingPointWeighted {
 
+    private static final long INF = Long.MAX_VALUE;
+
     // Minimum total weighted cost for source1 and source2 to reach destination,
     // sharing the common tail once. Returns -1 if any terminal is unreachable.
     public long minimumSharedRouteCost(int n, int[][] edges,
-                                       int source1, int source2, int destination) {
+                                       int alice, int bob, int destination) {
 
-        // Build undirected weighted adjacency list: edge = {u, v, weight}.
+        //construct graph from edges
         List<List<int[]>> graph = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++)
+        {
             graph.add(new ArrayList<>());
         }
-        for (int[] edge : edges) {
-            int u = edge[0], v = edge[1], weight = edge[2];
-            graph.get(u).add(new int[]{v, weight});
-            graph.get(v).add(new int[]{u, weight});
+        for(int[] edge : edges)
+        {
+            int u = edge[0];
+            int v = edge[1];
+            int w = edge[2];
+            graph.get(u).add(new int[]{v, w});
+            graph.get(v).add(new int[]{u, w});
         }
 
-        long[] distFromS1 = dijkstra(source1, graph);
-        long[] distFromS2 = dijkstra(source2, graph);
-        long[] distFromD = dijkstra(destination, graph);
+        //find distance of each ndoe from alice, bob and destination
+        //then for each node, find the sum of didtances to each of them 
+        //minimize the distance (the node will be kind of meeting point)
+        long[] distanceFromAlice = diktras(graph, alice);
+        long[] distanceFromBob = diktras(graph, bob);
+        long[] distanceFromDest = diktras(graph, destination);
 
-        long answer = Long.MAX_VALUE;
+        long minDistinct = Long.MAX_VALUE;
 
-        // Try every node as the meeting point where the two routes merge.
-        for (int m = 0; m < n; m++) {
-            if (distFromS1[m] == Long.MAX_VALUE
-                    || distFromS2[m] == Long.MAX_VALUE
-                    || distFromD[m] == Long.MAX_VALUE) {
-                continue;
+        for(int i = 0; i < n; i++)
+        {
+            if(distanceFromAlice[i] != INF && distanceFromBob[i] != INF && distanceFromDest[i] != INF)
+            {
+                long d = safeAdd(safeAdd(distanceFromAlice[i], distanceFromBob[i]), distanceFromDest[i]);
+                minDistinct = Math.min(minDistinct, d);
             }
-            long totalCost = distFromS1[m] + distFromS2[m] + distFromD[m];
-            answer = Math.min(answer, totalCost);
         }
 
-        return answer == Long.MAX_VALUE ? -1 : answer;
+        return minDistinct == Long.MAX_VALUE? -1: minDistinct;
     }
 
-    // Dijkstra shortest weighted distance from `source`; Long.MAX_VALUE if unreachable.
-    private long[] dijkstra(int source, List<List<int[]>> graph) {
+    private long[] diktras(List<List<int[]>> graph, int src)
+    {
         int n = graph.size();
-        long[] distance = new long[n];
-        Arrays.fill(distance, Long.MAX_VALUE);
+        long[] dist = new long[n];
 
-        // {distanceSoFar, node}, min-heap by distance.
-        PriorityQueue<long[]> minHeap =
-                new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0]));
+        Arrays.fill(dist, INF);
+        dist[src] = 0;
+        //each element (dist, node)
+        PriorityQueue<long[]> pq = new PriorityQueue<>((a, b) -> Long.compare(a[0], b[0]));
+        pq.offer(new long[]{0, src});
+        while(!pq.isEmpty())
+        {
+            long[] cur = pq.poll();
+            long cDist = cur[0];
+            int cNode = (int)cur[1];
 
-        distance[source] = 0;
-        minHeap.offer(new long[]{0, source});
-
-        while (!minHeap.isEmpty()) {
-            long[] current = minHeap.poll();
-            long currentDistance = current[0];
-            int currentNode = (int) current[1];
-
-            // Skip stale heap entries.
-            if (currentDistance > distance[currentNode]) {
+            if(cDist != dist[cNode])
+            {
                 continue;
             }
 
-            for (int[] next : graph.get(currentNode)) {
-                int neighbor = next[0];
-                int edgeWeight = next[1];
-                long newDistance = currentDistance + edgeWeight;
+            for(int[] nei: graph.get(cNode))
+            {
+                int neiNode = nei[0];
+                int neiEdgeWt = nei[1];
+                long candidateDistance = safeAdd(cDist, neiEdgeWt);
 
-                if (newDistance < distance[neighbor]) {
-                    distance[neighbor] = newDistance;
-                    minHeap.offer(new long[]{newDistance, neighbor});
+                if(candidateDistance < dist[neiNode])
+                {
+                    dist[neiNode] = candidateDistance;
+                    pq.offer(new long[]{candidateDistance, neiNode});
                 }
             }
+
         }
-        return distance;
+        return dist;
     }
+
+    private long safeAdd(long first, long second)
+    {
+        if(first == INF || second > INF - first)
+        {
+            return INF;
+        }
+        return first + second;
+    }
+
+  
+
+
 
     // ------------------------------------------------------------------
     // Quick self-test.
