@@ -158,45 +158,39 @@ public class TopKFromStream {
     static class TopKUsersStream {
 
         // user -> latest message count
-        private final Map<String, Integer> frequency = new HashMap<>();
-
-        // Users ordered by:
-        // 1. Higher count first
-        // 2. Alphabetical username for equal counts
-        private final TreeSet<UserCount> ranking =
-            new TreeSet<>((a, b) -> {
-                if (a.count != b.count) {
-                    return Integer.compare(b.count, a.count);
-                }
-                return a.user.compareTo(b.user);
-            });
+        Map<String, Integer> frequency = new HashMap<>();
+        //username, count;
+        TreeSet<UserCount> userSetInOrder = new TreeSet<>((a, b) -> {
+            if (a.count != b.count) {
+                return Integer.compare(b.count, a.count);
+            }
+            return a.user.compareTo(b.user);
+        });
 
         public void addMessage(String user) {
-            int oldCount = frequency.getOrDefault(user, 0);
+            int oldCountOfUser = frequency.getOrDefault(user, 0);
 
-            // Remove the stale object before changing the user's count.
-            if (oldCount > 0) {
-                ranking.remove(new UserCount(user, oldCount));
+            if(oldCountOfUser > 0)
+            {
+                userSetInOrder.remove(new UserCount(user, oldCountOfUser));
             }
-
-            int newCount = oldCount + 1;
-            frequency.put(user, newCount);
-
-            // Insert a new object at the correct ranked position.
-            ranking.add(new UserCount(user, newCount));
+            frequency.put(user, oldCountOfUser + 1);
+            userSetInOrder.add(new UserCount(user, oldCountOfUser + 1));
         }
 
         public List<String> getTopK(int k) {
+            if (k <= 0) {
+                throw new IllegalArgumentException("k should be positive");
+            }
             List<String> result = new ArrayList<>();
-
-            // TreeSet iteration already follows ranking order.
-            for (UserCount entry : ranking) {
-                if (result.size() == k) {
+            for(UserCount user: userSetInOrder)
+            {
+                result.add(user.user);
+                if(result.size() == k)
+                {
                     break;
                 }
-                result.add(entry.user);
             }
-
             return result;
         }
 
