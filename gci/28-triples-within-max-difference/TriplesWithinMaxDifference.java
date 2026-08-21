@@ -74,48 +74,69 @@ public class TriplesWithinMaxDifference {
 
         long total = 0;
 
-        // A anchors the minimum: B and C may equal it. bLo/cLo mark the
-        // first index >= the anchor; bHi/cHi mark the first index > the
-        // anchor + D. All four only move forward as `a[i]` increases.
         int bLo = 0, bHi = 0, cLo = 0, cHi = 0;
-        for (int valueA : a) {
-            long hi = (long) valueA + maxDifference;
-            while (bLo < b.length && b[bLo] < valueA) bLo++;
-            while (bHi < b.length && b[bHi] <= hi) bHi++;
-            while (cLo < c.length && c[cLo] < valueA) cLo++;
-            while (cHi < c.length && c[cHi] <= hi) cHi++;
-            total += (long) Math.max(0, bHi - bLo) * Math.max(0, cHi - cLo);
+        //anchor a values as minimum. then b and c
+        for(int i = 0; i < a.length; i++)
+        {
+            long hi = (long) a[i] + maxDifference;
+            while(bLo < b.length && b[bLo] < a[i])  bLo++;
+            //finally bLo index will be >= a[i]
+            while(bHi < b.length && b[bHi] <= hi) bHi++;
+            //finally bHi will be out of bounds at upper end
+
+            while(cLo < c.length && c[cLo] < a[i])  cLo++;
+            //finally bLo index will be >= a[i]
+            while(cHi < c.length && c[cHi] <= hi) cHi++;
+            //finally bHi will be out of bounds at upper end
+
+            total += (long)(bHi - bLo) * (cHi - cLo);
         }
 
-        // B anchors the minimum: A must be strictly greater (else it was
-        // already counted under A), C may still equal it.
+        //now anchor b, but dont consider a = b
+        // b < a && b <= c
+
         int aLo = 0, aHi = 0;
         cLo = 0;
         cHi = 0;
-        for (int valueB : b) {
-            long hi = (long) valueB + maxDifference;
-            while (aLo < a.length && a[aLo] <= valueB) aLo++;
-            while (aHi < a.length && a[aHi] <= hi) aHi++;
-            while (cLo < c.length && c[cLo] < valueB) cLo++;
-            while (cHi < c.length && c[cHi] <= hi) cHi++;
-            total += (long) Math.max(0, aHi - aLo) * Math.max(0, cHi - cLo);
+        //anchor a values as minimum. then b and c
+        for(int j = 0; j < b.length; j++)
+        {
+            long hi = (long) b[j] + maxDifference;
+            while(aLo < a.length && a[aLo] <= b[j])  aLo++;
+            //finally bLo index will be >= a[i]
+            while(aHi < a.length && a[aHi] <= hi) aHi++;
+            //finally bHi will be out of bounds at upper end
+
+            while(cLo < c.length && c[cLo] < b[j])  cLo++;
+            //finally bLo index will be >= a[i]
+            while(cHi < c.length && c[cHi] <= hi) cHi++;
+            //finally bHi will be out of bounds at upper end
+
+            total += (long)(aHi - aLo) * (cHi - cLo);
         }
 
-        // C anchors the minimum: both A and B must be strictly greater.
         aLo = 0;
         aHi = 0;
         bLo = 0;
         bHi = 0;
-        for (int valueC : c) {
-            long hi = (long) valueC + maxDifference;
-            while (aLo < a.length && a[aLo] <= valueC) aLo++;
-            while (aHi < a.length && a[aHi] <= hi) aHi++;
-            while (bLo < b.length && b[bLo] <= valueC) bLo++;
-            while (bHi < b.length && b[bHi] <= hi) bHi++;
-            total += (long) Math.max(0, aHi - aLo) * Math.max(0, bHi - bLo);
-        }
+        //anchor a values as minimum. then b and c
+        for(int k = 0; k < c.length; k++)
+        {
+            long hi = (long) c[k] + maxDifference;
+            while(aLo < a.length && a[aLo] <= c[k])  aLo++;
+            //finally bLo index will be >= a[i]
+            while(aHi < a.length && a[aHi] <= hi) aHi++;
+            //finally bHi will be out of bounds at upper end
 
+            while(bLo < b.length && b[bLo] <= c[k])  bLo++;
+            //finally bLo index will be >= a[i]
+            while(bHi < b.length && b[bHi] <= hi) bHi++;
+            //finally bHi will be out of bounds at upper end
+
+            total += (long)(aHi - aLo) * (bHi - bLo);
+        }
         return total;
+
     }
 
     /*

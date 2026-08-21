@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 20 / 56.**
+**Revised: 21 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -110,7 +110,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 25 | ☐ | Subsequence dictionary match |
 | 26 | ☑ | Array jump — take or skip |
 | 27 | ☐ | Arithmetic adjacent-diff subarrays |
-| 28 | ☐ | Triples within max difference |
+| 28 | ☑ | Triples within max difference |
 | 29 | ☐ | Logger rate limiter |
 | 30 | ☐ | Music shuffler with no repeat in K |
 | 31 | ☐ | Best café for friends |
@@ -336,6 +336,25 @@ What's correct:
 - Keep scores and jump addition in `long`. Cast a jump back to `int` only after proving it is still inside the array.
 - Both APIs run in O(N) time and O(N) space; returning the selected indices also uses O(K) output space.
 - Verified `maxScore` with 4 targeted cases and 10,000 randomized arrays against an independent brute-force oracle. Verified `maxScoreIndices` with null, empty, ordinary, and overflow-boundary cases plus 20,000 randomized arrays, checking both path legality and optimal score against exhaustive search.
+
+**#28 — Triples from three sorted arrays within D (minimum anchor + monotonic ranges)**
+
+Mistakes made:
+- Initially redeclared pointer variables inside the same method scope instead of resetting them between anchor passes, so the file did not compile.
+- Advanced upper pointers while values were `>= anchor + D`; the pointer must instead move across every valid value `<= anchor + D` and stop at the first larger value.
+- In the C-anchor pass, indexed B with `cHi` instead of `bHi`, causing an out-of-bounds failure.
+- Initially computed `anchor + maxDifference` as `int`, so a large positive anchor could overflow and create an incorrect upper bound.
+- Temporarily omitted the null, empty-array, and negative-D guard.
+
+What's correct:
+- Three values satisfy every pairwise difference limit exactly when `maximum - minimum <= D`; once minimum x is fixed, both other values only need to lie in `[x, x + D]`.
+- Every valid triple has a minimum in A, B, or C, so trying each array as the minimum anchor cannot miss a triple.
+- Use tie priority A, then B, then C to count each triple once: A allows both ties; B requires `A > B` but allows `C == B`; C requires both `A > C` and `B > C`.
+- Each low pointer marks the first allowed value. Each high pointer marks the first value greater than `anchor + D`, making the valid range `[low, high)`.
+- Sorted anchors make both range boundaries non-decreasing, so every pointer moves only forward. Counting takes O(A + B + C) time and O(1) auxiliary space.
+- Count index triples, not distinct value triples. Keep the total and each computed upper bound in `long` so duplicates and integer boundaries remain correct.
+- The follow-up uses the same three passes and ranges, but emits every index combination instead of multiplying range lengths. Its time is O(A + B + C + T) and output space is O(T), where T is the number of returned triples.
+- Verified the count API with 6 targeted cases and 20,000 randomized arrays against a cubic oracle. Verified both count and returned index triples over another 10,000 randomized cases, including duplicates, negatives, empty arrays, ties, and integer boundaries.
 
 ---
 
