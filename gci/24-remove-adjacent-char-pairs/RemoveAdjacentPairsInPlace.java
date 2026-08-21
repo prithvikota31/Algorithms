@@ -1,7 +1,7 @@
 /*
  * ============================================================================
  * Problem 24 (Google L4 prep) - Follow-up: remove adjacent opposite-case
- * pairs WITHOUT an explicit stack (in-place, O(1) extra space).
+ * pairs WITHOUT an explicit stack (write pointer over a mutable buffer).
  * ============================================================================
  *
  * PROMPT
@@ -30,7 +30,9 @@
  *
  * COMPLEXITY
  *   Time:  O(n) -- each character is visited once.
- *   Space: O(1) extra (in-place on the character array; excludes input/output).
+ *   Space: O(1) working space after the char[] exists. With this String API,
+ *          toCharArray() and the returned String still allocate O(n) space.
+ *          A char[] input plus a returned length would be truly in-place.
  * ============================================================================
  */
 public class RemoveAdjacentPairsInPlace {
@@ -38,12 +40,18 @@ public class RemoveAdjacentPairsInPlace {
     public String makeGood(String s) {
         char[] chars = s.toCharArray();
         int top = 0;
-
-        for (char current : chars) {
-            if (top > 0 && isOppositeCase(chars[top - 1], current)) {
+        //top gives last correct position on the char Array
+        //aAbcCdeFf
+        for(int i = 0; i < chars.length; i++)
+        {
+            char ch = chars[i];
+            if(top > 0 && isOppositeCase(ch, chars[top - 1]))
+            {
                 top--;
-            } else {
-                chars[top] = current;
+            }
+            else
+            {
+                chars[top] = ch;
                 top++;
             }
         }
@@ -52,7 +60,7 @@ public class RemoveAdjacentPairsInPlace {
     }
 
     private boolean isOppositeCase(char a, char b) {
-        return Math.abs(a - b) == 32;
+        return Math.abs(a - b) == Math.abs('A' - 'a');
     }
 
     public static void main(String[] args) {

@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 23 / 56.**
+**Revised: 24 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -106,7 +106,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 21 | ☐ | Rectangle from 2D points |
 | 22 | ☐ | Vertical line splitting rectangle area |
 | 23 | ☑ | Longest non-decreasing subarray |
-| 24 | ☐ | Remove adjacent character pairs |
+| 24 | ☑ | Remove adjacent character pairs |
 | 25 | ☐ | Subsequence dictionary match |
 | 26 | ☑ | Array jump — take or skip |
 | 27 | ☐ | Arithmetic adjacent-diff subarrays |
@@ -347,6 +347,23 @@ What's correct:
 - To return the largest component's nodes in O(N), first identify its top node using sizes, then collect from only that node while stopping at every `0` boundary.
 - Problems #45 and #46 are duplicate formulations of #20's component-count and largest-component outputs, so the same independent re-solve covers them.
 - Complexity: O(N) time and O(H) recursion space; returning the largest component also needs O(M) output space for M returned nodes.
+
+**#24 — Remove adjacent opposite-case pairs (stack + write pointer)**
+
+Mistakes made:
+- Initially created the `StringBuilder` with the full input and then treated it as an empty stack, mixing unprocessed input with surviving output.
+- Read the current character from the changing builder instead of the original string, so deletions could invalidate later indices.
+- Passed the last character's numeric value to `deleteCharAt` instead of passing its index `length - 1`.
+- Had Java syntax errors: `chat` instead of `char`, a missing boolean return type, and `char` instead of `chars` in the `String` constructor.
+- In the write-pointer follow-up, initially checked `i > 0` and compared against `chars[top]`; the cleaned prefix may be empty even when input has been read, and its last survivor is at `top - 1`.
+
+What's correct:
+- The only possible new cancellation is between the current character and the last surviving character, so the surviving prefix behaves exactly like a stack.
+- The base solution uses `StringBuilder` as that stack: append to push and delete `length - 1` to pop. A pop naturally exposes any cascading cancellation.
+- In the write-pointer version, `top` is the next free position and the cleaned prefix is `[0, top)`. Pop with `top--`; push with `chars[top++] = current`.
+- `new String(chars, 0, top)` takes a start index and a length, so it returns exactly indices 0 through `top - 1`.
+- Both methods run in O(N) time. The base uses O(N) stack space. The String-based follow-up still allocates an O(N) `char[]` and output String; it is truly O(1) extra only when given a mutable `char[]` and returning the valid length.
+- Verified both methods with 6 targeted cases and 20,000 randomized English-letter strings against an independent repeated-removal oracle.
 
 **#26 — Array jump: take or skip (bottom-up DP + path reconstruction)**
 
