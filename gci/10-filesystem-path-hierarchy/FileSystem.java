@@ -64,138 +64,178 @@ import java.util.*;
 public class FileSystem {
 
     private static class Node{
-        Map<String, Node> children = new HashMap<>();
+        Map<String, Node> links = new HashMap<>();
         boolean isFile;
-        int totalFilesize; //for single file it's only file size, directory total size
+        int totalSize = 0;
+
+        public boolean isFile()
+        {
+            return isFile;
+        }
+        public void setFile()
+        {
+            isFile = true;
+        }
+
+        public Node getKey(String key)
+        {
+
+            return links.get(key);
+
+        }
+
+        public void setKey(String key)
+        {
+            links.put(key, new Node());
+        }
+
+        public boolean containsKey(String key)
+        {
+            return links.containsKey(key);
+        }
     }
 
     private Node root = new Node();
 
-    private void addFile(String path, int size)
+    public void addFile(String path, int size)
     {
-        String[] parts = splitPath(path);   // e.g. docs/photos/a.txt
-
-        Node current = root;
-        List<Node> nodePath = new ArrayList<>();
-        nodePath.add(current);
-
-        for(String part: parts)
+        if(path.equals("/"))
         {
-            // Can't create/descend into a child under a file (e.g. /docs/a.txt/x).
-            if(current.isFile)
+            throw new IllegalArgumentException("root cannot be replaced by a file");
+        }
+
+        // /docs/aaron/personal/file.txt
+        Node cur = root;
+
+        String[] pathStrings = path.split("/");
+        List<Node> completePath = new ArrayList<>();
+        completePath.add(cur);
+        boolean targetAlreadyExists = false;
+
+        for(int i = 0; i < pathStrings.length; i++)
+        {
+            if(cur.isFile())
             {
-                throw new IllegalArgumentException(
-                    "A file cannot contain children: " + path);
+                throw new IllegalArgumentException("can't create another file under file");
             }
-            current.children.putIfAbsent(part, new Node());
-            current = current.children.get(part);
-            nodePath.add(current);
+            String s = pathStrings[i];
+            if(i == pathStrings.length - 1)
+            {
+                targetAlreadyExists = cur.containsKey(s);
+            }
+            if(cur.containsKey(s))
+            {
+                cur = cur.getKey(s);
+            }
+            else
+            {
+                cur.setKey(s);
+                cur = cur.getKey(s);
+            }
+
+            completePath.add(cur);
         }
 
-        // Can't turn a non-empty directory into a file (e.g. addFile("/docs", 10)).
-        if(!current.children.isEmpty())
-        {
-            throw new IllegalArgumentException(
-                "A directory cannot be replaced by a file: " + path);
-        }
-
-        // Overwrite-safe delta: new size - old size (old = 0 for a fresh file).
         int delta = 0;
-        if(current.isFile)
+
+        if(targetAlreadyExists && !cur.isFile())
         {
-            delta = size - current.totalFilesize;
+            throw new IllegalArgumentException("A directory cannot be replaced by a file");
+        }
+
+        if(cur.isFile())
+        {
+            delta = size - cur.totalSize;
         }
         else
         {
             delta = size;
         }
 
-        current.isFile = true;
 
-        // Push the delta to every node on the path so ancestor totals stay correct.
-        for(Node node: nodePath)
+        cur.setFile();
+
+        for(Node node: completePath)
         {
-            node.totalFilesize += delta;
+            node.totalSize += delta;
         }
     }
 
-    private void removeFile(String path)
+    public void removeFile(String path)
     {
-        String[] parts = splitPath(path);   // e.g. docs/photos/a.txt
-
-        Node current = root;
-        List<Node> nodePath = new ArrayList<>();
-        nodePath.add(current);
-
-        for(String part: parts)
-        {
-            current = current.children.get(part);
-            if(current == null) return;   // path doesn't exist -> no-op
-            nodePath.add(current);
-        }
-
-        // Deleting the root ("/") wipes the whole tree.
-        if(nodePath.size() == 1)
-        {
-            current.totalFilesize = 0;
-            current.children.clear();
+        if (path.equals("/")) {
+            root = new Node();
             return;
         }
+         // /docs/aaron/personal/file.txt
+        Node cur = root;
 
-        // A node's cached total IS its subtree size, so this works for a single
-        // file OR a whole directory: subtract it from every ancestor, then unlink.
-        int delta = -current.totalFilesize;
+        String[] pathStrings = path.split("/");
+        List<Node> completePath = new ArrayList<>();
+        completePath.add(cur);
 
-        Node parent = nodePath.get(nodePath.size() - 2);
-        String name = parts[parts.length - 1];
-        parent.children.remove(name);
-
-        nodePath.remove(nodePath.size() - 1);   // drop the removed node itself
-        for(Node node: nodePath)
+        for(int i = 0; i < pathStrings.length; i++)
         {
-            node.totalFilesize += delta;
+            String s = pathStrings[i];
+            if(cur.containsKey(s))
+            {
+                cur = cur.getKey(s);
+            }
+            else
+            {
+                //there is no such path
+                return;
+            }
+
+            completePath.add(cur);
+        }
+
+        int delta = -cur.totalSize;
+
+        Node parent = completePath.get(completePath.size() - 2);
+        parent.links.remove( pathStrings[pathStrings.length - 1]);
+        completePath.remove(completePath.size() - 1);
+        for(Node node: completePath)
+        {
+            node.totalSize += delta;
         }
     }
 
-    private int getSize(String path)
+    public int getSize(String path)
     {
-        Node node = findNode(path);
-        if(node == null)    return -1;
-        return node.totalFilesize;
+        Node node = find(path);
+        if(node == null)
+        {
+            return -1;
+        }
+        else
+        {
+            return node.totalSize;
+        }
     }
 
-    private Node findNode(String path)
+    private Node find(String path)
     {
-        Node current = root;
+        String[] pathStrings = path.split("/");
 
-        String[] parts = splitPath(path);
-
-        for(String part: parts)
+        Node cur = root;
+        for(int i = 0; i < pathStrings.length; i++)
         {
-            current = current.children.get(part);
-            if(current == null)
+            String s = pathStrings[i];
+            if(cur.containsKey(s))
+            {
+                cur = cur.getKey(s);
+            }
+            else
             {
                 return null;
             }
         }
-        return current;
+        return cur;
     }
 
 
-    private String[] splitPath(String path)
-    {
-        // Root/empty path has no components -> return an empty array so
-        // findNode() lands on root itself (getSize("/") = whole-tree total).
-        // Without this, "".split("/") yields [""], and findNode looks up a
-        // child named "" and wrongly returns null.
-        if (path == null || path.isEmpty() || path.equals("/")) {
-            return new String[0];
-        }
 
-        String cleanPath = (path.charAt(0) == '/')? path.substring(1):path;
-        // split() takes a String regex, not a char literal: use "/" not '/'.
-        return cleanPath.split("/");
-    }
 
     // ---------------------------------------------------------------------
     // Quick self-test.

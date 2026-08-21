@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 21 / 56.**
+**Revised: 22 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -92,7 +92,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 7 | ☑ | Merge orderings via topological sort |
 | 8 | ☑ | Character order from pairs |
 | 9 | ☑ | Recursive placeholder substitution |
-| 10 | ☐ | Filesystem / path hierarchy |
+| 10 | ☑ | Filesystem / path hierarchy |
 | 11 | ☑ | Max common prefix across files |
 | 12 | ☐ | Longest increasing subsequence, adjacent diff |
 | 13 | ☑ | Top K from a stream |
@@ -170,6 +170,21 @@ What's correct:
 - Weighted queue entries are `(long distance, node)`. Skip stale entries, keep relaxation arithmetic in `long`, and use one shared unreachable sentinel with overflow-safe addition.
 - Both variants run in O((V + E) log V) or better: O(V + E) for the unweighted BFS version and O((V + E) log V) for the weighted Dijkstra version, with O(V + E) space.
 - Verified the unweighted solution over 137,341 cases against a brute-force selected-edge-subset oracle. Verified the weighted solution over 13,669 targeted, exhaustive, and randomized cases against an independent minimum-cost selected-edge-subset oracle, including costs above `Integer.MAX_VALUE` and the old `1e12` sentinel.
+
+**#10 — Filesystem path hierarchy (path trie + cached subtree sizes)**
+
+Mistakes made:
+- Initially assigned a new file's size directly and then applied the same delta to every node on the complete path, including the file node, so file sizes were counted twice.
+- Root deletion used the normal parent-unlink path, which tried to access a nonexistent parent and threw an index error.
+- Initially identified a directory only by whether it currently had children, allowing an empty directory to be silently converted into a file.
+- The first rewrite exposed the operations only as private methods, preventing normal callers from using the filesystem API.
+
+What's correct:
+- Represent path components as a trie and cache each node's complete subtree size. Adding or overwriting a file applies `newSize - oldSize` to every node from root through the file.
+- Removing a file or directory subtracts that node's cached subtree size from its ancestors and unlinks the entire subtree in O(P); removing `/` replaces the root with an empty directory.
+- File/directory identity is independent of child count: an existing empty directory cannot become a file, root cannot become a file, and attempting either invalid operation leaves state unchanged.
+- `addFile`, `removeFile`, and `getSize` each take O(P) time for P path components, with O(total path components) storage, assuming aggregate sizes fit in `int`.
+- Verified all 18 built-in scenarios plus 200,000 deterministic stateful operations and 9,654,232 full-state size comparisons against an independent flat file/directory model.
 
 **#13 — Top K from a stream (min-heap + frequency rankings)**
 
