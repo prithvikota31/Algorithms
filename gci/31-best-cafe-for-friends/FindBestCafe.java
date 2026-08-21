@@ -28,16 +28,16 @@
  * friends. e.g. friend distances [1, 10] -> multi-source BFS says 1, but the
  * fair score is 10. One shared visited[] loses the other friends' info.
  *
- * So: BFS separately FROM EACH FRIEND, and for each café keep
- *      maxDistance[cafe] = max(maxDistance[cafe], distFromThisFriend)
- * mark a café invalid the moment any friend can't reach it. Answer = valid café
- * with the smallest maxDistance.
+ * Assuming there are fewer cafés than friends, BFS separately FROM EACH CAFÉ.
+ * During that BFS, count reached friends and track the farthest one's distance.
+ * Reject a café unless every friend is reached. Among the remaining cafés,
+ * choose the one with the smallest farthest-friend distance.
  *
  * APPROACHES
  *   Brute force : enumerate paths / Floyd-Warshall O(V^3) — computes all-pairs
  *                 though we only care about friends x cafés.
- *   Optimal     : one BFS per friend, track per-café max (below).
- *                 Time O(F*(V+E) + F*C)   Space O(V + C)   (reuse dist[]).
+ *   Chosen      : one BFS per café because C < F.
+ *                 Time O(C*(V+E))   Space O(V+E).
  *
  * Memory trick: nearest source -> MIN; fair meeting place -> track the MAX,
  * then minimize it.
@@ -47,78 +47,91 @@
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
-import java.util.Queue;
 
 public class FindBestCafe {
-
+    // Assumption: cafés are fewer than friends, so BFS starts from each café.
     public int findBestCafe(int n, int[][] edges, int[] friends, int[] cafes) {
-        // Build the undirected graph.
         List<List<Integer>> graph = new ArrayList<>();
-        for (int node = 0; node < n; node++) {
+        for(int i = 0; i < n; i++)
+        {
             graph.add(new ArrayList<>());
         }
-        for (int[] edge : edges) {
-            graph.get(edge[0]).add(edge[1]);
-            graph.get(edge[1]).add(edge[0]);
+
+        for(int[] edge: edges)
+        {
+            int u = edge[0];
+            int v = edge[1];
+            graph.get(u).add(v);
+            graph.get(v).add(u);
         }
 
-        // maxDistance[i] = worst friend distance to cafes[i] so far;
-        // valid[i] = false once some friend cannot reach it.
-        int[] maxDistance = new int[cafes.length];
-        boolean[] valid = new boolean[cafes.length];
-        Arrays.fill(valid, true);
-
-        // One BFS per friend.
-        for (int friend : friends) {
-            int[] distance = bfs(friend, graph);
-
-            for (int i = 0; i < cafes.length; i++) {
-                if (!valid[i]) {
-                    continue;
-                }
-                int cafe = cafes[i];
-                if (distance[cafe] == -1) {
-                    valid[i] = false;                 // this friend can't reach it
-                } else {
-                    maxDistance[i] = Math.max(maxDistance[i], distance[cafe]);
-                }
-            }
+        int[] friendMap = new int[n];
+        for(int i = 0; i < friends.length; i++)
+        {
+            int index = friends[i];
+            friendMap[index] = 1;
         }
-
-        // Pick the valid café with the smallest worst-case distance.
+        //all 1s in friendMap are friends
         int bestCafe = -1;
-        int bestMaximumDistance = Integer.MAX_VALUE;
-        for (int i = 0; i < cafes.length; i++) {
-            if (valid[i] && maxDistance[i] < bestMaximumDistance) {
-                bestMaximumDistance = maxDistance[i];
-                bestCafe = cafes[i];
+        int bestDistance = Integer.MAX_VALUE;
+        for(int cafe: cafes)
+        {
+            int[] distanceAndFriendVisitedCount = bfs(graph, cafe, friendMap);
+            if(distanceAndFriendVisitedCount[1] != friends.length)
+            {
+                continue;
+            }
+
+            if(bestDistance > distanceAndFriendVisitedCount[0])
+            {
+                bestDistance = distanceAndFriendVisitedCount[0];
+                bestCafe = cafe;
             }
         }
+
         return bestCafe;
     }
 
-    private int[] bfs(int source, List<List<Integer>> graph) {
+    // Result contains maximum friend distance and visited friend count.
+    private int[] bfs(List<List<Integer>> graph, int cafe, int[] friendMap)
+    {
+        //lets start from cafe and when we visit friend increase the count
+        //finally save the maxdistance of friend and also did count == totalfriends
+        int tempFriendCount = 0;
         int[] distance = new int[graph.size()];
         Arrays.fill(distance, -1);
+        Deque<Integer> q = new ArrayDeque<>();
+        q.offer(cafe);
+        distance[cafe] = 0;
+        if(friendMap[cafe] == 1)
+        {
+            tempFriendCount++;
+        }
+        int maxFriendDistanceFromCafe = 0;
+        while(!q.isEmpty())
+        {
+            int cur = q.poll();
 
-        Queue<Integer> queue = new ArrayDeque<>();
-        distance[source] = 0;
-        queue.offer(source);
-
-        // Unweighted -> BFS gives shortest distances.
-        while (!queue.isEmpty()) {
-            int currentNode = queue.poll();
-            for (int neighbor : graph.get(currentNode)) {
-                if (distance[neighbor] == -1) {
-                    distance[neighbor] = distance[currentNode] + 1;
-                    queue.offer(neighbor);
+            for(int nei: graph.get(cur))
+            {
+                if(distance[nei] == -1)
+                {
+                    distance[nei] = 1 + distance[cur];
+                    if(friendMap[nei] == 1)
+                    {
+                        maxFriendDistanceFromCafe = Math.max(maxFriendDistanceFromCafe, distance[nei]);
+                        tempFriendCount++;
+                    }
+                    q.offer(nei);
                 }
             }
         }
-        return distance;
-    }
 
+        return new int[]{maxFriendDistanceFromCafe, tempFriendCount};
+
+    }
     // ------------------------------------------------------------------
     // Quick self-test.
     // ------------------------------------------------------------------

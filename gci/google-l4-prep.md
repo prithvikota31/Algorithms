@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 24 / 56.**
+**Revised: 25 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -113,7 +113,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 28 | ☑ | Triples within max difference |
 | 29 | ☐ | Logger rate limiter |
 | 30 | ☐ | Music shuffler with no repeat in K |
-| 31 | ☐ | Best café for friends |
+| 31 | ☑ | Best café for friends |
 | 32 | ☐ | Movie similarity Top N |
 | 33 | ☐ | Teleporter shortest path |
 | 34 | ☐ | Currency arbitrage |
@@ -402,6 +402,21 @@ What's correct:
 - Count index triples, not distinct value triples. Keep the total and each computed upper bound in `long` so duplicates and integer boundaries remain correct.
 - The follow-up uses the same three passes and ranges, but emits every index combination instead of multiplying range lengths. Its time is O(A + B + C + T) and output space is O(T), where T is the number of returned triples.
 - Verified the count API with 6 targeted cases and 20,000 randomized arrays against a cubic oracle. Verified both count and returned index triples over another 10,000 randomized cases, including duplicates, negatives, empty arrays, ties, and integer boundaries.
+
+**#31 — Best café for friends (BFS from each café)**
+
+Mistakes made:
+- Initially misspelled `Deque`, omitted its import, and called `isEmpty()` with the wrong capitalization, so the rewrite did not compile.
+- Initially reversed the best-distance comparison, which would replace a better café only when the new maximum distance was larger.
+- Initialized the farthest-friend distance to -1. This preserved the chosen café for nonempty distinct friends, but 0 is the true score when the café itself is the only friend.
+- The header still described BFS from each friend even though the rewrite intentionally runs BFS from each café.
+
+What's correct:
+- In an undirected graph, distance is symmetric. A BFS from one café therefore gives that café's shortest distance to every reachable friend.
+- During each BFS, count reached friend nodes and track their maximum distance. A café is valid only when the count equals the number of distinct friends.
+- Choose the valid café with the smallest maximum distance. Strict improvement means the first café in the input wins a tie.
+- Under the stated assumption that there are C cafés and C < F friends, the solution runs in O(C(V + E)) time and O(V + E) space, including the graph.
+- Verified all 3 built-in cases, a targeted café-at-friend case, and 20,000 randomized graphs against an independent Floyd-Warshall oracle, including 17,455 cases where a café was also a friend node.
 
 ---
 
