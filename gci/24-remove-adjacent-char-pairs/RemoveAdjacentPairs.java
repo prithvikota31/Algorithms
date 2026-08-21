@@ -40,22 +40,33 @@
 public class RemoveAdjacentPairs {
 
     public String makeGood(String s) {
-        StringBuilder stack = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-        for (char current : s.toCharArray()) {
-            if (stack.length() > 0 && isOppositeCase(stack.charAt(stack.length() - 1), current)) {
-                stack.deleteCharAt(stack.length() - 1);
-            } else {
-                stack.append(current);
+        for(int i = 0; i < s.length(); i++)
+        {
+            char curChar = s.charAt(i);
+            if(sb.length() != 0)
+            {
+                char lastChar = sb.charAt(sb.length() - 1);
+                if(isOppositeCase(curChar, lastChar))
+                {
+                    sb.deleteCharAt(sb.length() - 1);
+                    continue;
+                }
             }
+            sb.append(curChar);
+
         }
+        return sb.toString();
 
-        return stack.toString();
     }
 
-    private boolean isOppositeCase(char a, char b) {
-        return Math.abs(a - b) == Math.abs('A' - 'a');
+    private boolean isOppositeCase(char c1, char c2)
+    {
+        return Math.abs('a' - 'A') == Math.abs(c1 - c2);
     }
+
+
 
     public static void main(String[] args) {
         RemoveAdjacentPairs sol = new RemoveAdjacentPairs();
