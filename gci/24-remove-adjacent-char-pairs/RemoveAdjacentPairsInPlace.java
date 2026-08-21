@@ -40,7 +40,7 @@ public class RemoveAdjacentPairsInPlace {
     public String makeGood(String s) {
         char[] chars = s.toCharArray();
         int top = 0;
-        //top gives last correct position on the char Array
+        //So think of top as next free index, not the index of the last valid character.
         //aAbcCdeFf
         for(int i = 0; i < chars.length; i++)
         {
