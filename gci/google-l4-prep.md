@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 22 / 56.**
+**Revised: 23 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -105,7 +105,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 20 | ☑ | Connected components of 1-nodes in a binary tree |
 | 21 | ☐ | Rectangle from 2D points |
 | 22 | ☐ | Vertical line splitting rectangle area |
-| 23 | ☐ | Longest non-decreasing subarray |
+| 23 | ☑ | Longest non-decreasing subarray |
 | 24 | ☐ | Remove adjacent character pairs |
 | 25 | ☐ | Subsequence dictionary match |
 | 26 | ☑ | Array jump — take or skip |
@@ -185,6 +185,21 @@ What's correct:
 - File/directory identity is independent of child count: an existing empty directory cannot become a file, root cannot become a file, and attempting either invalid operation leaves state unchanged.
 - `addFile`, `removeFile`, and `getSize` each take O(P) time for P path components, with O(total path components) storage, assuming aggregate sizes fit in `int`.
 - Verified all 18 built-in scenarios plus 200,000 deterministic stateful operations and 9,654,232 full-state size comparisons against an independent flat file/directory model.
+
+**#23 — Longest non-decreasing contiguous subarray (one pass + one-change prefix/suffix runs)**
+
+Mistakes made:
+- In the base rewrite, initially incremented an undefined loop variable instead of the right endpoint and returned 1 for an empty array before adding the null/empty guard.
+- In the follow-up, initially compared uninitialized `end` and `start` lengths instead of adjacent input values while constructing the two run arrays.
+- Initially omitted null, empty, and short-array guards, so singleton input indexed beyond the array.
+- Initially joined both neighboring runs without checking whether one integer could sit between them; after adding that bridge condition, considered only a full bridge and missed changing an interior value to attach to just one side.
+
+What's correct:
+- The base scan tracks the start of the current valid run; a decrease resets that start, while every other pair extends the run. It takes O(N) time and O(1) space.
+- For the follow-up, `end[i]` stores the non-decreasing run ending at i and `start[i]` stores the run starting at i.
+- Changing index i can attach to the left run, attach to the right run, or bridge both only when `nums[i - 1] <= nums[i + 1]`. Taking the best over all indices covers changing at most one value.
+- The follow-up takes O(N) time and O(N) space.
+- Verified both methods on all 11 built-ins, 97,657 exhaustive arrays, 5 targeted boundary cases, and 10,000 full-range randomized arrays against independent direct-run and explicit-replacement oracles.
 
 **#13 — Top K from a stream (min-heap + frequency rankings)**
 

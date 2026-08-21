@@ -45,24 +45,20 @@
 public class LongestNonDecreasingSubarray {
 
     public int longestNonDecreasingSubarray(int[] nums) {
+        //2, 3, 4, 4, 5, 3, 3, 4
         if (nums == null || nums.length == 0) {
             return 0;
         }
-
-        int startIndex = 0;
         int maxLength = 1;
+        int start = 0;
 
-        for (int endIndex = 1; endIndex < nums.length; endIndex++) {
-
-            // The current pair breaks non-decreasing order. Since the result
-            // must be contiguous, start a new run here.
-            if (nums[endIndex] < nums[endIndex - 1]) {
-                startIndex = endIndex;
+        for(int end = 1; end < nums.length; end++)
+        {
+            if(nums[end] < nums[end - 1])
+            {
+                start = end;
             }
-
-            // nums[startIndex ... endIndex] is currently non-decreasing.
-            int currentLength = endIndex - startIndex + 1;
-            maxLength = Math.max(maxLength, currentLength);
+            maxLength = Math.max(maxLength, end - start + 1);
         }
 
         return maxLength;
@@ -90,29 +86,27 @@ public class LongestNonDecreasingSubarray {
      * ------------------------------------------------------------------------
      */
     public int longestAfterOneChange(int[] nums) {
-        // TODO:
-        //  1. handle null / short arrays (length <= 2 -> whole array works).
-        //  2. build left[]  : left[i]  = (nums[i] >= nums[i-1]) ? left[i-1]+1 : 1
-        //  3. build right[] : right[i] = (nums[i] <= nums[i+1]) ? right[i+1]+1 : 1
-        //  4. for each i: best = max(left[i-1]+1, 1+right[i+1], and bridge
-        //     left[i-1]+1+right[i+1] when nums[i-1] <= nums[i+1]); guard ends.
-        //  5. return the running max.
+        //so think of every index in a way that it can be changed
+        //so calculate the longestSubArray till indice ending before I
+        // and indie starting after i''
         if (nums == null || nums.length == 0) {
             return 0;
         }
-        int n = nums.length;
-        if (n <= 2) {
-            return n;
+        if (nums.length <= 2) {
+            return nums.length;
         }
-        int[] end = new int[n]; //end[i], max subarray length ending at i
-        int[] start = new int[n]; //max subarray length starting at i
+        int n = nums.length;
+        int[] start = new int[n];
+        int[] end = new int[n];
 
+        //first lets fill end array
+        //end[i] represents subarray ending at I
         end[0] = 1;
         for(int i = 1; i < n; i++)
         {
             if(nums[i] >= nums[i - 1])
             {
-                end[i] = end[i - 1] + 1;
+                end[i] = 1 + end[i - 1];
             }
             else
             {
@@ -125,7 +119,7 @@ public class LongestNonDecreasingSubarray {
         {
             if(nums[i] <= nums[i + 1])
             {
-                start[i] = start[i + 1] + 1;
+                start[i] = 1 + start[i + 1];
             }
             else
             {
@@ -133,23 +127,29 @@ public class LongestNonDecreasingSubarray {
             }
         }
 
-    int ans = 1;
-    for (int i = 0; i < n; i++) {
-        int left = (i - 1 >= 0) ? end[i - 1] : 0;   // run just left of i
-        int right = (i + 1 < n) ? start[i + 1] : 0; // run just right of i
+        //for every i try to compute 1 + end[i - 1] + start[i + 1]
+        //with small indice out of bound check
+        int max = 1;
+        for(int i = 1; i <= n - 2; i++)
+        {
+            if(nums[i -1] <= nums[i + 1])
+            {
+                max = Math.max(max, 1 + end[i - 1] + start[i + 1]);
+            }
+            else
+            {
+                max = Math.max(max, 1 + Math.max(start[i + 1], end[i - 1]));
 
-        int best;
-        // Bridge both sides only if a single value can sit between them.
-        if (i - 1 >= 0 && i + 1 < n && nums[i - 1] <= nums[i + 1]) {
-            best = left + 1 + right;
-        } else {
-            // Otherwise attach the changed element to whichever side is longer.
-            best = Math.max(left + 1, right + 1);
+            }
         }
-        ans = Math.max(ans, best);
-    }
 
-    return ans;
+        max = Math.max(max, 1 + start[1]);
+
+
+        max = Math.max(max, 1 + end[n - 2]);
+        
+        return max;
+
     }
 
     // ------------------------------------------------------------------
