@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 /*
@@ -57,46 +56,60 @@ public class TeleporterShortestPath {
 
     public List<Integer> findShortestPath(int numberOfTeleporters, List<List<Integer>> connections,
             Set<Integer> brokenTeleporters, int source, int destination) {
-        if (source < 0 || source >= numberOfTeleporters
-                || destination < 0 || destination >= numberOfTeleporters
-                || brokenTeleporters.contains(source)
-                || brokenTeleporters.contains(destination)) {
+        if(brokenTeleporters.contains(source) || brokenTeleporters.contains(destination))
+        {
             return new ArrayList<>();
         }
-        if (source == destination) {
-            return new ArrayList<>(List.of(source));
+        if(source == destination)
+        {
+            return Arrays.asList(source);
         }
+        int[] distance = new int[numberOfTeleporters];
 
-        boolean[] visited = new boolean[numberOfTeleporters];
-        // Sentinel: parent[i] == i means "no real parent yet" (only ever
-        // true for the source, since nothing else keeps its self-loop).
+        Arrays.fill(distance, -1);
+        Deque<Integer> q = new ArrayDeque<>();
+        q.offer(source);
         int[] parent = new int[numberOfTeleporters];
-        for (int i = 0; i < numberOfTeleporters; i++) {
-            parent[i] = i;
-        }
+        parent[source] = source;
+        distance[source] = 0;
+        
 
-        Queue<Integer> queue = new ArrayDeque<>();
-        queue.offer(source);
-        visited[source] = true;
+        while(!q.isEmpty())
+        {
+            int cur = q.poll();
 
-        while (!queue.isEmpty()) {
-            int current = queue.poll();
-            if (current == destination) {
-                return buildPath(parent, destination);
+            if(cur == destination)
+            {
+                break;
             }
-
-            for (int neighbor : connections.get(current)) {
-                if (brokenTeleporters.contains(neighbor) || visited[neighbor]) {
-                    continue;
+            for(int nei: connections.get(cur))
+            {
+                if(distance[nei] == -1 && !brokenTeleporters.contains(nei))
+                {
+                    parent[nei] = cur;
+                    distance[nei] = distance[cur] + 1;
+                    q.offer(nei);
                 }
-
-                visited[neighbor] = true;
-                parent[neighbor] = current;
-                queue.offer(neighbor);
             }
         }
 
-        return new ArrayList<>();
+        List<Integer> result = new ArrayList<>();
+        if(distance[destination] == -1)
+        {
+            return result;
+        }
+
+        int cur = destination;
+        while(parent[cur] != cur)
+        {
+            result.add(cur);
+            cur = parent[cur];
+        }
+        result.add(source);
+        Collections.reverse(result);
+        return result;
+
+        
     }
 
     /*
@@ -123,76 +136,74 @@ public class TeleporterShortestPath {
      */
     public enum Status { WORKING, PARTIALLY_REPAIRED, BROKEN }
 
-    public List<Integer> findMinRepairDaysPath(int numberOfTeleporters, List<List<Integer>> connections,
+    public List<Integer> findMinRepairDaysPath(int numberOfTeleporters, List<List<Integer>> graph,
             Status[] status, int source, int destination) {
-        if (source < 0 || source >= numberOfTeleporters
-                || destination < 0 || destination >= numberOfTeleporters
-                || status[source] == Status.BROKEN || status[destination] == Status.BROKEN) {
+        if(status[source] == Status.BROKEN || status[destination] == Status.BROKEN)
+        {
             return new ArrayList<>();
         }
-        if (source == destination) {
-            return new ArrayList<>(List.of(source));
+        if(source == destination)
+        {
+            return Arrays.asList(source);
         }
 
+
+        Deque<Integer> q = new ArrayDeque<>();
+        q.offer(source);
         int[] dist = new int[numberOfTeleporters];
-        Arrays.fill(dist, Integer.MAX_VALUE);
         int[] parent = new int[numberOfTeleporters];
-        for (int i = 0; i < numberOfTeleporters; i++) {
-            parent[i] = i;
-        }
-        boolean[] finalized = new boolean[numberOfTeleporters];
-
-        Deque<Integer> deque = new ArrayDeque<>();
+        Arrays.fill(parent, -1);
+        Arrays.fill(dist, Integer.MAX_VALUE);
         dist[source] = 0;
-        deque.offerFirst(source);
+        parent[source] = source;
+        while(!q.isEmpty())
+        {
+            int cur = q.poll();
 
-        while (!deque.isEmpty()) {
-            int current = deque.pollFirst();
-            if (finalized[current]) {
-                continue;
+            if(cur == destination)
+            {
+                break;
             }
-            finalized[current] = true;
+            //calculate cost to leave from current pos
+            int costToLeaveCur = status[cur] == Status.PARTIALLY_REPAIRED? 1 : 0;
 
-            // Cost of leaving `current`, charged on every edge out of it.
-            int leavingCost = status[current] == Status.PARTIALLY_REPAIRED ? 1 : 0;
-
-            for (int neighbor : connections.get(current)) {
-                if (status[neighbor] == Status.BROKEN) {
-                    continue;
-                }
-                int newDist = dist[current] + leavingCost;
-                if (newDist < dist[neighbor]) {
-                    dist[neighbor] = newDist;
-                    parent[neighbor] = current;
-                    if (leavingCost == 0) {
-                        deque.offerFirst(neighbor);
-                    } else {
-                        deque.offerLast(neighbor);
+            for(int nei: graph.get(cur))
+            {
+                if(status[nei] != Status.BROKEN)
+                {
+                    if(dist[cur] + costToLeaveCur < dist[nei])
+                    {
+                        dist[nei] = dist[cur] + costToLeaveCur;
+                        parent[nei] = cur;
+                        if(costToLeaveCur == 0)
+                        {
+                            q.offerFirst(nei);
+                        }
+                        else
+                        {
+                            q.offerLast(nei);
+                        }
                     }
                 }
             }
-        }
 
-        if (dist[destination] == Integer.MAX_VALUE) {
-            return new ArrayList<>();
         }
-        return buildPath(parent, destination);
-    }
+        List<Integer> result = new ArrayList<>();
 
-    // Reconstructs destination -> ... -> source via parent pointers, then
-    // reverses to source -> ... -> destination.
-    private List<Integer> buildPath(int[] parent, int destination) {
-        List<Integer> path = new ArrayList<>();
-        int current = destination;
-        while (true) {
-            path.add(current);
-            if (parent[current] == current) {
-                break;
-            }
-            current = parent[current];
+        if(dist[destination] == Integer.MAX_VALUE)
+        {
+            return result;
         }
-        Collections.reverse(path);
-        return path;
+        int cur = destination;
+        while(parent[cur] != cur)
+        {
+            result.add(cur);
+            cur = parent[cur];
+        }
+        result.add(cur);
+        Collections.reverse(result);
+        return result;
+
     }
 
     public static void main(String[] args) {

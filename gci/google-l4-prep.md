@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 25 / 56.**
+**Revised: 26 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -115,7 +115,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 30 | ☐ | Music shuffler with no repeat in K |
 | 31 | ☑ | Best café for friends |
 | 32 | ☐ | Movie similarity Top N |
-| 33 | ☐ | Teleporter shortest path |
+| 33 | ☑ | Teleporter shortest path |
 | 34 | ☐ | Currency arbitrage |
 | 35 | ☐ | Broadcast signal propagation |
 | 36 | ☐ | Dependency cycles (SCC) |
@@ -417,6 +417,23 @@ What's correct:
 - Choose the valid café with the smallest maximum distance. Strict improvement means the first café in the input wins a tie.
 - Under the stated assumption that there are C cafés and C < F friends, the solution runs in O(C(V + E)) time and O(V + E) space, including the graph.
 - Verified all 3 built-in cases, a targeted café-at-friend case, and 20,000 randomized graphs against an independent Floyd-Warshall oracle, including 17,455 cases where a café was also a friend node.
+
+**#33 — Shortest path through teleporters (BFS + 0-1 BFS)**
+
+Mistakes made:
+- In the base rewrite, initially called `isEmpty()` with the wrong capitalization and read neighbors from an undefined `graph` variable instead of the `connections` parameter.
+- Initially checked `source == destination` before rejecting broken endpoints, which returned a path containing a broken teleporter when both endpoints were the same node.
+- Misspelled `ArrayList` while adding the broken-endpoint guard, so the base method did not compile.
+- In the 0-1 BFS follow-up, initially used malformed or unqualified enum constants and assigned `distance[source]` even though the array was named `dist`.
+- The first follow-up draft updated the parent and deque but not `dist[neighbor]`. Without recording the better cost, the same node still appears infinitely expensive and can be enqueued repeatedly.
+
+What's correct:
+- In the base problem every usable directed edge costs one, so ordinary BFS discovers each teleporter through a minimum-hop path. Parent pointers reconstruct that path backward.
+- Broken teleporters are excluded entirely. A broken source or destination is rejected before handling the zero-edge `source == destination` case.
+- In the follow-up, leaving a working teleporter costs 0 and leaving a partially repaired teleporter costs 1. The destination itself is not charged because the route never leaves it.
+- A successful relaxation must update both `dist[neighbor]` and `parent[neighbor]`. A 0-cost move goes to the deque front because its total cost is unchanged; a 1-cost move goes to the back because every unchanged-cost candidate should run first.
+- Both methods run in O(V + E) time and O(V) auxiliary space for valid graph inputs.
+- Verified the base with all 4 built-in cases, a targeted broken-source case, and 20,000 randomized directed graphs against a Floyd-Warshall oracle. Verified the follow-up with its built-in case and 20,000 randomized 0/1 graphs against an independent Dijkstra oracle, checking path legality and total repair cost.
 
 ---
 
