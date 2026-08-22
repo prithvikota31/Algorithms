@@ -77,13 +77,12 @@
 
 ## Revision Tracker (Phase 1)
 
-Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
+Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 27 / 56.**
+**Revised: 27 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
-| 1 | ☐ | Nested function expression evaluation |
 | 2 | ☑ | Grid source-to-target reachability |
 | 3 | ☑ | Multi-source BFS — distance to nearest source |
 | 4 | ☑ | Router signal propagation |
@@ -99,7 +98,6 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 14 | ☑ | Move pieces to string (`L`/`R`/`_`) |
 | 15 | ☐ | Interval overlap progression |
 | 16 | ☐ | Product over last K of a stream |
-| 17 | ☐ | Infix / postfix expression evaluation |
 | 18 | ☑ | Merge two N-ary trees |
 | 19 | ☑ | Tree leaves with max ancestor |
 | 20 | ☑ | Connected components of 1-nodes in a binary tree |
@@ -118,7 +116,6 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 33 | ☑ | Teleporter shortest path |
 | 34 | ☐ | Currency arbitrage |
 | 35 | ☑ | Broadcast signal propagation |
-| 36 | ☐ | Dependency cycles (SCC) |
 | 37 | ☐ | Recipes from supplies |
 | 38 | ☐ | Sentence similarity (transitive) |
 | 39 | ☐ | Sequence reconstruction |
@@ -130,12 +127,9 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 45 | ☑ | Count connected 1-components |
 | 46 | ☑ | Largest connected 1-component |
 | 47 | ☑ | Best root for a binary tree |
-| 48 | ☐ | Reroot tree with color constraints |
 | 49 | ☑ | Mouse jump max score |
 | 50 | ☐ | F1 single-tyre race time |
 | 51 | ☐ | F1 tyre-change DP |
-| 52 | ☐ | Microwave keypad target time |
-| 53 | ☐ | Count squares from segments |
 | 54 | ☐ | Vertical area split |
 | 55 | ☐ | Rectangle exists (incremental) |
 | 56 | ☐ | Max rectangle area |
