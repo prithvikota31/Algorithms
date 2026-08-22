@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file.
 
-**Revised: 26 / 56.**
+**Revised: 27 / 56.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -117,7 +117,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 32 | ☐ | Movie similarity Top N |
 | 33 | ☑ | Teleporter shortest path |
 | 34 | ☐ | Currency arbitrage |
-| 35 | ☐ | Broadcast signal propagation |
+| 35 | ☑ | Broadcast signal propagation |
 | 36 | ☐ | Dependency cycles (SCC) |
 | 37 | ☐ | Recipes from supplies |
 | 38 | ☐ | Sentence similarity (transitive) |
@@ -434,6 +434,21 @@ What's correct:
 - A successful relaxation must update both `dist[neighbor]` and `parent[neighbor]`. A 0-cost move goes to the deque front because its total cost is unchanged; a 1-cost move goes to the back because every unchanged-cost candidate should run first.
 - Both methods run in O(V + E) time and O(V) auxiliary space for valid graph inputs.
 - Verified the base with all 4 built-in cases, a targeted broken-source case, and 20,000 randomized directed graphs against a Floyd-Warshall oracle. Verified the follow-up with its built-in case and 20,000 randomized 0/1 graphs against an independent Dijkstra oracle, checking path legality and total repair cost.
+
+**#35 — Broadcast signal propagation (directed graph + DFS)**
+
+Mistakes made:
+- Initially created an empty adjacency list inside `maximumReach` instead of calling `buildReachabilityGraph`, so DFS had no node lists to traverse.
+- Declared the DFS visited state as `int[]` while assigning and testing boolean values, so the rewrite did not compile.
+- Initially calculated coordinate differences and squares as `int`, so overflow could create false reachability edges. A coordinate gap of 65,536 squared to zero and incorrectly connected two transmitters.
+
+What's correct:
+- Each ordered pair `(i, j)` is checked separately because reachability is directed. The edge `i -> j` depends only on transmitter `i`'s radius.
+- Squared-distance arithmetic uses `long` before subtraction and multiplication, avoiding square roots and ordinary `int` overflow.
+- Build the directed graph once. Then run DFS from every possible starting transmitter with a fresh visited array and keep the largest reached count.
+- Mark a node visited before recursing. This terminates cycles and ensures every activated transmitter is counted or collected exactly once.
+- The follow-up uses the same graph and DFS but collects visited indices instead of only returning their count.
+- The solution runs in O(N^3) worst-case time and O(N^2) space. Verified all 12 built-in DFS/BFS cases, the overflow boundary, 20,000 randomized maximum-reach cases, and 20,000 randomized collection cases against independent geometric BFS oracles.
 
 ---
 

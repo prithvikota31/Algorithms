@@ -59,18 +59,16 @@ public class BroadcastSignalPropagation {
 
     public int maximumReach(int[][] transmitters) {
         int n = transmitters.length;
-        if (n == 0) {
-            return 0;
-        }
+        
+        int maxReach = 0;
 
         List<List<Integer>> graph = buildReachabilityGraph(transmitters);
-
-        int maxReached = 0;
-        for (int start = 0; start < n; start++) {
+        for(int i = 0; i < n; i++)
+        {
             boolean[] visited = new boolean[n];
-            maxReached = Math.max(maxReached, dfsCount(start, graph, visited));
+            maxReach = Math.max(maxReach, dfsCount(graph, i, visited));
         }
-        return maxReached;
+        return maxReach;
     }
 
     /*
@@ -99,25 +97,32 @@ public class BroadcastSignalPropagation {
     private List<List<Integer>> buildReachabilityGraph(int[][] transmitters) {
         int n = transmitters.length;
         List<List<Integer>> graph = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
+        for(int i = 0; i < n; i++)
+        {
             graph.add(new ArrayList<>());
         }
 
-        for (int i = 0; i < n; i++) {
-            long x1 = transmitters[i][0];
-            long y1 = transmitters[i][1];
-            long radius = transmitters[i][2];
-
-            for (int j = 0; j < n; j++) {
-                if (i == j) {
+        //each node is indice of transmitter
+        //lets design a graph out of it
+        for(int i = 0; i < n; i++)
+        {
+            for(int j = 0; j < n; j++)
+            {
+                if(i == j)
+                {
                     continue;
                 }
+                //always check from i to j it will suffice to build graph for the current
+                //iteration setting
+                int[] ti = transmitters[i];
+                int[] tj = transmitters[j];
 
-                long dx = x1 - transmitters[j][0];
-                long dy = y1 - transmitters[j][1];
-                long distanceSquared = dx * dx + dy * dy;
+                long delX = (long) ti[0] - tj[0];
+                long delY = (long) ti[1] - tj[1];
+                long range2 = (long) ti[2] * ti[2];
 
-                if (distanceSquared <= radius * radius) {
+                if(delX * delX + delY * delY <= range2)
+                {
                     graph.get(i).add(j);
                 }
             }
@@ -126,24 +131,32 @@ public class BroadcastSignalPropagation {
         return graph;
     }
 
-    private int dfsCount(int current, List<List<Integer>> graph, boolean[] visited) {
-        visited[current] = true;
+
+    //dfsCount(graph, i, visited)
+    private int dfsCount(List<List<Integer>> graph, int node, boolean[] visited)
+    {   
+        visited[node] = true;
         int count = 1;
-        for (int neighbor : graph.get(current)) {
-            if (!visited[neighbor]) {
-                count += dfsCount(neighbor, graph, visited);
+        for(int nei: graph.get(node))
+        {
+            if(!visited[nei])
+            {
+                count += dfsCount(graph, nei, visited);
             }
         }
         return count;
+
     }
 
     private void dfsCollect(int current, List<List<Integer>> graph, boolean[] visited,
             List<Integer> reached) {
         visited[current] = true;
         reached.add(current);
-        for (int neighbor : graph.get(current)) {
-            if (!visited[neighbor]) {
-                dfsCollect(neighbor, graph, visited, reached);
+        for(int nei: graph.get(current))
+        {
+            if(!visited[nei])
+            {
+                dfsCollect(nei, graph, visited, reached);
             }
         }
     }
