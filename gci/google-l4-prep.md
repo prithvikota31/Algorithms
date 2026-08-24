@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 28 / 49.**
+**Revised: 29 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -119,7 +119,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 37 | ☐ | Recipes from supplies |
 | 38 | ☐ | Sentence similarity (transitive) |
 | 39 | ☑ | Sequence reconstruction |
-| 40 | ☐ | Token translator |
+| 40 | ☑ | Token translator |
 | 41 | ☐ | Build tree from parent-child pairs |
 | 42 | ☑ | Merge N-ary trees with conflict rules |
 | 43 | ☐ | Delete N-ary tree leaves |
@@ -457,6 +457,20 @@ What's correct:
 - An empty queue before all target values are processed identifies a cycle or incomplete reconstruction; multiple available nodes identify multiple valid orderings.
 - The solution runs in O(N + E) time and O(N + E) space for N target values and E unique constraints.
 - Verified all 9 built-in cases, 98,697 exhaustive directed-graph/target combinations through four nodes, and targeted duplicate-edge, known-singleton, and unknown-singleton cases against independent permutation enumeration.
+
+**#40 — Token translator (directed BFS + shortest-chain reconstruction)**
+
+Mistakes made:
+- The reachability rewrite initially iterated `graph.get(current)` directly, so an unknown or isolated source had no adjacency set and threw instead of returning false.
+- The path follow-up initially tried to construct an `ArrayList` from a single string and later returned booleans from a method whose result type is `List<String>`.
+- The first path-helper signature omitted the type of `target`, and the parent walk produced the chain backward from target to source before the final reversal was added.
+
+What's correct:
+- Transitive directed mappings are graph reachability. BFS with tokens marked visited when enqueued handles chains, diamonds, and legal mapping cycles in O(V + E) time.
+- Missing adjacency is an empty neighbor set, so an unknown or terminal-only source is simply an unreachable dead end unless source equals target.
+- For the path follow-up, the parent map also serves as visited state. BFS records the first parent of each token, which yields a shortest translation chain in an unweighted graph.
+- Map the source to itself as the reconstruction sentinel, walk from target through parents, then reverse the collected list to return source-to-target order.
+- Both APIs use O(V + E) space. Verified all 12 built-ins plus 74,460 exhaustive reachability checks and 74,460 shortest-path legality/optimality checks across every directed graph through four tokens, including unknown sources and duplicate mappings.
 
 ---
 

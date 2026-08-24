@@ -133,66 +133,60 @@ public class Translator {
             List<List<String>> mappings,
             String source,
             String target) {
-
-        if (source.equals(target)) {
+        if(source.equals(target))
+        {
             return List.of(source);
         }
 
-        Map<String, Set<String>> graph = buildGraph(mappings);
+        Map<String, Set<String>> graph = new HashMap<>();
+        for(List<String> mapping: mappings)
+        {
+            String u = mapping.get(0);
+            String v = mapping.get(1);
+            graph.computeIfAbsent(u, k -> new HashSet<>()).add(v);
+            graph.computeIfAbsent(v, k -> new HashSet<>());
+        }
 
-        // parent doubles as the visited set; source maps to null.
+        //we got a graph;
+        Deque<String> q = new ArrayDeque<>();
+        // Set<String> visited = new HashSet<>();
         Map<String, String> parent = new HashMap<>();
-        Queue<String> queue = new LinkedList<>();
+        // visited.add(source);
+        parent.put(source, source);
+        q.offer(source);
+        while(!q.isEmpty())
+        {
+            String cur = q.poll();
+            if(cur.equals(target))
+            {
+                return buildPath(parent, target);
+            }
 
-        queue.offer(source);
-        parent.put(source, null);
-
-        while (!queue.isEmpty()) {
-
-            String current = queue.poll();
-
-            for (String neighbor :
-                    graph.getOrDefault(current, Collections.emptySet())) {
-
-                if (parent.containsKey(neighbor)) {
-                    continue;
+            for(String nei: graph.getOrDefault(cur, Collections.emptySet()))
+            {
+                if(!parent.containsKey(nei))
+                {
+                    q.offer(nei);
+                    parent.put(nei, cur);
                 }
-
-                parent.put(neighbor, current);
-
-                if (neighbor.equals(target)) {
-                    return rebuildChain(parent, target);
-                }
-
-                queue.offer(neighbor);
             }
         }
-
-        return List.of();
+        return new ArrayList<>();
+        
     }
 
-    private Map<String, Set<String>> buildGraph(List<List<String>> mappings) {
-        Map<String, Set<String>> graph = new HashMap<>();
-
-        for (List<String> mapping : mappings) {
-            graph.computeIfAbsent(mapping.get(0), key -> new HashSet<>())
-                 .add(mapping.get(1));
+    private List<String> buildPath(Map<String, String> parent, String target)
+    {
+        String cur = target;
+        List<String> result = new ArrayList<>();
+        while(!parent.get(cur).equals(cur))
+        {
+            result.add(cur);
+            cur = parent.get(cur);
         }
-
-        return graph;
-    }
-
-    private List<String> rebuildChain(Map<String, String> parent, String target) {
-        List<String> chain = new ArrayList<>();
-        String current = target;
-
-        while (current != null) {
-            chain.add(current);
-            current = parent.get(current);
-        }
-
-        Collections.reverse(chain);
-        return chain;
+        result.add(cur);
+        Collections.reverse(result);
+        return result;
     }
 
     public static void main(String[] args) {
