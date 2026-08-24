@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 27 / 49.**
+**Revised: 28 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -118,7 +118,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 35 | ☑ | Broadcast signal propagation |
 | 37 | ☐ | Recipes from supplies |
 | 38 | ☐ | Sentence similarity (transitive) |
-| 39 | ☐ | Sequence reconstruction |
+| 39 | ☑ | Sequence reconstruction |
 | 40 | ☐ | Token translator |
 | 41 | ☐ | Build tree from parent-child pairs |
 | 42 | ☑ | Merge N-ary trees with conflict rules |
@@ -443,6 +443,20 @@ What's correct:
 - Mark a node visited before recursing. This terminates cycles and ensures every activated transmitter is counted or collected exactly once.
 - The follow-up uses the same graph and DFS but collects visited indices instead of only returning their count.
 - The solution runs in O(N^3) worst-case time and O(N^2) space. Verified all 12 built-in DFS/BFS cases, the overflow boundary, 20,000 randomized maximum-reach cases, and 20,000 randomized collection cases against independent geometric BFS oracles.
+
+**#39 — Sequence reconstruction (unique topological ordering)**
+
+Mistakes made:
+- Initially incremented indegree even when a duplicate edge was rejected by the adjacency set, so repeated constraints could leave a node permanently blocked.
+- Initially validated values only while processing adjacent pairs. An unknown value in a singleton sequence has no pair, so it was silently ignored and could incorrectly return true.
+
+What's correct:
+- Each adjacent pair in a subsequence is a directed ordering constraint. Deduplicate each edge and increment indegree only when the edge is newly inserted.
+- Validate every sequence value independently before constructing adjacent edges, including values in singleton sequences.
+- During Kahn's topological sort, the zero-indegree queue contains every legal next choice. It must contain exactly one node at every step, and that node must equal the next value in the target.
+- An empty queue before all target values are processed identifies a cycle or incomplete reconstruction; multiple available nodes identify multiple valid orderings.
+- The solution runs in O(N + E) time and O(N + E) space for N target values and E unique constraints.
+- Verified all 9 built-in cases, 98,697 exhaustive directed-graph/target combinations through four nodes, and targeted duplicate-edge, known-singleton, and unknown-singleton cases against independent permutation enumeration.
 
 ---
 

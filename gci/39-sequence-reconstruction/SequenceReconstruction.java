@@ -1,10 +1,4 @@
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 /*
  * ============================================================================
@@ -77,81 +71,79 @@ public class SequenceReconstruction {
             int[] nums,
             List<List<Integer>> sequences) {
 
+        int n = nums.length;
         Map<Integer, Set<Integer>> graph = new HashMap<>();
-        Map<Integer, Integer> indegree = new HashMap<>();
+        Map<Integer, Integer> inDegree = new HashMap<>();
 
-        // Initialize all numbers from the target.
-        for (int num : nums) {
-            graph.put(num, new HashSet<>());
-            indegree.put(num, 0);
+        for(int i = 0; i < n; i++)
+        {
+            graph.put(nums[i], new HashSet<>());
+            inDegree.put(nums[i], 0);
         }
 
-        // Build directed edges from every adjacent pair
-        // appearing inside each subsequence.
-        for (List<Integer> sequence : sequences) {
 
-            for (int num : sequence) {
-                if (!graph.containsKey(num)) {
+        for(int i = 0; i < sequences.size(); i++)
+        {
+            List<Integer> sequence = sequences.get(i);
+
+            for (int value : sequence) {
+                if (!graph.containsKey(value)) {
                     return false;
                 }
             }
+            for(int j = 0; j <= sequence.size() - 2; j++)
+            {
+                int u = sequence.get(j);
+                int v = sequence.get(j + 1);
 
-            for (int i = 1; i < sequence.size(); i++) {
+                if(!graph.containsKey(u) || !graph.containsKey(v))
+                {
+                    return false;        
+                }
 
-                int from = sequence.get(i - 1);
-                int to = sequence.get(i);
-
-                // Avoid counting the same edge twice.
-                if (graph.get(from).add(to)) {
-                    indegree.put(to, indegree.get(to) + 1);
+                boolean updateInDegree = graph.get(u).add(v);
+                if(updateInDegree)
+                {
+                    inDegree.put(v, inDegree.get(v) + 1);
                 }
             }
         }
 
-        Queue<Integer> queue = new LinkedList<>();
-
-        // All currently available nodes.
-        for (int num : nums) {
-            if (indegree.get(num) == 0) {
-                queue.offer(num);
+        Deque<Integer> q = new ArrayDeque<>();
+        for(int key: inDegree.keySet())
+        {
+            if(inDegree.get(key) == 0)
+            {
+                q.offer(key);
             }
         }
 
+        if(q.size() != 1)   return false;
         int index = 0;
+        while(!q.isEmpty())
+        {
+            if(q.size() != 1)   return false;
+            int cur = q.poll();
 
-        while (!queue.isEmpty()) {
-
-            // More than one choice means multiple valid
-            // topological orders exist.
-            if (queue.size() != 1) {
+            if(nums[index] != cur)
+            {
                 return false;
             }
-
-            int current = queue.poll();
-
-            // The unique order must exactly match nums.
-            if (index >= nums.length || current != nums[index]) {
-                return false;
-            }
-
             index++;
+            
+            for(int nei: graph.get(cur))
+            {
+                inDegree.put(nei, inDegree.get(nei) - 1);
 
-            // Remove current from the graph.
-            for (int neighbor : graph.get(current)) {
-
-                indegree.put(
-                    neighbor,
-                    indegree.get(neighbor) - 1
-                );
-
-                if (indegree.get(neighbor) == 0) {
-                    queue.offer(neighbor);
+                if(inDegree.get(nei) == 0)
+                {
+                    q.offer(nei);
+                    inDegree.remove(nei);
                 }
             }
         }
 
-        // Every target element must have been reconstructed.
-        return index == nums.length;
+        return index == n;      
     }
 
     public static void main(String[] args) {
