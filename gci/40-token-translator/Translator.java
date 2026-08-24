@@ -1,5 +1,7 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -84,47 +86,42 @@ public class Translator {
             String source,
             String target) {
 
-        // A token trivially translates to itself.
-        if (source.equals(target)) {
+        if(source.equals(target))
+        {
             return true;
         }
 
-        // Build the translation graph:
-        // graph[token] = tokens directly reachable from it.
         Map<String, Set<String>> graph = new HashMap<>();
-
-        for (List<String> mapping : mappings) {
-            String from = mapping.get(0);
-            String to = mapping.get(1);
-
-            graph.computeIfAbsent(from, key -> new HashSet<>())
-                 .add(to);
+        for(List<String> mapping: mappings)
+        {
+            String u = mapping.get(0);
+            String v = mapping.get(1);
+            graph.computeIfAbsent(u, k -> new HashSet<>()).add(v);
+            graph.computeIfAbsent(v, k -> new HashSet<>());
         }
 
-        // BFS explores every token reachable from source at most once.
-        Queue<String> queue = new LinkedList<>();
+        //we got a graph;
+        Deque<String> q = new ArrayDeque<>();
         Set<String> visited = new HashSet<>();
-
-        queue.offer(source);
         visited.add(source);
-
-        while (!queue.isEmpty()) {
-
-            String current = queue.poll();
-            if (current.equals(target)) {
+        q.offer(source);
+        while(!q.isEmpty())
+        {
+            String cur = q.poll();
+            if(cur.equals(target))
+            {
                 return true;
             }
 
-            for (String neighbor :
-                    graph.getOrDefault(current, Collections.emptySet())) {
-
-                // Mark when enqueuing so the same token is never queued twice.
-                if (visited.add(neighbor)) {
-                    queue.offer(neighbor);
+            for(String nei: graph.getOrDefault(cur, Collections.emptySet()))
+            {
+                if(!visited.contains(nei))
+                {
+                    q.offer(nei);
+                    visited.add(nei);
                 }
             }
         }
-
         return false;
     }
 
