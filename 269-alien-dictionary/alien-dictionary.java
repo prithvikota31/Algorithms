@@ -1,91 +1,84 @@
 class Solution {
     public String alienOrder(String[] words) {
+        //build an empty graph
+        //indegree and graph
+        Map<Character, Set<Character>> graph = new HashMap<>();
+        Map<Character, Integer> inDegree = new HashMap<>();
 
-        HashMap<Character, Integer> indegree = new HashMap<>();
-        HashMap<Character, Set<Character>> graph = new HashMap<>();
-
-        int l = words.length;
-
-        // create nodes in graph
-
-        for(String word : words)
+        for(String word: words)
         {
             for(int i = 0; i < word.length(); i++)
             {
-                graph.putIfAbsent(word.charAt(i), new HashSet<>());
-                indegree.putIfAbsent(word.charAt(i), 0);
-                
+                char ch = word.charAt(i);
+                graph.putIfAbsent(ch, new HashSet<>());
+                inDegree.putIfAbsent(ch, 0);
             }
         }
 
-        // iterate through words and fill both maps
-
-        for(int i = 0; i < l - 1; i++)
+        // now build graph
+        for(int i = 0; i <= words.length - 2; i++)
         {
             String w1 = words[i];
-            String w2 = words[i+1];
-
+            String w2 = words[i + 1];
+            //eg: abcd, ab
             if(w1.length() > w2.length() && w1.startsWith(w2))
             {
                 return "";
             }
 
-            int l1 = Math.min(w1.length(), w2.length());
-
-            for(int j = 0; j < l1; j++)
+            int minlen = Math.min(w1.length(), w2.length());
+            for(int j = 0; j < minlen; j++)
             {
                 char c1 = w1.charAt(j);
                 char c2 = w2.charAt(j);
-
                 if(c1 != c2)
                 {
-                    boolean added = graph.get(c1).add(c2);
-                    if(added)
+                    //check if already this edge is added
+                    boolean newlyAdded = graph.get(c1).add(c2);
+                    if(newlyAdded)
                     {
-                        indegree.put(c2, indegree.get(c2) + 1);
+                        inDegree.put(c2, inDegree.get(c2) + 1);
                     }
-                    
                     break;
                 }
             }
         }
+        //graph and indegree built
 
-        //take a queue for top sort
+        
+        //now kahns
+        Deque<Character> q = new ArrayDeque<>();
 
-        Queue<Character> q = new LinkedList<>();
-
-        StringBuilder sb = new StringBuilder();
-
-        for(char c : indegree.keySet())
+        for(char ch: inDegree.keySet())
         {
-            if(indegree.get(c) == 0)
+            int count = inDegree.get(ch);
+            if(count == 0)
             {
-                q.offer(c);
+                q.offer(ch);
             }
         }
-
+        StringBuilder topo = new StringBuilder();
         while(!q.isEmpty())
         {
-            char curr = q.poll();
+            char ch = q.poll();
+            topo.append(ch);
 
-            sb.append(curr);
-
-            for(char c : graph.get(curr))
+            for(char nei: graph.get(ch))
             {
-                indegree.put(c, indegree.get(c) - 1);
-                if(indegree.get(c) == 0)
+                inDegree.put(nei, inDegree.get(nei) - 1);
+                if(inDegree.get(nei) == 0)
                 {
-                    q.offer(c);
+                    q.offer(nei);
                 }
             }
         }
 
-        if(sb.length() != indegree.size())
+
+        if(topo.length() == inDegree.size())
         {
-            return "";
+            return topo.toString();
         }
 
-        return sb.toString();
-
+        return "";
     }
 }
