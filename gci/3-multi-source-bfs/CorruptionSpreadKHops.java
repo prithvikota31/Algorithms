@@ -59,88 +59,78 @@ public class CorruptionSpreadKHops {
             int[] corruptedServers,
             int k) {
 
+        // Build the undirected adjacency list.
         List<List<Integer>> graph = new ArrayList<>();
-        for(int i = 0; i < n; i++)
-        {
+        for (int node = 0; node < n; node++) {
             graph.add(new ArrayList<>());
         }
-        for(int[] edge: edges)
-        {
-            int u = edge[0];
-            int v = edge[1];
-            graph.get(u).add(v);
-            graph.get(v).add(u);
+        for (int[] edge : edges) {
+            int firstNode = edge[0];
+            int secondNode = edge[1];
+            graph.get(firstNode).add(secondNode);
+            graph.get(secondNode).add(firstNode);
         }
 
-        Deque<Integer> q = new ArrayDeque<>();
+        // Phase 1: multi-source BFS from every initially corrupted server.
+        // dangerDistance[node] == -1 means the node remains safe.
+        int[] dangerDistance = new int[n];
+        Arrays.fill(dangerDistance, -1);
 
-        int[] finalCorrupted = new int[n];
-        Arrays.fill(finalCorrupted, -1);
-        //anything which changes from -1 is corrupted
-
-        for(int corrupted: corruptedServers)
-        {
-            q.add(corrupted);
-            finalCorrupted[corrupted] = 0;
-        }
-
-        while(!q.isEmpty())
-        {
-            int cur = q.poll();
-
-            if(finalCorrupted[cur] > k)
-            {
-                break;
+        Deque<Integer> queue = new ArrayDeque<>();
+        for (int corruptedServer : corruptedServers) {
+            if (dangerDistance[corruptedServer] == -1) {
+                dangerDistance[corruptedServer] = 0;
+                queue.offer(corruptedServer);
             }
+        }
 
-            if(finalCorrupted[cur] == k)
-            {
+        while (!queue.isEmpty()) {
+            int currentNode = queue.poll();
+
+            // This node is blocked, but corruption cannot spread beyond K hops.
+            if (dangerDistance[currentNode] == k) {
                 continue;
             }
 
-            for(int i = 0; i < graph.get(cur).size(); i++)
-            {
-                int nei = graph.get(cur).get(i);
-                if(finalCorrupted[nei] == -1)
-                {
-                    finalCorrupted[nei] = finalCorrupted[cur] + 1;
-                    q.offer(nei);
+            for (int adjacentNode : graph.get(currentNode)) {
+                if (dangerDistance[adjacentNode] == -1) {
+                    dangerDistance[adjacentNode] = dangerDistance[currentNode] + 1;
+                    queue.offer(adjacentNode);
                 }
             }
         }
-        q.clear();
-        
-        if (finalCorrupted[source] != -1 ||
-        finalCorrupted[destination] != -1) {
+
+        // A path cannot begin or end on a blocked server.
+        if (dangerDistance[source] != -1
+                || dangerDistance[destination] != -1) {
             return -1;
         }
 
+        // Phase 2: ordinary BFS through safe servers only.
         int[] pathDistance = new int[n];
         Arrays.fill(pathDistance, -1);
 
-        q.offer(source);
+        queue.offer(source);
         pathDistance[source] = 0;
-        
 
-        while(!q.isEmpty())
-        {
-            int cur = q.poll();
-            if(cur == destination)
-            {
-                return pathDistance[cur];
+        while (!queue.isEmpty()) {
+            int currentNode = queue.poll();
+
+            if (currentNode == destination) {
+                return pathDistance[currentNode];
             }
 
-            for(int i = 0; i < graph.get(cur).size(); i++)
-            {
-                int nei = graph.get(cur).get(i);
+            for (int adjacentNode : graph.get(currentNode)) {
+                boolean isSafe = dangerDistance[adjacentNode] == -1;
+                boolean isUnvisited = pathDistance[adjacentNode] == -1;
 
-                if(finalCorrupted[nei] == -1 && pathDistance[nei] == -1)
-                {
-                    pathDistance[nei] = pathDistance[cur] + 1;
-                    q.offer(nei);
+                if (isSafe && isUnvisited) {
+                    pathDistance[adjacentNode] = pathDistance[currentNode] + 1;
+                    queue.offer(adjacentNode);
                 }
             }
         }
+
         return -1;
     }
 
