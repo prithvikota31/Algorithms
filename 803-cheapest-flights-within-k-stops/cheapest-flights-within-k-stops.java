@@ -1,80 +1,57 @@
-import java.util.*;
-
 class Solution {
-
-    public int findCheapestPrice(
-            int n,
-            int[][] flights,
-            int src,
-            int dst,
-            int k) {
-
-        List<List<int[]>> adj = new ArrayList<>();
-
-        for (int i = 0; i < n; i++) {
-            adj.add(new ArrayList<>());
-        }
-
-        for (int[] flight : flights) {
-
-            int from = flight[0];
-            int to = flight[1];
-            int price = flight[2];
-
-            adj.get(from).add(
-                new int[]{to, price}
-            );
+    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+        List<List<int[]>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++)
+        {
+            graph.add(new ArrayList<>());
         }
 
         int[] dist = new int[n];
-        Arrays.fill(dist, Integer.MAX_VALUE);
+        Arrays.fill(dist, (int)1e9);
+        for(int[] flight: flights)
+        {
+            int u = flight[0];
+            int v = flight[1];
+            int wt = flight[2];
+            graph.get(u).add(new int[]{v, wt});
+        }
 
         dist[src] = 0;
+        //k stops = k + 1 flights
+        //when we poll k + 1 usage break theloop
+        //flightsused, u, wt
+        Deque<int[]> q = new ArrayDeque<>();
+        q.offer(new int[]{0, src, 0});
+        while(!q.isEmpty())
+        {
+            int[] cur = q.poll();
+            int cFlightsUsed = cur[0];
+            int cNode = cur[1];
+            int cWeight = cur[2];
 
-        // {flightsUsed, node, cost}
-        Queue<int[]> queue = new ArrayDeque<>();
-
-        queue.offer(
-            new int[]{0, src, 0}
-        );
-
-        while (!queue.isEmpty()) {
-
-            int[] cur = queue.poll();
-
-            int flightsUsed = cur[0];
-            int node = cur[1];
-            int cost = cur[2];
-
-            // K stops = maximum K + 1 flights.
-            if (flightsUsed == k + 1) {
+            if(cFlightsUsed == k + 1)
+            {
                 break;
             }
 
-            for (int[] edge : adj.get(node)) {
+            for(int[] nei: graph.get(cNode))
+            {
+                int neiNode = nei[0];
+                int neiWt = nei[1];
 
-                int nei = edge[0];
-                int price = edge[1];
-
-                int newCost = cost + price;
-
-                if (newCost < dist[nei]) {
-
-                    dist[nei] = newCost;
-
-                    queue.offer(
-                        new int[]{
-                            flightsUsed + 1,
-                            nei,
-                            newCost
-                        }
-                    );
+                if(cWeight + neiWt < dist[neiNode])
+                {
+                    dist[neiNode] = cWeight + neiWt;
+                    q.offer(new int[]{cFlightsUsed + 1, neiNode, dist[neiNode]});
                 }
             }
+
         }
 
-        return dist[dst] == Integer.MAX_VALUE
-                ? -1
-                : dist[dst];
+        if(dist[dst] == (int)1e9)
+        {
+            return -1;
+        }
+        return dist[dst];
     }
 }
