@@ -40,7 +40,7 @@ import java.util.Arrays;
  */
 public class F1TyreChangeDP {
 
-    private static final long INF = Long.MAX_VALUE / 4;
+    private static final long INF = Long.MAX_VALUE;
 
     public long minimumFinishTime(int[][] tires, int changeTime, int numLaps) {
         if (numLaps <= 0) {
@@ -48,36 +48,45 @@ public class F1TyreChangeDP {
         }
         validateInput(tires, changeTime);
 
-        long[] bestStint = new long[numLaps + 1];
-        Arrays.fill(bestStint, INF);
+        // best[k] = minimum time to run k consecutive laps
+        // without changing the tyre.
+        long[] best = new long[numLaps + 1];
+        Arrays.fill(best, INF);
 
+        // Precompute best stint cost.
         for (int[] tire : tires) {
-            long currentLapTime = tire[0];
-            long totalTime = 0;
+            long lapTime = tire[0];
+            long stintTime = 0;
 
-            for (int stintLength = 1; stintLength <= numLaps; stintLength++) {
-                totalTime += currentLapTime;
-                bestStint[stintLength] = Math.min(bestStint[stintLength], totalTime);
-                currentLapTime *= tire[1];
+            for (int laps = 1; laps <= numLaps; laps++) {
+                stintTime += lapTime;
+                best[laps] = Math.min(best[laps], stintTime);
+
+                lapTime *= tire[1];
             }
         }
 
+        // dp[i] = minimum total time to finish exactly i laps.
         long[] dp = new long[numLaps + 1];
         Arrays.fill(dp, INF);
         dp[0] = 0;
 
-        for (int lapsCompleted = 1; lapsCompleted <= numLaps; lapsCompleted++) {
-            for (int stintLength = 1; stintLength <= lapsCompleted; stintLength++) {
-                int earlierLaps = lapsCompleted - stintLength;
-                long candidateTime = bestStint[stintLength];
+        for (int laps = 1; laps <= numLaps; laps++) {
 
-                // If earlier laps exist, append this final stint after a tyre
-                // change. The first stint of the race has no change cost.
-                if (earlierLaps > 0) {
-                    candidateTime += dp[earlierLaps] + changeTime;
+            // Assume the final stint contains 'stint' laps.
+            for (int stint = 1; stint <= laps; stint++) {
+                int previousLaps = laps - stint;
+
+                if (previousLaps == 0) {
+                    // First stint: no tyre-change cost.
+                    dp[laps] = Math.min(dp[laps], best[stint]);
+                } else {
+                    // Finish previous laps, change tyre, then run final stint.
+                    dp[laps] = Math.min(
+                        dp[laps],
+                        dp[previousLaps] + changeTime + best[stint]
+                    );
                 }
-
-                dp[lapsCompleted] = Math.min(dp[lapsCompleted], candidateTime);
             }
         }
 

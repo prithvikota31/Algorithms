@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 30 / 49.**
+**Revised: 31 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -129,7 +129,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 47 | ☑ | Best root for a binary tree |
 | 49 | ☑ | Mouse jump max score |
 | 50 | ☑ | F1 single-tyre race time |
-| 51 | ☐ | F1 tyre-change DP |
+| 51 | ☑ | F1 tyre-change DP |
 | 54 | ☐ | Vertical area split |
 | 55 | ☐ | Rectangle exists (incremental) |
 | 56 | ☐ | Max rectangle area |
@@ -484,6 +484,22 @@ What's correct:
 - Zero laps correctly costs zero for every nonempty tyre set, and a degradation factor of one produces a constant lap time.
 - The solution runs in O(T * L) time for T tyre types and L laps, with O(1) auxiliary space.
 - Verified all 5 built-ins, 6 targeted boundary cases, 9,900 exhaustive tyre pairs, and 50,000 randomized valid inputs against an independent `BigInteger` geometric-sum oracle.
+
+**#51 — F1 tyre-change race time (best stints + partition DP)**
+
+Mistakes made:
+- Initially sized `best` and `dp` by the number of tyre types even though both arrays are indexed by lap count, and returned `dp[tires.length]` instead of `dp[numLaps]`.
+- Initially left positive-lap DP states at Java's default zero, so minimizing against positive candidates incorrectly kept zero rather than an unreachable sentinel.
+- Initially stored the degrading lap time in `int`, allowing multiplication to overflow even when the valid race result required `long`.
+- Initially shadowed the long sentinel with `Integer.MAX_VALUE`, which rejected valid costs above the 32-bit range.
+
+What's correct:
+- `best[k]` is the minimum time to run exactly k consecutive laps on one fresh tyre, without a tyre-change cost. Simulate every tyre's geometric lap sequence to precompute it.
+- `dp[i]` is the minimum total time to finish exactly i laps, with `dp[0] = 0` as the empty race prefix.
+- Try every possible final-stint length. The candidate is `best[stint]` when it is the first stint; otherwise it is `dp[previousLaps] + changeTime + best[stint]`.
+- Keeping lap, stint, and DP times in `long` supports valid totals above `Integer.MAX_VALUE`; the documented contract assumes required calculations fit in `long`.
+- The solution runs in O(T * L + L^2) time and O(L) space.
+- Verified all built-ins and the repository comparison DP, plus 6 targeted, 11,088 exhaustive, and 20,000 randomized cases against an independent `BigInteger` oracle that enumerates every stint partition and tyre choice.
 
 ---
 
