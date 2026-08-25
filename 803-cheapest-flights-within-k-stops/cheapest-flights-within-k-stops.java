@@ -48,7 +48,7 @@ class Solution {
 
             // K stops = maximum K + 1 flights.
             if (flightsUsed == k + 1) {
-                continue;
+                break;
             }
 
             for (int[] edge : adj.get(node)) {
