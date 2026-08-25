@@ -7,20 +7,22 @@
  *
  * THE QUESTION
  * ------------
- * Grid with S, T, one cat C, walkable '.', water 'W'. Move 4-directionally
- * through non-water, non-cat cells. Each cell's "safety" = its Manhattan
- * distance to the cat (distance ignores walls; the mouse is blocked by them).
- * A path's score = the MINIMUM cell safety along it. Return the maximum score
- * over all S->T paths, or -1 if T is unreachable.
- *
- * ASSUMPTION: a single cat. With multiple cats, a cell's safety would be the
- * distance to the NEAREST cat (min over cats) — precompute a catDist[][] then.
+ * Grid with S, T, one or more cats C, walkable '.', and water 'W'. Move
+ * 4-directionally through non-water, non-cat cells. Each cell's "safety" is
+ * its distance to the NEAREST cat. Cat distance ignores walls; only the mouse
+ * is blocked by them. A path's score is the MINIMUM cell safety along it.
+ * Return the maximum score over all S->T paths, or -1 if T is unreachable.
  *
  * ----------------------------------------------------------------------------
  * MENTAL MAP  (the part to remember)
  * ----------------------------------------------------------------------------
- * Pattern: MAXIMUM-BOTTLENECK path -> max-heap Dijkstra.
- *   - cell safety      = Manhattan distance to cat
+ * Phase 1: MULTI-SOURCE BFS, like Rotten Oranges. Put every cat in the queue at
+ * distance zero. The first time BFS reaches a cell is its distance to the
+ * nearest cat. Water does not block this BFS because cat distance is Manhattan
+ * distance; water blocks only the mouse's path.
+ *
+ * Phase 2: MAXIMUM-BOTTLENECK path -> max-heap Dijkstra.
+ *   - cell safety      = distance to nearest cat
  *   - path score       = min cell safety seen so far
  *   - always expand the path with the LARGEST current score
  *       nextPathSafety = min(currentSafety, safety(next))
@@ -30,60 +32,87 @@
  *
  * APPROACHES
  *   Binary search + BFS on a safety threshold — valid, O(RC log(maxDist)).
- *   Max-heap Dijkstra (below) — more direct, O(RC log(RC)).
+ *   Multi-source BFS + max-heap Dijkstra (below) — O(RC log(RC)).
  * ----------------------------------------------------------------------------
  */
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class MaximumSafetyPath {
 
     public int maximumSafety(char[][] grid) {
-        int rows = grid.length;
-        int cols = grid[0].length;
+        int n = grid.length;
+        int m = grid[0].length;
 
-        int sourceRow = -1, sourceCol = -1;
-        int targetRow = -1, targetCol = -1;
-        int catRow = -1, catCol = -1;
+        int sourceRow = -1;
+        int sourceCol = -1;
+        int targetRow = -1;
+        int targetCol = -1;
 
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                char cell = grid[row][col];
-                if (cell == 'S') {
+        int[][] safety = new int[n][m];
+        for (int[] row : safety) {
+            Arrays.fill(row, -1);
+        }
+
+        Queue<int[]> queue = new ArrayDeque<>();
+
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < m; col++) {
+                if (grid[row][col] == 'S') {
                     sourceRow = row;
                     sourceCol = col;
-                } else if (cell == 'T') {
+                } else if (grid[row][col] == 'T') {
                     targetRow = row;
                     targetCol = col;
-                } else if (cell == 'C') {
-                    catRow = row;
-                    catCol = col;
+                } else if (grid[row][col] == 'C') {
+                    safety[row][col] = 0;
+                    queue.offer(new int[] {row, col});
                 }
             }
         }
 
-        // Defensive: need a source and a target to have any answer.
-        if (sourceRow == -1 || targetRow == -1) {
+        if (sourceRow == -1 || targetRow == -1 || queue.isEmpty()) {
             return -1;
         }
 
-        // bestSafety[r][c] = largest bottleneck safety found to reach (r,c).
-        int[][] bestSafety = new int[rows][cols];
+        int[] delRow = {-1, 0, 1, 0};
+        int[] delCol = {0, 1, 0, -1};
+
+        // Multi-source BFS: safety[row][col] is distance to the nearest cat.
+        while (!queue.isEmpty()) {
+            int[] current = queue.poll();
+            int row = current[0];
+            int col = current[1];
+
+            for (int direction = 0; direction < 4; direction++) {
+                int nextRow = row + delRow[direction];
+                int nextCol = col + delCol[direction];
+
+                if (nextRow >= 0 && nextRow < n
+                        && nextCol >= 0 && nextCol < m
+                        && safety[nextRow][nextCol] == -1) {
+                    safety[nextRow][nextCol] = safety[row][col] + 1;
+                    queue.offer(new int[] {nextRow, nextCol});
+                }
+            }
+        }
+
+        // bestSafety[row][col] is the largest bottleneck found to reach a cell.
+        int[][] bestSafety = new int[n][m];
         for (int[] row : bestSafety) {
             Arrays.fill(row, -1);
         }
 
-        // Max-heap ordered by path safety. Entry: {pathSafety, row, col}.
         PriorityQueue<int[]> maxHeap =
                 new PriorityQueue<>((a, b) -> Integer.compare(b[0], a[0]));
 
-        int sourceSafety = getDistance(sourceRow, sourceCol, catRow, catCol);
-        bestSafety[sourceRow][sourceCol] = sourceSafety;
-        maxHeap.offer(new int[] {sourceSafety, sourceRow, sourceCol});
-
-        int[] delRow = {0, 1, 0, -1};
-        int[] delCol = {1, 0, -1, 0};
+        bestSafety[sourceRow][sourceCol] = safety[sourceRow][sourceCol];
+        maxHeap.offer(new int[] {
+            safety[sourceRow][sourceCol], sourceRow, sourceCol
+        });
 
         while (!maxHeap.isEmpty()) {
             int[] current = maxHeap.poll();
@@ -91,12 +120,10 @@ public class MaximumSafetyPath {
             int currentRow = current[1];
             int currentCol = current[2];
 
-            // Stale entry — a better path to this cell already settled.
             if (currentSafety < bestSafety[currentRow][currentCol]) {
                 continue;
             }
 
-            // Highest safety remaining in the heap: T's score is now optimal.
             if (currentRow == targetRow && currentCol == targetCol) {
                 return currentSafety;
             }
@@ -105,17 +132,17 @@ public class MaximumSafetyPath {
                 int nextRow = currentRow + delRow[direction];
                 int nextCol = currentCol + delCol[direction];
 
-                boolean canMove = nextRow >= 0 && nextRow < rows
-                        && nextCol >= 0 && nextCol < cols
+                boolean canMove = nextRow >= 0 && nextRow < n
+                    && nextCol >= 0 && nextCol < m
                         && grid[nextRow][nextCol] != 'W'
                         && grid[nextRow][nextCol] != 'C';
                 if (!canMove) {
                     continue;
                 }
 
-                int nextCellSafety = getDistance(nextRow, nextCol, catRow, catCol);
-                // A path is only as safe as its least-safe cell.
-                int nextPathSafety = Math.min(currentSafety, nextCellSafety);
+                int nextPathSafety = Math.min(
+                    currentSafety,
+                    safety[nextRow][nextCol]);
 
                 if (nextPathSafety > bestSafety[nextRow][nextCol]) {
                     bestSafety[nextRow][nextCol] = nextPathSafety;
@@ -125,10 +152,6 @@ public class MaximumSafetyPath {
         }
 
         return -1;
-    }
-
-    private int getDistance(int row, int col, int catRow, int catCol) {
-        return Math.abs(row - catRow) + Math.abs(col - catCol);
     }
 
     // ------------------------------------------------------------------
@@ -162,5 +185,14 @@ public class MaximumSafetyPath {
             {'C', '.', 'T'}
         };
         System.out.println(sol.maximumSafety(c)); // -1
+
+        // Two cats: safety is measured from the nearest one.
+        char[][] d = {
+            {'S', '.', '.', 'C'},
+            {'.', 'W', '.', '.'},
+            {'.', '.', 'W', '.'},
+            {'C', '.', '.', 'T'}
+        };
+        System.out.println(sol.maximumSafety(d)); // 1
     }
 }
