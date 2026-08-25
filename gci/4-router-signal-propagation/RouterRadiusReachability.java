@@ -35,7 +35,9 @@
  */
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 public class RouterRadiusReachability {
 
@@ -61,11 +63,30 @@ public class RouterRadiusReachability {
             return false;
         }
 
-        Deque<Integer> q = new ArrayDeque<>(); // it contains indices of routers
-        q.offer(src);
         int n = routers.length;
+        List<List<Integer>> graph = new ArrayList<>();
+        for(int i = 0; i < n; i++)
+        {
+            graph.add(new ArrayList<>());
+        }
+
+        // Build directed edges. Router i reaches router j using router i's radius.
+        for(int i = 0; i < n; i++)
+        {
+            for(int j = 0; j < n; j++)
+            {
+                if(i != j && canBeReached(routers[i], routers[j]))
+                {
+                    graph.get(i).add(j);
+                }
+            }
+        }
+
+        Deque<Integer> q = new ArrayDeque<>();
         int[] visited = new int[n];
         visited[src] = 1;
+        q.offer(src);
+
         while(!q.isEmpty())
         {
             int cur = q.poll();
@@ -74,10 +95,9 @@ public class RouterRadiusReachability {
                 return true;
             }
 
-            for(int i = 0; i < n; i++)
+            for(int nei : graph.get(cur))
             {
-                int nei = i;
-                if(visited[nei] == 0 && canBeReached(routers[cur], routers[nei]))
+                if(visited[nei] == 0)
                 {
                     visited[nei] = 1;
                     q.offer(nei);
@@ -89,9 +109,18 @@ public class RouterRadiusReachability {
 
     private boolean canBeReached(int[] src, int[] router)
     {
-        long delX = (long) src[0] - router[0];
-        long delY = (long) src[1] - router[1];
         long radius = src[2];
+        if(radius < 0)
+        {
+            return false;
+        }
+
+        long delX = Math.abs((long) src[0] - router[0]);
+        long delY = Math.abs((long) src[1] - router[1]);
+        if(delX > radius || delY > radius)
+        {
+            return false;
+        }
 
         return delX * delX + delY * delY <= radius * radius;
     }
