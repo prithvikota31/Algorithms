@@ -37,32 +37,22 @@
 public class F1SingleTyreRaceTime {
 
     public long minimumRaceTime(int[][] tires, int numLaps) {
-        if (numLaps <= 0) {
-            return 0;
-        }
-        if (tires == null || tires.length == 0) {
-            throw new IllegalArgumentException("at least one tyre is required");
-        }
+        long mintime = Long.MAX_VALUE;
 
-        long bestRaceTime = Long.MAX_VALUE;
-
-        for (int[] tire : tires) {
-            if (tire == null || tire.length < 2 || tire[0] <= 0 || tire[1] <= 0) {
-                throw new IllegalArgumentException("each tyre must contain positive f and r");
-            }
-
-            long currentLapTime = tire[0];
+        for(int[] tire: tires)
+        {
+            long lapTime = (long)tire[0];
+            int incFactor = tire[1];
             long totalTime = 0;
-
-            for (int lap = 0; lap < numLaps; lap++) {
-                totalTime += currentLapTime;
-                currentLapTime *= tire[1];
+            for(int i = 0; i < numLaps; i++)
+            {
+                totalTime += lapTime;
+                lapTime = lapTime * incFactor;
             }
+            mintime = Math.min(mintime, totalTime);
 
-            bestRaceTime = Math.min(bestRaceTime, totalTime);
         }
-
-        return bestRaceTime;
+        return mintime;
     }
 
     public static void main(String[] args) {

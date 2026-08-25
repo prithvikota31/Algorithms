@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 29 / 49.**
+**Revised: 30 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -128,7 +128,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 46 | ☑ | Largest connected 1-component |
 | 47 | ☑ | Best root for a binary tree |
 | 49 | ☑ | Mouse jump max score |
-| 50 | ☐ | F1 single-tyre race time |
+| 50 | ☑ | F1 single-tyre race time |
 | 51 | ☐ | F1 tyre-change DP |
 | 54 | ☐ | Vertical area split |
 | 55 | ☐ | Rectangle exists (incremental) |
@@ -471,6 +471,19 @@ What's correct:
 - For the path follow-up, the parent map also serves as visited state. BFS records the first parent of each token, which yields a shortest translation chain in an unweighted graph.
 - Map the source to itself as the reconstruction sentinel, walk from target through parents, then reverse the collected list to return source-to-target order.
 - Both APIs use O(V + E) space. Verified all 12 built-ins plus 74,460 exhaustive reachability checks and 74,460 shortest-path legality/optimality checks across every directed graph through four tokens, including unknown sources and duplicate mappings.
+
+**#50 — F1 single-tyre race time (geometric-sequence simulation)**
+
+Mistakes made:
+- No algorithmic mistake remained in the independent rewrite. Its correctness relies on the stated input contract: at least one valid tyre, nonnegative lap count, and every simulated race total fitting in `long`.
+- The rewrite omits the previous defensive null, empty-tyre, and malformed-tyre checks, so those invalid inputs are outside its accepted contract rather than receiving explicit exceptions.
+
+What's correct:
+- Once one tyre is selected, no further choice remains: its lap times are `f, f*r, f*r^2, ...`. Simulate all requested laps for each tyre and keep the smallest complete-race sum.
+- Keep lap and total times in `long`; casting only the final result would not repair overflow that occurred during multiplication or addition.
+- Zero laps correctly costs zero for every nonempty tyre set, and a degradation factor of one produces a constant lap time.
+- The solution runs in O(T * L) time for T tyre types and L laps, with O(1) auxiliary space.
+- Verified all 5 built-ins, 6 targeted boundary cases, 9,900 exhaustive tyre pairs, and 50,000 randomized valid inputs against an independent `BigInteger` geometric-sum oracle.
 
 ---
 
