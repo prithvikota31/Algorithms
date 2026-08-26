@@ -1,36 +1,25 @@
 class Solution {
     public int minMeetingRooms(int[][] intervals) {
-        int n = intervals.length;
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
 
-        int[] start = new int[n];
-        int[] end = new int[n];
-        for(int i = 0; i < n; i++)
-        {
-            start[i] = intervals[i][0];
-            end[i] = intervals[i][1];
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        int maxRooms = 0;
+
+        for (int[] interval : intervals) {
+            int start = interval[0];
+            int end = interval[1];
+
+            // Remove every meeting that has already ended
+            while (!minHeap.isEmpty() && minHeap.peek() <= start) {
+                minHeap.poll();
+            }
+
+            // Current meeting now occupies one room
+            minHeap.offer(end);
+
+            maxRooms = Math.max(maxRooms, minHeap.size());
         }
 
-        Arrays.sort(start);
-        Arrays.sort(end);
-        int usingRooms = 0;
-        int s = 0;
-        int e = 0;
-        int max = 0;
-        while(s < n && e < n)
-        {
-            if(start[s] < end[e])
-            {
-                usingRooms++;
-                s++;
-            }
-            else
-            {
-                usingRooms--;
-                e++;
-            }
-            max = Math.max(max, usingRooms);
-
-        }
-        return max;
+        return maxRooms;
     }
 }
