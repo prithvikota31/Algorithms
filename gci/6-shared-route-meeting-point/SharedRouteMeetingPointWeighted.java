@@ -21,7 +21,7 @@
  * distFromD[M] == distFromM[D]). Then scan every node as M.
  *
  * Complexity: 3x Dijkstra -> O((V + E) log V) overall, O(V + E) space.
- * Use long distances to avoid overflow when summing three path costs.
+ * Assume all path costs and their final sum fit in long.
  * ============================================================================
  */
 
@@ -64,7 +64,7 @@ public class SharedRouteMeetingPointWeighted {
         {
             if(distanceFromAlice[i] != INF && distanceFromBob[i] != INF && distanceFromDest[i] != INF)
             {
-                long d = safeAdd(safeAdd(distanceFromAlice[i], distanceFromBob[i]), distanceFromDest[i]);
+                long d = distanceFromAlice[i] + distanceFromBob[i] + distanceFromDest[i];
                 minDistinct = Math.min(minDistinct, d);
             }
         }
@@ -88,7 +88,7 @@ public class SharedRouteMeetingPointWeighted {
             long cDist = cur[0];
             int cNode = (int)cur[1];
 
-            if(cDist != dist[cNode])
+            if(cDist > dist[cNode])
             {
                 continue;
             }
@@ -97,7 +97,7 @@ public class SharedRouteMeetingPointWeighted {
             {
                 int neiNode = nei[0];
                 int neiEdgeWt = nei[1];
-                long candidateDistance = safeAdd(cDist, neiEdgeWt);
+                long candidateDistance = cDist + neiEdgeWt;
 
                 if(candidateDistance < dist[neiNode])
                 {
@@ -108,15 +108,6 @@ public class SharedRouteMeetingPointWeighted {
 
         }
         return dist;
-    }
-
-    private long safeAdd(long first, long second)
-    {
-        if(first == INF || second > INF - first)
-        {
-            return INF;
-        }
-        return first + second;
     }
 
   
