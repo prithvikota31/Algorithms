@@ -48,69 +48,113 @@ import java.util.Map;
 public class LongestSubsequenceDictionaryWord {
 
     public String findLongestWord(String s, String[] dictionary) {
-        Map<Character, List<Integer>> positions = buildIndex(s);
-
+        // ch -> list of integers for s
+        Map<Character, List<Integer>> charToIndicesMap = buildMap(s);
         String bestWord = "";
-        for (String word : dictionary) {
-            if (!isSubsequence(word, positions)) {
-                continue;
-            }
-            if (word.length() > bestWord.length()
-                    || (word.length() == bestWord.length() && word.compareTo(bestWord) < 0)) {
-                bestWord = word;
+        for(String word: dictionary)
+        {
+            if(isSubsequence(word, charToIndicesMap))
+            {
+                if(word.length() > bestWord.length())
+                {
+                    bestWord = word;
+                }
+                else if(word.length() == bestWord.length())
+                {
+                    if(word.compareTo(bestWord) < 0)
+                    {
+                        bestWord = word;
+                    }
+                }
             }
         }
         return bestWord;
     }
 
-    private Map<Character, List<Integer>> buildIndex(String s) {
-        Map<Character, List<Integer>> positions = new HashMap<>();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            positions.computeIfAbsent(c, key -> new ArrayList<>()).add(i);
-        }
-        return positions;
-    }
+    private boolean isSubsequence(String word, Map<Character, List<Integer>> charToIndices)
+    {
+        // Source index used to match the previous character of the word.
+        int previousMatchedIndex = -1;
 
-    private boolean isSubsequence(String word, Map<Character, List<Integer>> positions) {
-        int currentIndex = -1;
-
-        for (char c : word.toCharArray()) {
-            List<Integer> list = positions.get(c);
-            if (list == null) {
+        for(int i = 0; i < word.length(); i++)
+        {
+            char currentChar = word.charAt(i);
+            // All source indices at which the current character occurs.
+            List<Integer> occurrenceIndices = charToIndices.get(currentChar);
+            if(occurrenceIndices == null)
+            {
                 return false;
             }
 
-            int nextPosition = binarySearchNext(list, currentIndex);
-            if (nextPosition == -1) {
+                // Find the earliest occurrence after the previous match.
+            int nextMatchedIndex = findIndiceBinarySearch(
+                    occurrenceIndices, previousMatchedIndex);
+
+            if(nextMatchedIndex == -1)
+            {
                 return false;
             }
+            previousMatchedIndex = nextMatchedIndex;
 
-            currentIndex = nextPosition;
         }
-
         return true;
+
     }
 
-    // Returns the smallest value in positions strictly greater than target, or -1 if none.
-    private int binarySearchNext(List<Integer> positions, int target) {
-        int left = 0;
-        int right = positions.size() - 1;
-        int answer = -1;
-
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-
-            if (positions.get(mid) > target) {
-                answer = positions.get(mid);
-                right = mid - 1;
-            } else {
-                left = mid + 1;
+    private int findIndice(List<Integer> occurrenceIndices, int previousMatchedIndex)
+    {
+        // The next source index must be after the previous matched index.
+        for(int occurrenceIndex: occurrenceIndices)
+        {
+            if(occurrenceIndex > previousMatchedIndex)
+            {
+                return occurrenceIndex;
             }
         }
-
-        return answer;
+        return -1;
     }
+
+    private int findIndiceBinarySearch(
+            List<Integer> occurrenceIndices, int previousMatchedIndex)
+    {
+        int low = 0;
+        int high = occurrenceIndices.size() - 1;
+        int nextMatchedIndex = -1;
+        while(low <= high)
+        {
+            int mid = low + (high - low) / 2;
+            if(occurrenceIndices.get(mid) > previousMatchedIndex)
+            {
+                nextMatchedIndex = occurrenceIndices.get(mid);
+                high = mid - 1;
+            }
+            else
+            {
+                low = mid + 1;
+            }
+        }
+        return nextMatchedIndex;
+    }
+
+    private Map<Character, List<Integer>> buildMap(String source)
+    {
+        Map<Character, List<Integer>> charToIndices = new HashMap<>();
+        // character -> sorted list of source indices
+        //apple
+        //a - 0
+        //p - 1, 2
+        //l - 3
+        //e - 4
+        for(int i = 0; i < source.length(); i++)
+        {
+            char currentChar = source.charAt(i);
+            charToIndices.putIfAbsent(currentChar, new ArrayList<>());
+            charToIndices.get(currentChar).add(i);
+        }
+        return charToIndices;
+    }
+
+
 
     public static void main(String[] args) {
         LongestSubsequenceDictionaryWord sol = new LongestSubsequenceDictionaryWord();

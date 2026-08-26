@@ -38,7 +38,7 @@
 | 22 | ☑ | Given rectangles on a plane, find a vertical line that divides their total area equally; variation: rectangles may overlap. → [sweep line, overlaps counted separately](22-rectangle-area-split/VerticalAreaSplit.java). Each rectangle becomes `+height` at `x1` and `-height` at `x2`; between events the active height is constant so the cut inside a strip is a direct division. **<span style="color:red">Union-area follow-up (overlap counted ONCE) marked optional/conceptual only (not implemented): needs sweep-line + coordinate compression + segment tree tracking active y-coverage — niche geometry technique, low reuse across other L4 problems. Know the one-liner: "can't just add heights; sweep x-events, maintain active y-coverage via segment tree."</span>** |
 | 23 | ☑ | Find the longest non-decreasing contiguous subarray; follow-up: change one value arbitrarily to maximize the result. → [solution](23-longest-non-decreasing-subarray/LongestNonDecreasingSubarray.java) |
 | 24 | ☑ | Remove adjacent invalid character pairs, such as the same letter in opposite cases; follow-up: solve without an explicit stack. → [stack (StringBuilder)](24-remove-adjacent-char-pairs/RemoveAdjacentPairs.java), [in-place follow-up](24-remove-adjacent-char-pairs/RemoveAdjacentPairsInPlace.java) |
-| 25 | ☑ | Given a dictionary of special words, determine whether qualifying subsequences of an input string belong to the dictionary. → [base solution](25-subsequence-dictionary-match/SubsequenceDictionaryMatch.java). **Follow-ups:** (1) longest matching word, tie-broken lexicographically → [LongestSubsequenceDictionaryWord.java](25-subsequence-dictionary-match/LongestSubsequenceDictionaryWord.java); (2) Trie-based optimization for huge dictionaries with shared prefixes → [TrieDictionarySubsequenceMatch.java](25-subsequence-dictionary-match/TrieDictionarySubsequenceMatch.java). |
+| 25 | ☑ | Given a dictionary of special words, determine whether qualifying subsequences of an input string belong to the dictionary. → [base solution](25-subsequence-dictionary-match/SubsequenceDictionaryMatch.java). **Required L4 follow-up:** longest matching word, tie-broken lexicographically → [LongestSubsequenceDictionaryWord.java](25-subsequence-dictionary-match/LongestSubsequenceDictionaryWord.java). **<span style="color:red">Optional enrichment, not required for L4 revision:</span>** Trie optimization for a huge dictionary with shared prefixes → [TrieDictionarySubsequenceMatch.java](25-subsequence-dictionary-match/TrieDictionarySubsequenceMatch.java). |
 | 26 | ☑ | Given an array, from index i either skip or take the element; taking it adds a score and jumps according to `arr[i]`; maximize total score. → [base solution](26-array-jump-take-or-skip/ArrayJumpMaxScore.java). **Follow-up:** return the selected indices, not just the score → `maxScoreIndices` in the same file. |
 | 27 | ☑ | Find arithmetic subarrays where every adjacent difference is exactly +1 or exactly -1. → [solution](27-arithmetic-adjacent-diff-subarrays/ArithmeticAdjacentDiffSubarrays.java). **Follow-up:** return the longest valid subarray's indices → `longestArithmeticSubarray` in the same file. |
 | 28 | ☑ | Given three sorted arrays, find triples containing one value from each array such that every pairwise difference is at most D. → [base solution](28-triples-within-max-difference/TriplesWithinMaxDifference.java). **Follow-up:** return the actual triples → `findValidTriples` in the same file. |
@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 31 / 49.**
+**Revised: 32 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -105,7 +105,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 22 | ☐ | Vertical line splitting rectangle area |
 | 23 | ☑ | Longest non-decreasing subarray |
 | 24 | ☑ | Remove adjacent character pairs |
-| 25 | ☐ | Subsequence dictionary match |
+| 25 | ☑ | Subsequence dictionary match |
 | 26 | ☑ | Array jump — take or skip |
 | 27 | ☐ | Arithmetic adjacent-diff subarrays |
 | 28 | ☑ | Triples within max difference |
@@ -194,6 +194,21 @@ What's correct:
 - Changing index i can attach to the left run, attach to the right run, or bridge both only when `nums[i - 1] <= nums[i + 1]`. Taking the best over all indices covers changing at most one value.
 - The follow-up takes O(N) time and O(N) space.
 - Verified both methods on all 11 built-ins, 97,657 exhaustive arrays, 5 targeted boundary cases, and 10,000 full-range randomized arrays against independent direct-run and explicit-replacement oracles.
+
+**#25 — Dictionary subsequence matching (position index + binary search)**
+
+Mistakes made:
+- Initially stored `word.charAt(i)` in an `int`, so a `Map<Character, ...>` lookup received an `Integer` key and every nonempty word failed.
+- In the binary-search rewrite, initially set `high` to `size()` instead of the last valid index, causing an out-of-bounds access.
+- Initially returned the index inside a character's occurrence list rather than the source-string position stored at that index, breaking the next relative-order check.
+
+What's correct:
+- Preprocess the fixed source into `character -> sorted source indices`. For each word character, binary-search for the earliest occurrence strictly after the previous match.
+- Choosing the earliest possible occurrence is greedy-safe because it leaves the largest suffix available for the remaining characters.
+- The base preserves dictionary order and duplicate entries, handles repeated characters and the empty word, and runs in O(S + D * L * log S) time with O(S) space.
+- The required L4 follow-up keeps the longest qualifying word and, on equal length, the lexicographically smallest one using the same subsequence check.
+- **The Trie implementation is optional enrichment and is not required to complete or revise this problem for Google L4 preparation.** Know only that it can share prefix work for an unusually large dictionary.
+- Verified the base with all 5 built-ins, 5 targeted cases, 3,585,040 exhaustive source/word comparisons, and 10,000 randomized dictionaries. Verified the longest-word follow-up with all 5 built-ins, 5 targeted cases, 1,193,920 exhaustive comparisons, and 10,000 randomized dictionaries against independent two-pointer oracles.
 
 **#13 — Top K from a stream (min-heap + frequency rankings)**
 
