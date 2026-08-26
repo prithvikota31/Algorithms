@@ -1,44 +1,35 @@
 class Solution {
     public int[][] insert(int[][] intervals, int[] newInterval) {
-        //check overlap, if overlap, remove that from list and merge again
+        int n = intervals.length;
 
         List<int[]> ans = new ArrayList<>();
 
-        //completely before overlap
-        //during overlap
-        //completely after overlap
-        int n = intervals.length;
-        int ind = 0;
+        int index = 0;
 
-        //nonoverlap front
-        while(ind < n && intervals[ind][1] < newInterval[0])
+        int mergedStart = newInterval[0];
+        int mergedEnd = newInterval[1];
+
+        while(index < n && intervals[index][1] < mergedStart)
         {
-            ans.add(intervals[ind]);
-            ind++;
+            ans.add(new int[]{intervals[index][0], intervals[index][1]});
+            index++;
         }
 
-        //during overlap
-        //but already [ind][1] > newInterval[0]; covered above
-        //(interval.end, new.start) condition for overlap
-        //newInterval[0] <= intervals[ind][1] is already satisfied above
-        while(ind < n && newInterval[1] >= intervals[ind][0] && 
-                newInterval[0] <= intervals[ind][1])
+        while(index < n && intervals[index][1] >= mergedStart && intervals[index][0] <= mergedEnd)
         {
-            newInterval[0] = Math.min(newInterval[0], intervals[ind][0]);
-            newInterval[1] = Math.max(newInterval[1], intervals[ind][1]);
-            ind++;
+            mergedStart = Math.min(mergedStart, intervals[index][0]);
+            mergedEnd = Math.max(mergedEnd, intervals[index][1]);
+            index++;
         }
 
-        ans.add(newInterval);
+        ans.add(new int[]{mergedStart, mergedEnd});
 
-        //after overlap
-        while(ind < n)
+        while(index < n)
         {
-            ans.add(intervals[ind]);
-            ind++;
+            ans.add(new int[]{intervals[index][0], intervals[index][1]});
+            index++;
         }
 
         return ans.toArray(new int[0][]);
-
     }
 }
