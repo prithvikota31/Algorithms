@@ -1,6 +1,6 @@
 /*
  * ============================================================================
- * Problem 10 (Google L4 prep) — Character Order from Pairwise Relationships
+ * Problem 8 (Google L4 prep) — Character Order from Pairwise Relationships
  * ============================================================================
  *
  * PROMPT
@@ -81,6 +81,7 @@ public class CharacterOrderFromPairs {
             {
                 inDegree.put(pair[1], inDegree.getOrDefault(pair[1], 0) + 1);
             }
+            graph.putIfAbsent(pair[1], new HashSet<>());
             inDegree.putIfAbsent(pair[0], 0);
         }
         // we got graph and inDegree 
@@ -104,7 +105,7 @@ public class CharacterOrderFromPairs {
             char cur = q.poll();
             sb.append(cur);
 
-            for(char nei: graph.getOrDefault(cur, Collections.emptySet()))
+            for(char nei: graph.get(cur))
             {
                 inDegree.put(nei, inDegree.get(nei) - 1);
 
