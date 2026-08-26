@@ -1,51 +1,48 @@
 class Solution {
     public int[] minInterval(int[][] intervals, int[] queries) {
-        int m = intervals.length;
-        int n = queries.length;
-
-        //sort intervals by start time
-        //for query to be in start <= query and query <= end
-
-        Arrays.sort(intervals, (a, b) -> (Integer.compare(a[0], b[0])));
-
-        //now sort queries in increasing order saving the index
-        //value, index
+        //first task is to sort intervals by start
+        //queries by earliest, along with its indices
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
         List<int[]> queryWithIndex = new ArrayList<>();
-        for(int i = 0; i < n; i++)
+        for(int i = 0; i < queries.length; i++)
         {
-            queryWithIndex.add(new int[]{queries[i], i});
+            queryWithIndex.add(new int[]{i, queries[i]}); //{index, query};
         }
-        Collections.sort(queryWithIndex, (a, b) -> Integer.compare(a[0], b[0]));
 
-        //each value is length, end
-        PriorityQueue<int[]> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a[0], b[0]));
+        Collections.sort(queryWithIndex, (a, b) -> Integer.compare(a[1], b[1]));
 
-        int[] ans = new int[n];
+
+        PriorityQueue<int[]> minHeap = new PriorityQueue<>((a, b) -> Integer.compare(a[0], b[0])); //{interval, start end}
+
+        int intervalIndex = 0;
+        int[] ans = new int[queries.length];
         Arrays.fill(ans, -1);
-        int ind = 0;
-
-        for(int[] query: queryWithIndex)
+        //process query by query
+        int q = 0;
+        while(q < queries.length)
         {
-            int orgIndex = query[1];
-            int orgQuery = query[0];
+            int queryIndex = queryWithIndex.get(q)[0];
+            int query = queryWithIndex.get(q)[1];
 
-            while(ind < m && intervals[ind][0] <= orgQuery) //see start <= q
+            //start < query
+            while(intervalIndex < intervals.length && intervals[intervalIndex][0] <= query)
             {
-                minHeap.offer(new int[]{(intervals[ind][1] - intervals[ind][0] + 1), intervals[ind][1]});
-                ind++;
+                minHeap.offer(new int[]{intervals[intervalIndex][1] - intervals[intervalIndex][0] + 1, 
+                                    intervals[intervalIndex][0] ,intervals[intervalIndex][1]});
+                intervalIndex++;
             }
-            //now heap has all intervals with start <= q
 
-            //next if end < q, remove
-            while(!minHeap.isEmpty() && minHeap.peek()[1] < orgQuery)
+            //end < query (remove) (even equal is captured by query)
+            while(!minHeap.isEmpty() && minHeap.peek()[2] < query)
             {
                 minHeap.poll();
             }
-
             if(!minHeap.isEmpty())
             {
-                ans[orgIndex] = minHeap.peek()[0];
+                ans[queryIndex] = minHeap.peek()[0];
             }
+
+            q++;
         }
 
         return ans;
