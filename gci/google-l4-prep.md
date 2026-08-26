@@ -42,7 +42,7 @@
 | 26 | ☑ | Given an array, from index i either skip or take the element; taking it adds a score and jumps according to `arr[i]`; maximize total score. → [base solution](26-array-jump-take-or-skip/ArrayJumpMaxScore.java). **Follow-up:** return the selected indices, not just the score → `maxScoreIndices` in the same file. |
 | 27 | ☑ | Find arithmetic subarrays where every adjacent difference is exactly +1 or exactly -1. → [solution](27-arithmetic-adjacent-diff-subarrays/ArithmeticAdjacentDiffSubarrays.java). **Follow-up:** return the longest valid subarray's indices → `longestArithmeticSubarray` in the same file. |
 | 28 | ☑ | Given three sorted arrays, find triples containing one value from each array such that every pairwise difference is at most D. → [base solution](28-triples-within-max-difference/TriplesWithinMaxDifference.java). **Follow-up:** return the actual triples → `findValidTriples` in the same file. |
-| 29 | ☑ | Logger rate limiter: suppress duplicate messages that occur again within a specified time window. → [solution](29-logger-rate-limiter/LoggerRateLimiter.java). **Follow-up:** thread-safe version → `LoggerRateLimiter.ThreadSafe` in the same file. |
+| 29 | ☑ | Logger rate limiter: suppress duplicate messages that occur again within a specified time window. → [solution](29-logger-rate-limiter/LoggerRateLimiter.java). **<span style="color:red">Optional enrichment, not required for L4 revision:</span>** thread-safe version → `LoggerRateLimiter.ThreadSafe` in the same file. |
 | 30 | ☑ | Design a random music shuffler where no song may repeat within the previous K plays while maintaining correct random selection. → [solution](30-music-shuffler-no-repeat-k/MusicShuffler.java). **Follow-up:** weighted random selection → `MusicShuffler.Weighted` in the same file. |
 | 31 | ☑ | Given friends located on graph nodes and cafés on other nodes, choose the café minimizing the maximum distance traveled by any friend. → [solution](31-best-cafe-for-friends/FindBestCafe.java) |
 | 32 | ☑ | Given a movie-similarity graph and a starting movie, find the Top N reachable movies by rating. → [solution](32-movie-similarity-top-n/TopNSimilarMovies.java). |
@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 32 / 49.**
+**Revised: 33 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -109,7 +109,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 26 | ☑ | Array jump — take or skip |
 | 27 | ☐ | Arithmetic adjacent-diff subarrays |
 | 28 | ☑ | Triples within max difference |
-| 29 | ☐ | Logger rate limiter |
+| 29 | ☑ | Logger rate limiter |
 | 30 | ☐ | Music shuffler with no repeat in K |
 | 31 | ☑ | Best café for friends |
 | 32 | ☐ | Movie similarity Top N |
@@ -209,6 +209,19 @@ What's correct:
 - The required L4 follow-up keeps the longest qualifying word and, on equal length, the lexicographically smallest one using the same subsequence check.
 - **The Trie implementation is optional enrichment and is not required to complete or revise this problem for Google L4 preparation.** Know only that it can share prefix work for an unusually large dictionary.
 - Verified the base with all 5 built-ins, 5 targeted cases, 3,585,040 exhaustive source/word comparisons, and 10,000 randomized dictionaries. Verified the longest-word follow-up with all 5 built-ins, 5 targeted cases, 1,193,920 exhaustive comparisons, and 10,000 randomized dictionaries against independent two-pointer oracles.
+
+**#29 — Logger rate limiter (last successful print time)**
+
+Mistakes made:
+- No base-algorithm defect remained in the revision. The main pitfall is updating a message's timestamp when it is suppressed; doing so would incorrectly slide the window forward forever under frequent duplicates.
+
+What's correct:
+- Store only `lastPrintedTime[message]`, because the latest successful print is the only history that can affect the next decision.
+- A first occurrence prints immediately. A repeated message prints when `timestamp - previousTime >= window`; equality is allowed.
+- Update the map only when the message prints. Suppressed events leave the previous successful timestamp unchanged, and different messages have independent windows.
+- The required L4 solution takes O(1) expected time per event and O(M) space for M distinct messages, assuming timestamps arrive in nondecreasing order and subtraction fits `int`.
+- **The concurrency/thread-safe implementation is optional enrichment and is not required to complete or revise this problem for Google L4 preparation.**
+- Verified all base built-ins, 21 targeted boundary/interleaving checks, and 100,000 deterministic randomized events against an independent accepted-history oracle.
 
 **#13 — Top K from a stream (min-heap + frequency rankings)**
 

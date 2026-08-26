@@ -71,7 +71,8 @@ public class LoggerRateLimiter {
 
     /*
      * ------------------------------------------------------------------------
-     * FOLLOW-UP (must prepare): make it thread-safe for multiple producers.
+     * OPTIONAL FOLLOW-UP (not required for Google L4 revision): make it
+     * thread-safe for multiple producers.
      *
      * MENTAL MAP
      *   A plain HashMap's get-then-put is two separate steps — another thread
