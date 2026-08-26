@@ -10,7 +10,7 @@ class Solution {
             int end = interval[1];
 
             // Remove every meeting that has already ended
-            while (!minHeap.isEmpty() && minHeap.peek() <= start) {
+            if (!minHeap.isEmpty() && minHeap.peek() <= start) {
                 minHeap.poll();
             }
 
