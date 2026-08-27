@@ -1,38 +1,59 @@
 class MinStack {
-    
-    Deque<Long> stack;
-    long min; 
+
+    //logic : if new min push s = 2 * val - min 
+    Deque<Long> stack = new ArrayDeque<>();
+    long min = Integer.MAX_VALUE;
     public MinStack() {
-        stack = new ArrayDeque<Long>();
+        
     }
     
-    public void push(int val) {
+    public void push(int value) {
         if(stack.isEmpty())
         {
-            stack.offerLast((long)val);
-            min = val;
+            min = value;
+            stack.push((long)value);
+            return;
         }
-        else if(val < min){
-            stack.offerLast(2L*val - min);
-            min = val;
+        if(value < min) //eg 4 < 5
+        {
+            stack.push(2L * value - min); //3
+            min = value; //4
         }
-        else{
-            stack.offerLast((long)val);
+        else
+        {
+            stack.push((long)value);
         }
     }
     
     public void pop() {
-        long top = stack.pollLast();
-        if(top < min)
+        if(stack.isEmpty())
         {
-            min = 2L*min - top;
+            return;
+        }
+
+        long s = stack.peek();
+        if(s >= min)
+        {
+            stack.pop();
+            return;
+        }
+        else
+        {
+            min = 2 * min - s;
+            stack.pop();
         }
     }
     
     public int top() {
-        long top = stack.peekLast();
-        if(top < min)   return (int)min;
-        else    return (int)top;
+        long s = stack.peek();
+        if(s >= min)
+        {
+            return (int)s;
+        }
+        else
+        {
+            return (int)min;
+        }
     }
     
     public int getMin() {
@@ -43,7 +64,7 @@ class MinStack {
 /**
  * Your MinStack object will be instantiated and called as such:
  * MinStack obj = new MinStack();
- * obj.push(val);
+ * obj.push(value);
  * obj.pop();
  * int param_3 = obj.top();
  * int param_4 = obj.getMin();
