@@ -7,7 +7,7 @@ class Solution {
         stack.offerLast(-1);
         for(int i = 0; i < heights.length; i++)
         {
-            while(stack.peekLast() != -1 && heights[stack.peekLast()] >= heights[i])
+            while(stack.peekLast() != -1 && heights[stack.peekLast()] > heights[i])
             {
                 //now caculate
                 int rightSideMin = i;
