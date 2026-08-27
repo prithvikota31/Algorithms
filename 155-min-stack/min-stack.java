@@ -39,7 +39,7 @@ class MinStack {
         }
         else
         {
-            min = 2 * min - s;
+            min = 2L * min - s;
             stack.pop();
         }
     }
