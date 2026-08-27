@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 33 / 49.**
+**Revised: 34 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -96,7 +96,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 12 | ☐ | Longest increasing subsequence, adjacent diff |
 | 13 | ☑ | Top K from a stream |
 | 14 | ☑ | Move pieces to string (`L`/`R`/`_`) |
-| 15 | ☐ | Interval overlap progression |
+| 15 | ☑ | Interval overlap progression |
 | 16 | ☐ | Product over last K of a stream |
 | 18 | ☑ | Merge two N-ary trees |
 | 19 | ☑ | Tree leaves with max ancestor |
@@ -222,6 +222,20 @@ What's correct:
 - The required L4 solution takes O(1) expected time per event and O(M) space for M distinct messages, assuming timestamps arrive in nondecreasing order and subtraction fits `int`.
 - **The concurrency/thread-safe implementation is optional enrichment and is not required to complete or revise this problem for Google L4 preparation.**
 - Verified all base built-ins, 21 targeted boundary/interleaving checks, and 100,000 deterministic randomized events against an independent accepted-history oracle.
+
+**#15 — Interval overlap progression (boundary checks + sorting/sweep)**
+
+Mistakes made:
+- The maximum-simultaneous-overlap implementation initially sorted starts with `a[0] - b[0]`, which can overflow and misorder intervals at full-range `int` endpoints. Use `Integer.compare` instead.
+
+What's correct:
+- These are closed intervals, so touching endpoints overlap. Two intervals overlap when `firstStart <= secondEnd && secondStart <= firstEnd`.
+- To detect any overlapping pair, sort by one boundary and compare adjacent intervals. Sorting by start is conventional; sorting by end is also valid when the full overlap condition is used.
+- Maximum simultaneous overlap is Meeting Rooms II with closed-endpoint semantics: an old interval frees a room only when `end < nextStart`. Polling one reusable room is sufficient for each newly arriving interval; heap size tracks rooms allocated.
+- Insert interval uses three phases: append intervals strictly before the new interval, merge every touching/overlapping interval into it, then append the remainder.
+- Merge intervals sorts by start and expands the last merged interval while the next start is at most its end.
+- Pair overlap is O(1); the other operations are O(N log N) when sorting is required, with linear scans after sorting.
+- Verified every built-in plus full-range endpoint cases and 20,000 deterministic randomized interval sets against brute-force overlap/concurrency checks and an independent union-find merge oracle.
 
 **#13 — Top K from a stream (min-heap + frequency rankings)**
 

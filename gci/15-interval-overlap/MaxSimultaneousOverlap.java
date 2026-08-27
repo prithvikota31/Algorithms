@@ -29,7 +29,7 @@ public class MaxSimultaneousOverlap {
         if(n <= 1)  return n;
 
         //lets user heap
-        Arrays.sort(intervals, (a, b) -> (a[0] - b[0]));
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
         PriorityQueue<Integer> endTimesMinHeap = new PriorityQueue<>();
 
         for(int[] interval: intervals)
