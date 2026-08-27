@@ -68,73 +68,68 @@ public class RecursivePlaceholderSubstitution {
     public String substitute(String input, Map<String, String> replacements) {
         //do dfs from string along with pathvisited, so it detects cycle and also computes 
         //assume keys are like nodes here
-        Set<String> pathVisitedKeys = new HashSet<>();
-        Map<String, String> keyCache = new HashMap<>(); //key -> final value
-        return dfs(input, replacements, pathVisitedKeys, keyCache);
+        Set<String> pathVisited = new HashSet<>();
+        //clean string of any key from replacements
+        Map<String, String> keyCache = new HashMap<>(); 
+        return dfs(input, replacements, pathVisited, keyCache);
     }
 
     private String dfs(String input, Map<String, String> replacements, 
-        Set<String> pathVisitedKeys, Map<String, String> keyCache)
+            Set<String> pathVisited, Map<String, String> keyCache)
     {
         StringBuilder sb = new StringBuilder();
-
         for(int i = 0; i < input.length(); i++)
         {
-            char ch = input.charAt(i);
-            if(ch != '%')
+            char inputChar = input.charAt(i);
+            if(inputChar != '%')
             {
-                sb.append(ch);
+                sb.append(inputChar);
                 continue;
             }
-            //found first %
+            //now we found % at i 
             int end = input.indexOf('%', i + 1);
-            //assume we always find end//we will write if not later
-            if(end == -1)
+
+            if(end == -1) // no matching % found
             {
-                sb.append(ch); //% as normal character
+                sb.append(inputChar);
                 continue;
             }
-            String key = input.substring(i + 1, end);
-            //if replacements doesn't contains key, treat it as normal string
-            if(!replacements.containsKey(key))
+            //we found matching char
+            String newKey = input.substring(i + 1, end);
+            if(!replacements.containsKey(newKey))
             {
                 sb.append(input.substring(i, end + 1));
             }
             else
             {
-                sb.append(dfsHelper(key, replacements, pathVisitedKeys, keyCache));
+                sb.append(dfsHelper(newKey, replacements, pathVisited, keyCache));
             }
-            i = end;
+
+            i = end; //pointing at %, in for loop increment takes it to next char
         }
         return sb.toString();
     }
 
     private String dfsHelper(String key, Map<String, String> replacements, 
-        Set<String> pathVisitedKeys, Map<String, String> keyCache)
+            Set<String> pathVisited, Map<String, String> keyCache)
     {
-        
-        String unchangedValue = replacements.get(key);
-
+        String unChangedValue = replacements.get(key);
+        if(pathVisited.contains(key))
+        {
+            //cycle found
+            throw new IllegalArgumentException("cycle found");
+        }
         if(keyCache.containsKey(key))
         {
             return keyCache.get(key);
         }
-        if(pathVisitedKeys.contains(key))
-        {
-            throw new IllegalArgumentException(
-                        "Cycle detected involving key: " + key);
-        }
-        pathVisitedKeys.add(key);
-
-        String finalValue = dfs(unchangedValue, replacements, pathVisitedKeys, keyCache);
-
+        pathVisited.add(key);
+        String finalValue = dfs(unChangedValue, replacements, pathVisited, keyCache);
+        pathVisited.remove(key);
         keyCache.put(key, finalValue);
-        
-        pathVisitedKeys.remove(key);
         return finalValue;
     }
-
-    // ---------------------------------------------------------------------
+  // ---------------------------------------------------------------------
     // Quick self-test.
     // ---------------------------------------------------------------------
     public static void main(String[] args) {
