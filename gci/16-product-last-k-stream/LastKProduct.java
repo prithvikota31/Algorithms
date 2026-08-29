@@ -25,7 +25,8 @@
  *
  * Instead of remultiplying K values per query, maintain the product as values
  * enter and leave:
- *      newProduct = oldProduct * incoming / outgoing
+ *      newProduct = oldProduct / outgoing * incoming
+ * Evict first so an unnecessary K+1-value product cannot overflow.
  *
  * BUT zero breaks division. So track zeros separately:
  *      nonZeroProduct = product of all non-zero values in the window
@@ -35,7 +36,8 @@
  *
  * Division is exact for a non-zero outgoing value because
  *      nonZeroProduct = outgoing * (all other values)
- * (Assumes every product fits in long.)
+ * (Assumes the product of the non-zero values maintained in each window fits
+ * in long.)
  *
  * APPROACHES
  *   Brute force : keep last K in a queue; multiply all K per query.
@@ -60,43 +62,44 @@ import java.util.Deque;
 
 public class LastKProduct {
 
-
-    private Deque<Integer> window;
+    private final Deque<Integer> window;
+    private final int k;
     private int zeroCount;
-    private long nonZeroProduct;
-    private int k;
-    public LastKProduct(int k) {
+    private long lastKProduct;
 
-        if(k <= 0)
-        {
+    public LastKProduct(int k) {
+        if (k <= 0) {
             throw new IllegalArgumentException("K must be positive");
         }
-        window = new ArrayDeque<>();
         this.k = k;
+        this.window = new ArrayDeque<>();
         zeroCount = 0;
-        nonZeroProduct = 1;
+        lastKProduct = 1;
+
     }
 
     public void add(int value) {
+        if(window.size() == k)
+        {
+            int removing = window.poll();
+            if(removing == 0)
+            {
+                zeroCount--;
+            }
+            else
+            {
+                lastKProduct = (long)lastKProduct / removing;
+            }
+        }
+
         window.offer(value);
         if(value == 0)
         {
             zeroCount++;
         }
-        else{
-            nonZeroProduct *= value;
-        }
-        
-        if(window.size() > k)
+        else
         {
-            int removalValue = window.pollFirst();
-            if(removalValue == 0)
-            {
-                zeroCount--;
-            }
-            else{
-                nonZeroProduct = nonZeroProduct / removalValue;
-            }
+            lastKProduct = lastKProduct * value;
         }
     }
 
@@ -110,8 +113,9 @@ public class LastKProduct {
         {
             return 0L;
         }
-        else{
-            return nonZeroProduct;
+        else
+        {
+            return lastKProduct;
         }
     }
 

@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 35 / 49.**
+**Revised: 36 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -97,7 +97,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 13 | ☑ | Top K from a stream |
 | 14 | ☑ | Move pieces to string (`L`/`R`/`_`) |
 | 15 | ☑ | Interval overlap progression |
-| 16 | ☐ | Product over last K of a stream |
+| 16 | ☑ | Product over last K of a stream |
 | 18 | ☑ | Merge two N-ary trees |
 | 19 | ☑ | Tree leaves with max ancestor |
 | 20 | ☑ | Connected components of 1-nodes in a binary tree |
@@ -197,6 +197,23 @@ What's correct:
 - For `1 <= difference <= D`, the shared quadratic solver reconstructs values using long differences. The segment-tree method handles the documented positive-value contract with a range maximum over `[value-D, value-1]` and point update at `value`.
 - Exact-difference length and optimized index methods run in O(N) expected time where value-keyed maps are used; quadratic reconstruction is O(N²); the positive-value segment-tree follow-up is O(N log M).
 - Comprehensive verification covered every public API: exhaustive small arrays, null/empty and full-int-range boundaries, deterministic tie cases, 20,000-50,000 randomized exact-difference cases, 488,280 bounded-`D` exhaustive combinations, 30,000 bounded-`D` randomized cases, and 615,954 positive-value segment-tree checks, with no failures.
+
+**#16 — Product of the last K stream values (sliding window + prefix products)**
+
+Mistakes made:
+- In the fixed-K rewrite, initially left the rolling product at Java's default zero instead of the multiplicative identity 1, so every non-zero product stayed zero.
+- Initially multiplied incoming values without dividing out the outgoing non-zero value when the window slid, so expired values remained in the result.
+- The first sliding-window correction multiplied the incoming value before evicting the outgoing value. That formed an unnecessary K+1-value intermediate product and could overflow even when the final K-value product fit in `long`.
+- Temporarily accepted non-positive fixed window sizes, leaving the queue behavior undefined for `k <= 0`.
+- In the dynamic-K rewrite, the equality case in `prefixProducts.size() <= k` looked ambiguous until accounting for the leading identity entry.
+
+What's correct:
+- The fixed-K solution keeps exactly K values in a deque, the product of their non-zero values, and a separate zero count. It evicts first, dividing out a non-zero departure, before multiplying the arrival; `getProduct()` returns zero whenever the current window contains a zero.
+- The dynamic-K solution stores prefix products only since the latest zero. A zero resets the list to `[1]`, because any later query reaching before that identity boundary must include the zero.
+- The key dynamic-K invariant is that the leading 1 represents the empty prefix, so after the latest zero, or from the empty start, `prefixProducts.size() - 1` is exactly the number of represented values. Therefore `k >= prefixProducts.size()` means the requested window crosses a zero; otherwise prefix division returns the last-k product.
+- Fixed K takes O(1) time per operation and O(K) space. Dynamic K takes amortized O(1) time per operation and O(N) space; resetting an `ArrayList` is linear in the current segment but linear overall across all resets.
+- The fixed-K contract assumes each maintained non-zero window product fits in `long`. The dynamic-K contract assumes every cumulative product since the latest zero fits in `long`, and `1 <= k <=` the number of inserted values.
+- Verified fixed K with 3,295,917 exhaustive and targeted checks, including zero transitions, negatives, invalid capacities, and an avoidable intermediate-overflow regression. Verified dynamic K with 16,833,000 exhaustive and deterministic randomized checks across varying valid k, consecutive and multiple zeros, negative products, and full-window queries, with no failures under the documented arithmetic assumptions.
 
 **#23 — Longest non-decreasing contiguous subarray (one pass + one-change prefix/suffix runs)**
 
@@ -583,7 +600,7 @@ What's correct:
 - ☐ Sum the contribution of all valid arithmetic subarrays.
 - ☐ Find triples from three sorted arrays where all pairwise absolute differences are at most D.
 - ☐ Find three numbers in one collection lying within distance D.
-- ☐ Product of the last K numbers in a stream.
+- ☑ Product of the last K numbers in a stream.
 - ☐ Mean of the last N values.
 - ☐ Mean of the last N excluding the largest K.
 - ☐ MK Average-style streaming statistics.

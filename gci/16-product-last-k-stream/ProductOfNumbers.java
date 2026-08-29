@@ -9,7 +9,8 @@
  * Now K is NOT fixed in the constructor. Support:
  *      add(int value)
  *      getProduct(int k)   // product of the last k values, O(1)
- * Assume k never exceeds the number of inserted values.
+ * Assume 1 <= k <= the number of inserted values and every cumulative
+ * product since the latest zero fits in long.
  *
  * EXAMPLE
  *      add(3); add(0); add(2); add(5); add(4);
@@ -64,8 +65,6 @@ import java.util.List;
 
 public class ProductOfNumbers {
 
-    // prefixProducts[i] = product of the first i values added after the most
-    // recent zero. Index 0 holds the identity 1 (empty prefix).
     private final List<Long> prefixProducts;
 
     public ProductOfNumbers() {
@@ -74,25 +73,29 @@ public class ProductOfNumbers {
     }
 
     public void add(int value) {
-        // A zero ends the current non-zero segment. Anything crossing it must
-        // return 0, so older prefix products are no longer needed: reset.
-        if (value == 0) {
+        if(value == 0)
+        {
             prefixProducts.clear();
             prefixProducts.add(1L);
-            return;
         }
-        long previousProduct = prefixProducts.get(prefixProducts.size() - 1);
-        prefixProducts.add(previousProduct * value);
+        else
+        {
+            long last = prefixProducts.get(prefixProducts.size() - 1);
+            prefixProducts.add(value * last);
+        }
+
     }
 
     public long getProduct(int k) {
-        // prefixProducts.size() - 1 non-zero values exist after the latest
-        // zero. If fewer than k, the window must contain that zero.
-        if (k >= prefixProducts.size()) {
+        // The leading 1 is an empty-prefix sentinel, so after the latest zero
+        // (or from the empty start) we have prefixProducts.size() - 1 values.
+        // If k exceeds that count, the requested window crosses a zero.
+        if(prefixProducts.size() <= k)
+        {
             return 0;
         }
-        int lastIndex = prefixProducts.size() - 1;
-        return prefixProducts.get(lastIndex) / prefixProducts.get(lastIndex - k);
+        int lastValue = prefixProducts.size() - 1;
+        return prefixProducts.get(lastValue) / prefixProducts.get(lastValue - k);
     }
 
     /*
