@@ -19,7 +19,7 @@ class Solution {
         {
             return true;
         }
-        else if(root == null || subRoot == null)
+        else if(root == null)
         {
             return false;
         }
