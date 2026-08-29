@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 39 / 49.**
+**Revised: 40 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -131,7 +131,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 50 | ☑ | F1 single-tyre race time |
 | 51 | ☑ | F1 tyre-change DP |
 | 54 | ☑ | Vertical area split |
-| 55 | ☐ | Rectangle exists (incremental) |
+| 55 | ☑ | Rectangle exists (incremental) |
 | 56 | ☐ | Max rectangle area |
 
 ### Revision notes
@@ -227,6 +227,19 @@ What's correct:
 - Duplicate insertions are harmless because the set retains one copy. String encoding with a comma delimiter remains unambiguous for negative and full-range `int` coordinates.
 - `addPoint` takes expected O(1) time. `hasRectangle` takes O(N²) time and O(N) temporary space for N distinct points.
 - Verified all built-ins plus all 512 subsets of a 3x3 grid, 500,000 stateful randomized insertion-prefix checks, duplicates, non-square and L-shaped cases, crossed points, and full-`int`-range corners: 500,520 independent checks with no failures.
+
+**#55 — Incremental rectangle existence (shared y-pairs across x-columns)**
+
+Mistakes avoided:
+- A duplicate point must not form a height pair with itself; the existing y-values at a column are stored in a set and `oldY == y` is skipped.
+- A repeated y-pair at the same x-column must not count as a second column; each y-pair maps to a set of distinct x-values rather than a raw occurrence count.
+- The y-pair is normalized as `(minY,maxY)`, so adding its two endpoints in either order produces the same key.
+
+What's correct:
+- An axis-aligned rectangle exists exactly when two distinct x-columns contain the same pair of distinct y-values. When `(x,y)` arrives, pair y with every previous height at x and register x under that normalized y-pair.
+- The first time a y-pair's x-set reaches size 2, four corners exist. Because points are only added, rectangle existence is monotonic, so the cached boolean can remain true forever and `hasRectangle()` is O(1).
+- If K distinct heights already exist at x, `addPoint` takes expected O(K) time. The maps use O(N + P) space, where P is the number of distinct `(y-pair,x-column)` relationships generated.
+- Verified all built-ins, every subset of a 3x3 point grid under canonical, reverse, and shuffled insertion orders, 20,000 stateful random streams with deliberate duplicates, delayed fourth corners, multiple rectangles, and full-`int`-range coordinates: 1,011,564 independent prefix comparisons with no failures.
 
 **#22 / #54 — Vertical line splitting rectangle area (event sweep)**
 
@@ -720,7 +733,7 @@ What's correct:
 - ☐ Maximum Number of Visible Points.
 - ☐ Count squares formed by horizontal and vertical segments.
 - ☑ Vertical line splitting rectangle area equally.
-- ☐ Point insertion + rectangle-existence query.
+- ☑ Point insertion + rectangle-existence query.
 - ☐ Maximum rectangle from stored points.
 - ☐ Merge two scrolling screenshots using maximum suffix-prefix overlap.
 - ☐ Date minus offset days, handling month/year/leap-year boundaries.

@@ -44,33 +44,36 @@ import java.util.Set;
  */
 public class RectangleExistsIncremental {
 
+    private boolean hasRectangle = false;
     private final Map<Integer, Set<Integer>> xToYs = new HashMap<>();
     private final Map<String, Set<Integer>> yPairToXs = new HashMap<>();
-    private boolean rectangleExists = false;
 
     public void addPoint(int x, int y) {
-        if (xToYs.containsKey(x)) {
-            for (int oldY : xToYs.get(x)) {
-                if (oldY == y) {
-                    continue; // duplicate point re-added, not a real height pair
+        if(xToYs.containsKey(x))
+        {
+            //form all ypairs and fill pair map
+            for(int oldY: xToYs.get(x))
+            {
+                if(oldY == y)
+                {
+                    continue;
                 }
-                int low = Math.min(oldY, y);
-                int high = Math.max(oldY, y);
-                String key = encode(low, high);
-
-                yPairToXs.computeIfAbsent(key, k -> new HashSet<>()).add(x);
-
-                if (yPairToXs.get(key).size() >= 2) {
-                    rectangleExists = true;
+                int lowY = Math.min(oldY, y);
+                int highY = Math.max(oldY, y);
+                String yPair = encode(lowY, highY);
+                yPairToXs.computeIfAbsent(yPair, k -> new HashSet<>()).add(x);
+                if(yPairToXs.get(yPair).size() >= 2)
+                {
+                    hasRectangle = true;
                 }
             }
         }
-
         xToYs.computeIfAbsent(x, k -> new HashSet<>()).add(y);
+
     }
 
     public boolean hasRectangle() {
-        return rectangleExists;
+        return hasRectangle;
     }
 
     private String encode(int y1, int y2) {
