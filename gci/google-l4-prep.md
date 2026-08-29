@@ -25,7 +25,7 @@
 | 9 | ☑ | Perform recursive placeholder substitution where replacement values may reference other placeholders; follow-up: detect cycles. → [solution](9-recursive-placeholder-substitution/RecursivePlaceholderSubstitution.java) |
 | 10 | ☑ | Build a filesystem, URL, or path hierarchy and support queries involving descendants, prefixes, subtree properties, or aggregated values. → [solution](10-filesystem-path-hierarchy/FileSystem.java) |
 | 11 | ☑ | Given files represented as arrays of lines, find the maximum common-prefix length between any pair of files. → [solution](11-max-common-prefix-files/FilePrefixMatcher.java) |
-| 12 | ☑ | Find the longest increasing subsequence where adjacent difference is exactly 1; follow-up: difference at most D; follow-up: reconstruct the indices or path. → [solution](12-longest-inc-subseq-adjacent-diff/LongestSubseqAdjacentDiff.java) **<span style="color:red">TODO: revisit segment-tree implementation (LC 2407 diff≤D, `lengthDiffAtMostDOptimal`) — internalize range-max query + point update, partial-overlap recursion, and the negatives fix (offset shift vs coordinate compression).</span>** |
+| 12 | ☑ | Find the longest increasing subsequence where adjacent difference is exactly 1; follow-up: difference at most D; follow-up: reconstruct the indices or path. → [solution](12-longest-inc-subseq-adjacent-diff/LongestSubseqAdjacentDiff.java) (O(N) value-keyed DP for exact difference 1; parent pointers for indices/path; segment-tree range maximum for the positive-value diff≤D follow-up). |
 | 13 | ☑ | Maintain or compute the Top K elements from a stream, such as users, words, scores, or records. → [solution](13-top-k-from-stream/TopKFromStream.java) |
 | 14 | ☑ | Given strings containing `L`, `R`, and `_`, determine whether the start can reach the target when `L` moves only left and `R` moves only right. → [solution](14-move-pieces-to-string/MovePiecesToString.java) |
 | 15 | ☑ | Interval progression: determine whether two intervals overlap; follow-ups: whether any pair overlaps, count overlaps, insert an interval, and merge overlaps. → [overlap](15-interval-overlap/IntervalOverlap.java), [any-pair](15-interval-overlap/AnyPairOverlap.java), [max-simultaneous](15-interval-overlap/MaxSimultaneousOverlap.java), [insert](15-interval-overlap/InsertInterval.java), [merge](15-interval-overlap/MergeIntervals.java) |
@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 34 / 49.**
+**Revised: 35 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -93,7 +93,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 9 | ☑ | Recursive placeholder substitution |
 | 10 | ☑ | Filesystem / path hierarchy |
 | 11 | ☑ | Max common prefix across files |
-| 12 | ☐ | Longest increasing subsequence, adjacent diff |
+| 12 | ☑ | Longest increasing subsequence, adjacent diff |
 | 13 | ☑ | Top K from a stream |
 | 14 | ☑ | Move pieces to string (`L`/`R`/`_`) |
 | 15 | ☑ | Interval overlap progression |
@@ -179,6 +179,24 @@ What's correct:
 - File/directory identity is independent of child count: an existing empty directory cannot become a file, root cannot become a file, and attempting either invalid operation leaves state unchanged.
 - `addFile`, `removeFile`, and `getSize` each take O(P) time for P path components, with O(total path components) storage, assuming aggregate sizes fit in `int`.
 - Verified all 18 built-in scenarios plus 200,000 deterministic stateful operations and 9,654,232 full-state size comparisons against an independent flat file/directory model.
+
+**#12 — Increasing subsequence with constrained adjacent difference (DP + value index)**
+
+Mistakes made:
+- The first quadratic length rewrite returned only `dp[n - 1]`, missing a longest chain that ended earlier, and did not handle an empty array.
+- Exact-`+1` checks initially used `nums[j] + 1 == nums[i]`, so `Integer.MAX_VALUE` wrapped to `Integer.MIN_VALUE` and created false transitions.
+- The optimal hash-map length rewrite initially declared `Long` keys but queried with boxed `Integer` expressions, so every predecessor lookup missed.
+- The first quadratic index reconstruction reversed its improvement comparison, left its best endpoint at `-1`, and reconstructed backward without reversing.
+- The optimized map reconstruction initially used `int` keys for `value - 1`, had an inconsistent endpoint variable, and replaced earlier equal-length paths when deterministic earliest ties were expected.
+- The shared bounded-`D` path solver initially returned indices despite a values-returning contract and computed differences in `int`.
+
+What's correct:
+- For exact difference 1, `dp[i]` is the best chain ending at index i; the O(N²) transition extends an earlier j only when `(long) nums[i] - nums[j] == 1`.
+- The O(N) optimization stores the best chain ending at each value. A current value x needs only the best earlier chain ending at x-1; scanning left-to-right preserves index order.
+- Index reconstruction stores a parent for every chosen transition. Both quadratic DP and value-keyed map versions walk parents backward and reverse the result.
+- For `1 <= difference <= D`, the shared quadratic solver reconstructs values using long differences. The segment-tree method handles the documented positive-value contract with a range maximum over `[value-D, value-1]` and point update at `value`.
+- Exact-difference length and optimized index methods run in O(N) expected time where value-keyed maps are used; quadratic reconstruction is O(N²); the positive-value segment-tree follow-up is O(N log M).
+- Comprehensive verification covered every public API: exhaustive small arrays, null/empty and full-int-range boundaries, deterministic tie cases, 20,000-50,000 randomized exact-difference cases, 488,280 bounded-`D` exhaustive combinations, 30,000 bounded-`D` randomized cases, and 615,954 positive-value segment-tree checks, with no failures.
 
 **#23 — Longest non-decreasing contiguous subarray (one pass + one-change prefix/suffix runs)**
 

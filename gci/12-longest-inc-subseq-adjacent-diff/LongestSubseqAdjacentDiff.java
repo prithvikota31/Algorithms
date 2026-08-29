@@ -44,7 +44,7 @@
  *
  * COMPLEXITY
  *   Base diff-1, OPTIMAL: lengthDiffOneOptimal (length) and
- *     indicesDiffOneOptimal (path indices) -> O(n) time / O(n) space
+ *     indicesDiffOneOptimalMap (path indices) -> O(n) time / O(n) space
  *     (value-keyed DP; the only legal predecessor of value x is x - 1, so no
  *      inner scan is needed).
  *   diff<=D:
@@ -63,21 +63,28 @@ public class LongestSubseqAdjacentDiff {
     // BASE: longest subsequence with adjacent difference EXACTLY 1 (length).
     // ------------------------------------------------------------------
     public int lengthDiffOne(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
         int n = nums.length;
-        if (n == 0) return 0;
-
-        int[] dp = new int[n];              // dp[i] = best chain length ending at i
-        int ans = 0;
-        for (int i = 0; i < n; i++) {
-            dp[i] = 1;                      // chain of just nums[i]
-            for (int j = 0; j < i; j++) {
-                if (nums[i] - nums[j] == 1 && dp[j] + 1 > dp[i]) {
-                    dp[i] = dp[j] + 1;
+        int[] dp = new int[n];
+        Arrays.fill(dp, 1);
+        
+        int answer = 1;
+        // dp[i] = longest valid subsequence ending at index i
+        for(int i = 1; i < n; i++)
+        {
+            for(int j = 0; j < i; j++)
+            {
+                if((long) nums[i] - nums[j] == 1 &&  1 + dp[j] > dp[i])
+                {
+                    dp[i] = 1 + dp[j];
                 }
             }
-            ans = Math.max(ans, dp[i]);
+            answer = Math.max(answer, dp[i]);
         }
-        return ans;
+
+        return answer;
     }
 
     // ------------------------------------------------------------------
@@ -88,17 +95,25 @@ public class LongestSubseqAdjacentDiff {
     // long keys avoid overflow when x == Integer.MIN_VALUE (x - 1 underflow).
     // ------------------------------------------------------------------
     public int lengthDiffOneOptimal(int[] nums) {
+        if(nums == null || nums.length == 0)
+        {
+            return 0;
+        }
+        //map stores value -> best length so far
         Map<Long, Integer> bestLength = new HashMap<>();
+
         int max = 0;
-        //bestLength(value) = bestLength(value - 1) + 1
         for(int num: nums)
         {
             long value = num;
-            int bestPossible = bestLength.getOrDefault(value - 1, 0) + 1;
-            bestLength.put(value, Math.max(bestLength.getOrDefault(value, 0), bestPossible));
-            max = Math.max(max, bestLength.get(value));
-        }
+            //best possible so far
+            int bestPossible = bestLength.getOrDefault(value - 1, 0);
 
+            int maxCurrentNumLength = Math.max(bestLength.getOrDefault(value, 0), bestPossible + 1);
+
+            bestLength.put(value, maxCurrentNumLength);
+            max = Math.max(max, maxCurrentNumLength);
+        }
         return max;
     }
 
@@ -109,13 +124,13 @@ public class LongestSubseqAdjacentDiff {
     // ------------------------------------------------------------------
 
     public List<Integer> indicesDiffOneOptimalV2(int[] nums) {
-        int n = nums.length;
-        if(n == 0)
+        if(nums == null || nums.length == 0)
         {
             return new ArrayList<>();
         }
+        int n = nums.length;
 
-        Map<Integer, Integer> bestValueIndex = new HashMap<>(); //value -> indice
+        Map<Long, Integer> bestValueIndex = new HashMap<>(); //value -> index
 
         int[] parent = new int[n];
         int[] length = new int[n]; //gives best length ending at i
@@ -123,7 +138,7 @@ public class LongestSubseqAdjacentDiff {
 
         for(int i = 0; i < n; i++)
         {
-            int currentValue = nums[i];
+            long currentValue = nums[i];
 
             Integer previousIndex = bestValueIndex.get(currentValue - 1);
             if(previousIndex == null) //nothing exists before this value
@@ -169,96 +184,121 @@ public class LongestSubseqAdjacentDiff {
         Collections.reverse(path);
         return path;
     }
-    public List<Integer> indicesDiffOneOptimal(int[] nums) {
-        int n = nums.length;
 
-        if (n == 0) {
+    public List<Integer> indicesDiffOneOptimalMap(int[] nums)
+    {
+        if(nums == null || nums.length == 0)
+        {
             return new ArrayList<>();
         }
+        int n = nums.length;
+        Map<Long, Integer> bestValueIndexMap = new HashMap<>();
+        //val -> (i)index (this val has best max at index i)
 
-        /*
-         * value -> index
-         *
-         * For each value, remember the index where the longest path
-         * ending with that value currently finishes.
-         *
-         * Example:
-         * nums = [2, 3]
-         * bestIndexEndingWithValue:
-         * 2 -> 0
-         * 3 -> 1
-         */
-        Map<Long, Integer> bestIndexEndingWithValue = new HashMap<>();
+        int[] parent = new int[n];
+        int[] length = new int[n];
 
-        /*
-         * pathLengthEndingAt[i]:
-         * Length of the best path whose final element is nums[i].
-         *
-         * previousIndex[i]:
-         * Index immediately before i in that path.
-         * -1 means nums[i] starts the path.
-         */
-        int[] pathLengthEndingAt = new int[n];
-        int[] previousIndex = new int[n];
-        Arrays.fill(previousIndex, -1);
+        Arrays.fill(parent, -1);
+        Arrays.fill(length, 1);
 
-        /*
-         * Index where the longest path found anywhere ends.
-         * We start reconstruction from this index.
-         */
-        int longestPathEndIndex = 0;
+        for(int i = 0; i < n; i++)
+        {
+            long value = nums[i];
 
-        for (int currentIndex = 0; currentIndex < n; currentIndex++) {
-            long currentValue = nums[currentIndex];
-
-            /*
-             * To place currentValue after another element,
-             * the previous value must be currentValue - 1.
-             * If currentValue = 4, search for the best path ending at 3.
-             */
-            Integer predecessorIndex = bestIndexEndingWithValue.get(currentValue - 1);
-
-            if (predecessorIndex == null) {
-                // No predecessor exists, so start a new path.
-                pathLengthEndingAt[currentIndex] = 1;
-            } else {
-                // Extend the predecessor's path.
-                pathLengthEndingAt[currentIndex] = pathLengthEndingAt[predecessorIndex] + 1;
-                // Leave a breadcrumb for reconstruction.
-                previousIndex[currentIndex] = predecessorIndex;
+            if(!bestValueIndexMap.containsKey(value - 1))
+            {
+                length[i] = 1;
+            }
+            else //value - 1 best is present
+            {
+                int bestIndexValMinusOne = bestValueIndexMap.get(value - 1);
+                length[i] = length[bestIndexValMinusOne] + 1;
+                parent[i] = bestIndexValMinusOne;
             }
 
-            /*
-             * Decide whether currentIndex is now the best ending index
-             * for paths whose final value is currentValue.
-             */
-            Integer existingEndIndex = bestIndexEndingWithValue.get(currentValue);
-            if (existingEndIndex == null
-                    || pathLengthEndingAt[currentIndex] > pathLengthEndingAt[existingEndIndex]) {
-                bestIndexEndingWithValue.put(currentValue, currentIndex);
-            }
+            //check current value's best ending index
+            Integer bestIndexCurVal = bestValueIndexMap.get(value);
 
-            // Remember where the longest path across all values ends.
-            if (pathLengthEndingAt[currentIndex] > pathLengthEndingAt[longestPathEndIndex]) {
-                longestPathEndIndex = currentIndex;
+            if(bestIndexCurVal == null || length[i] > length[bestIndexCurVal])
+            {
+                bestValueIndexMap.put(value, i);
             }
         }
 
-        /*
-         * Walk backward through the breadcrumbs, then reverse.
-         * Example: 6 -> 5 -> 3 -> 1 -> 0
-         */
-        List<Integer> resultIndices = new ArrayList<>();
-        int currentIndex = longestPathEndIndex;
-        while (currentIndex != -1) {
-            resultIndices.add(currentIndex);
-            currentIndex = previousIndex[currentIndex];
-        }
-        Collections.reverse(resultIndices);
+        // now find bestIndex with maxValue
+        int maxIndex = 0;
+        int max = 1;
 
-        return resultIndices;
+        for(int i = 0; i < n; i++)
+        {
+            if(length[i] > max)
+            {
+                maxIndex = i;
+                max = length[i];
+            }
+        }
+
+        List<Integer> result = new ArrayList<>();
+        int cur = maxIndex;
+        while(parent[cur] != -1)
+        {
+            result.add(cur);
+            cur = parent[cur];
+        }
+        result.add(cur);
+        Collections.reverse(result);
+        return result;
     }
 
+    public List<Integer> indicesDiffOneOptimalDP(int[] nums)
+    {
+        if(nums == null || nums.length == 0)
+        {
+            return new ArrayList<>();
+        }
+        int n = nums.length;
+
+        int[] parent = new int[n];
+        int[] dp = new int[n];
+
+        Arrays.fill(parent, -1);
+        Arrays.fill(dp, 1);
+        
+        for(int i = 1; i < n; i++)
+        {
+            for(int j = 0; j < i; j++)
+            {
+                if((long) nums[i] - nums[j] == 1 && dp[i] < dp[j] + 1)
+                {
+                    parent[i] = j;
+                    dp[i] = dp[j] + 1;
+                } 
+            }
+        }
+        //now we got parent array and dp array
+        //find max value in DP
+        int maxIndex = 0;
+        int maxValue = 1;
+        for(int i = 0; i < n; i++)
+        {
+            if(dp[i] > maxValue)
+            {
+                maxIndex = i;
+                maxValue = dp[i];
+            }
+        }
+
+        List<Integer> result = new ArrayList<>();
+        int cur = maxIndex;
+        while(parent[cur] != -1)
+        {
+            result.add(cur);
+            cur = parent[cur];
+        }
+        result.add(cur);
+        Collections.reverse(result);
+        return result;
+    }
     // ------------------------------------------------------------------
     // BASE + PATH: reconstruct the actual subsequence (values), diff EXACTLY 1.
     // ------------------------------------------------------------------
@@ -274,14 +314,17 @@ public class LongestSubseqAdjacentDiff {
         return solve(nums, D);
     }
 
+
+
     // ------------------------------------------------------------------
     // Shared O(n^2) DP + path reconstruction.
     // A step j -> i is allowed when  1 <= nums[i] - nums[j] <= D.
     // (D = 1 gives the "exactly 1" base problem.)
     // ------------------------------------------------------------------
     private List<Integer> solve(int[] nums, int D) {
+        if (nums == null || nums.length == 0) return new ArrayList<>();
+
         int n = nums.length;
-        if (n == 0) return new ArrayList<>();
 
         int[] dp = new int[n];              // dp[i] = best chain length ending at i
         int[] parent = new int[n];          // predecessor index for dp[i], or -1
@@ -291,7 +334,7 @@ public class LongestSubseqAdjacentDiff {
         for (int i = 0; i < n; i++) {
             dp[i] = 1;
             for (int j = 0; j < i; j++) {
-                int diff = nums[i] - nums[j];
+                long diff = (long) nums[i] - nums[j];
                 if (diff >= 1 && diff <= D && dp[j] + 1 > dp[i]) {
                     dp[i] = dp[j] + 1;
                     parent[i] = j;
@@ -303,13 +346,19 @@ public class LongestSubseqAdjacentDiff {
             }
         }
 
-        // Walk parent pointers back from the best endpoint, then reverse.
-        LinkedList<Integer> path = new LinkedList<>();
-        for (int i = globalEnd; i != -1; i = parent[i]) {
-            path.addFirst(nums[i]);
+        List<Integer> result = new ArrayList<>();
+        int cur = globalEnd;
+        while(parent[cur] != -1)
+        {
+            result.add(nums[cur]);
+            cur = parent[cur];
         }
-        return path;
+        result.add(nums[cur]);
+        Collections.reverse(result);
+        return result;
     }
+
+
 
     // ------------------------------------------------------------------
     // FOLLOW-UP A, OPTIMAL O(n log M): LENGTH of the longest strictly-
@@ -431,15 +480,12 @@ public class LongestSubseqAdjacentDiff {
         System.out.println(sol.pathDiffAtMostD(a, 1));   // [1, 2, 3, 4, 5, 6]
 
         int[] d = {2, 3, 1, 4, 3, 5, 6};
-        System.out.println(sol.indicesDiffOneOptimal(d));   // [0, 1, 3, 5, 6]
         System.out.println(sol.indicesDiffOneOptimalV2(d)); // [0, 1, 3, 5, 6]
 
         int[] e = {5, 6, 7, 1, 2, 3};                        // two runs of len 3; earliest wins
-        System.out.println(sol.indicesDiffOneOptimal(e));   // [0, 1, 2]  (values 5,6,7)
         System.out.println(sol.indicesDiffOneOptimalV2(e)); // [0, 1, 2]  (values 5,6,7)
 
         int[] f = {4, 4, 5, 6};                              // duplicate 4; still values 4,5,6
-        System.out.println(sol.indicesDiffOneOptimal(f));   // [0, 2, 3]  (values 4,5,6)
         System.out.println(sol.indicesDiffOneOptimalV2(f)); // [0, 2, 3]  (values 4,5,6)
 
         int[] g = {4, 2, 1, 4, 3, 4, 5, 8, 15};              // diff<=D, O(n log M) segment tree
