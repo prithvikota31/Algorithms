@@ -51,12 +51,17 @@ public class MaxRectangleArea {
     private long maxArea = 0;
 
     public void addPoint(int x, int y) {
-        if (xToYs.containsKey(x)) {
-            for (int oldY : xToYs.get(x)) {
+        Set<Integer> ysAtX = xToYs.computeIfAbsent(x, k -> new HashSet<>());
+        if (ysAtX.contains(y)) {
+            return;
+        }
+
+        if (!ysAtX.isEmpty()) {
+            for (int oldY : ysAtX) {
                 int y1 = Math.min(oldY, y);
                 int y2 = Math.max(oldY, y);
                 String key = encode(y1, y2);
-                long height = y2 - y1;
+                long height = (long) y2 - y1;
 
                 if (yPairToXs.containsKey(key)) {
                     for (int previousX : yPairToXs.get(key)) {
@@ -69,7 +74,7 @@ public class MaxRectangleArea {
             }
         }
 
-        xToYs.computeIfAbsent(x, k -> new HashSet<>()).add(y);
+        ysAtX.add(y);
     }
 
     public long getMaxArea() {

@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 40 / 49.**
+**Revised: 41 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -132,7 +132,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 51 | ☑ | F1 tyre-change DP |
 | 54 | ☑ | Vertical area split |
 | 55 | ☑ | Rectangle exists (incremental) |
-| 56 | ☐ | Max rectangle area |
+| 56 | ☑ | Max rectangle area |
 
 ### Revision notes
 
@@ -734,7 +734,7 @@ What's correct:
 - ☐ Count squares formed by horizontal and vertical segments.
 - ☑ Vertical line splitting rectangle area equally.
 - ☑ Point insertion + rectangle-existence query.
-- ☐ Maximum rectangle from stored points.
+- ☑ Maximum rectangle from stored points.
 - ☐ Merge two scrolling screenshots using maximum suffix-prefix overlap.
 - ☐ Date minus offset days, handling month/year/leap-year boundaries.
 - ☐ Two-string inserted-phrase detection.
