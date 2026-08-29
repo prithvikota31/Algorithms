@@ -45,36 +45,56 @@ public class RectangleExists {
     }
 
     public boolean hasRectangle() {
-        List<int[]> pointList = new ArrayList<>();
-        for (String point : points) {
-            String[] parts = point.split(",");
-            pointList.add(new int[] {Integer.parseInt(parts[0]), Integer.parseInt(parts[1])});
+        List<int[]> pointsList = new ArrayList<>();
+
+        for(String point: points)
+        {
+            pointsList.add(decode(point));
         }
+        int n = pointsList.size();
 
-        for (int i = 0; i < pointList.size(); i++) {
-            for (int j = i + 1; j < pointList.size(); j++) {
-                int x1 = pointList.get(i)[0];
-                int y1 = pointList.get(i)[1];
-                int x2 = pointList.get(j)[0];
-                int y2 = pointList.get(j)[1];
+        for(int i = 0; i < n; i++)
+        {
+            for(int j = i + 1; j < n; j++)
+            {
+                int[] coordinate1 = pointsList.get(i);
+                int[] coordinate2 = pointsList.get(j);
 
-                // Same row or same column can't be diagonal corners.
-                if (x1 == x2 || y1 == y2) {
+                int x1 = coordinate1[0];
+                int x2 = coordinate2[0];
+                int y1 = coordinate1[1];
+                int y2 = coordinate2[1];
+
+                if(x1 == x2 || y1 == y2)
+                {
                     continue;
                 }
 
-                if (points.contains(encode(x1, y2)) && points.contains(encode(x2, y1))) {
+                if(points.contains(encode(x1, y2)) 
+                        && points.contains((encode(x2, y1))))
+                {
                     return true;
                 }
             }
         }
-
         return false;
+
     }
 
-    private String encode(int x, int y) {
+    private String encode(int x, int y)
+    {
         return x + "," + y;
     }
+
+    private int[] decode(String s)
+    {
+        String[] strArr = s.split(",");
+        int[] c = new int[2];
+        c[0] = Integer.parseInt(strArr[0]);
+        c[1] = Integer.parseInt(strArr[1]);
+        return c;
+    }
+
 
     public static void main(String[] args) {
         // Full rectangle: (1,1),(1,3),(3,1),(3,3) -> true.

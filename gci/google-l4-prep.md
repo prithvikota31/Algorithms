@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 38 / 49.**
+**Revised: 39 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -101,7 +101,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 18 | ☑ | Merge two N-ary trees |
 | 19 | ☑ | Tree leaves with max ancestor |
 | 20 | ☑ | Connected components of 1-nodes in a binary tree |
-| 21 | ☐ | Rectangle from 2D points |
+| 21 | ☑ | Rectangle from 2D points |
 | 22 | ☑ | Vertical line splitting rectangle area |
 | 23 | ☑ | Longest non-decreasing subarray |
 | 24 | ☑ | Remove adjacent character pairs |
@@ -214,6 +214,19 @@ What's correct:
 - Fixed K takes O(1) time per operation and O(K) space. Dynamic K takes amortized O(1) time per operation and O(N) space; resetting an `ArrayList` is linear in the current segment but linear overall across all resets.
 - The fixed-K contract assumes each maintained non-zero window product fits in `long`. The dynamic-K contract assumes every cumulative product since the latest zero fits in `long`, and `1 <= k <=` the number of inserted values.
 - Verified fixed K with 3,295,917 exhaustive and targeted checks, including zero transitions, negatives, invalid capacities, and an avoidable intermediate-overflow regression. Verified dynamic K with 16,833,000 exhaustive and deterministic randomized checks across varying valid k, consecutive and multiple zeros, negative products, and full-window queries, with no failures under the documented arithmetic assumptions.
+
+**#21 — Axis-aligned rectangle existence (diagonal corners + hash set)**
+
+Mistakes made:
+- The first rewrite decoded both coordinates from `strArr[0]`, turning every stored `(x,y)` into `(x,x)` during pair enumeration.
+- That decoding error produced both kinds of failure: two crossed points such as `(1,2)` and `(2,1)` became a false rectangle, while valid non-square rectangles could be missed.
+
+What's correct:
+- Store each distinct point in a hash set. For every pair of stored points with different x- and y-coordinates, treat them as a candidate diagonal and check the two forced corners `(x1,y2)` and `(x2,y1)`.
+- This is complete because every axis-aligned rectangle has a diagonal among the enumerated point pairs. It is sound because a diagonal plus both forced corners supplies four distinct rectangle corners.
+- Duplicate insertions are harmless because the set retains one copy. String encoding with a comma delimiter remains unambiguous for negative and full-range `int` coordinates.
+- `addPoint` takes expected O(1) time. `hasRectangle` takes O(N²) time and O(N) temporary space for N distinct points.
+- Verified all built-ins plus all 512 subsets of a 3x3 grid, 500,000 stateful randomized insertion-prefix checks, duplicates, non-square and L-shaped cases, crossed points, and full-`int`-range corners: 500,520 independent checks with no failures.
 
 **#22 / #54 — Vertical line splitting rectangle area (event sweep)**
 
