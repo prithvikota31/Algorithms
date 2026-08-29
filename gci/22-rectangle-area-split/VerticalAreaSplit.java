@@ -11,7 +11,8 @@ import java.util.Random;
  * Given axis-aligned rectangles [x1, y1, x2, y2], find a vertical line x = k
  * such that the rectangle area left of the line equals the area to its right.
  * Rectangles may overlap; overlapping area is counted once per rectangle
- * (areas simply add -- this is not a union-area problem).
+ * (areas simply add -- this is not a union-area problem). The two supplied
+ * corners may appear in either order.
  *
  * EXAMPLES
  * --------
@@ -34,7 +35,8 @@ import java.util.Random;
  *
  * ALGORITHM
  * ---------
- * 1. Emit events (x1, +height) and (x2, -height); accumulate totalArea.
+ * 1. Normalize each pair of corners, emit events (startX, +height) and
+ *    (endX, -height), and accumulate totalArea using long differences.
  * 2. Sort events by x; targetArea = totalArea / 2.
  * 3. Walk the events. For the strip [previousX, currentX):
  *      stripArea = (currentX - previousX) * activeHeight
@@ -52,65 +54,74 @@ import java.util.Random;
 public class VerticalAreaSplit {
 
     public double findVerticalCut(int[][] rectangles) {
-        if (rectangles == null || rectangles.length == 0) {
+        if(rectangles == null || rectangles.length == 0)
+        {
             return 0;
         }
 
-        // Each event is {x, heightChange}.
-        double[][] events = new double[rectangles.length * 2][];
+        //rectangle (x1, y1, x2, y2) diagonal coordinates
+        int n = rectangles.length;
+        long[][] events = new long[2 * n][2];
+        //each event is (x, height it adds/subtracts)
         double totalArea = 0;
-        int next = 0;
+        int ind = 0;
+        for(int[] rectangle: rectangles)
+        {
+            int x1 = rectangle[0];
+            int y1 = rectangle[1];
+            int x2 = rectangle[2];
+            int y2 = rectangle[3];
 
-        for (int[] rect : rectangles) {
-            int startX = rect[0];
-            int endX = rect[2];
-            int height = rect[3] - rect[1];
+            long startX = Math.min((long) x1, x2);
+            long endX = Math.max((long) x1, x2);
+            long height = Math.abs((long) y2 - y1);
 
             totalArea += (double) (endX - startX) * height;
-            events[next++] = new double[] {startX, height};
-            events[next++] = new double[] {endX, -height};
+            events[ind][1] = height;
+            events[ind++][0] = startX;
+            events[ind][1] = -height;
+            events[ind++][0] = endX;
         }
 
-        Arrays.sort(events, (a, b) -> Double.compare(a[0], b[0]));
+        // so now we have all events
+        //lets sweep across the events one strip at a time
+        Arrays.sort(events, (a, b) -> Long.compare(a[0], b[0]));
 
         double targetArea = totalArea / 2.0;
-        double currentArea = 0;
-        double activeHeight = 0;
-        double previousX = events[0][0];
+        long previousStripX = events[0][0];
+        long activeHeight = 0;
+        double areaSoFar = 0;
+        int i = 0;
 
-        int eventIndex = 0;
-        while (eventIndex < events.length) {
-            // No rectangle starts or ends between these two x-coordinates,
-            // so their combined height is constant throughout this strip.
-            double stripStartX = previousX;
-            double stripEndX = events[eventIndex][0];
-            double stripWidth = stripEndX - stripStartX;
-            double areaInStrip = stripWidth * activeHeight;
+        while(i < events.length)
+        {
+            long stripEndX = events[i][0];
+            long stripStartX = previousStripX;
+            long stripWidth = stripEndX - stripStartX;
+            double stripArea = (double) stripWidth * activeHeight;
 
-            // If half the total area falls inside this strip, determine how
-            // far into the strip we must travel to collect the missing area.
-            if (activeHeight > 0
-                    && currentArea + areaInStrip >= targetArea) {
-                double remainingAreaNeeded = targetArea - currentArea;
-                double distanceIntoStrip = remainingAreaNeeded / activeHeight;
-                return stripStartX + distanceIntoStrip;
+            if(activeHeight > 0 && areaSoFar + stripArea >= targetArea)
+            {
+                double remainingArea = targetArea - areaSoFar;
+                double extend = remainingArea / activeHeight;
+
+                return stripStartX + extend;
+
+            }
+            areaSoFar += stripArea;
+
+            while(i < events.length && events[i][0] == stripEndX)
+            {
+                activeHeight += events[i][1];
+                i++;
             }
 
-            // The cut was not in this strip, so include its entire area.
-            currentArea += areaInStrip;
-
-            // Apply every rectangle start/end event at this boundary. The
-            // resulting height will be used for the next strip.
-            while (eventIndex < events.length
-                    && events[eventIndex][0] == stripEndX) {
-                activeHeight += events[eventIndex][1];
-                eventIndex++;
-            }
-
-            previousX = stripEndX;
+            previousStripX = stripEndX;
         }
 
-        return previousX;
+        return previousStripX;
+
+
     }
 
     public static void main(String[] args) {
@@ -164,6 +175,21 @@ public class VerticalAreaSplit {
         check("negative coordinates", sol.findVerticalCut(new int[][] {
                 {-4, -2, 0, 2}, {0, -2, 4, 2}
         }), 0.0);
+
+        // Combined active height exceeds int but fits in long.
+        check("large overlapping heights", sol.findVerticalCut(new int[][] {
+            {0, -1_000_000_000, 1, 1_000_000_000},
+            {0, -1_000_000_000, 1, 1_000_000_000}
+        }), 0.5);
+
+        // Coordinate subtraction must widen before spanning this range.
+        check("full int x-range", sol.findVerticalCut(new int[][] {
+            {Integer.MIN_VALUE, 0, Integer.MAX_VALUE, 1}
+        }), -0.5);
+
+        check("reversed diagonal corners", sol.findVerticalCut(new int[][] {
+            {4, 3, 0, 1}
+        }), 2.0);
 
         verifyAreaBalance(sol);
         System.out.println("all passed");

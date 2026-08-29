@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 36 / 49.**
+**Revised: 38 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -102,7 +102,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 19 | ☑ | Tree leaves with max ancestor |
 | 20 | ☑ | Connected components of 1-nodes in a binary tree |
 | 21 | ☐ | Rectangle from 2D points |
-| 22 | ☐ | Vertical line splitting rectangle area |
+| 22 | ☑ | Vertical line splitting rectangle area |
 | 23 | ☑ | Longest non-decreasing subarray |
 | 24 | ☑ | Remove adjacent character pairs |
 | 25 | ☑ | Subsequence dictionary match |
@@ -130,7 +130,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 49 | ☑ | Mouse jump max score |
 | 50 | ☑ | F1 single-tyre race time |
 | 51 | ☑ | F1 tyre-change DP |
-| 54 | ☐ | Vertical area split |
+| 54 | ☑ | Vertical area split |
 | 55 | ☐ | Rectangle exists (incremental) |
 | 56 | ☐ | Max rectangle area |
 
@@ -214,6 +214,23 @@ What's correct:
 - Fixed K takes O(1) time per operation and O(K) space. Dynamic K takes amortized O(1) time per operation and O(N) space; resetting an `ArrayList` is linear in the current segment but linear overall across all resets.
 - The fixed-K contract assumes each maintained non-zero window product fits in `long`. The dynamic-K contract assumes every cumulative product since the latest zero fits in `long`, and `1 <= k <=` the number of inserted values.
 - Verified fixed K with 3,295,917 exhaustive and targeted checks, including zero transitions, negatives, invalid capacities, and an avoidable intermediate-overflow regression. Verified dynamic K with 16,833,000 exhaustive and deterministic randomized checks across varying valid k, consecutive and multiple zeros, negative products, and full-window queries, with no failures under the documented arithmetic assumptions.
+
+**#22 / #54 — Vertical line splitting rectangle area (event sweep)**
+
+Mistakes made:
+- The first rewrite emitted start/end events but forgot to sort them by x, so the sweep depended on input rectangle order.
+- Initially added an entire strip to `areaSoFar` before locating the cut inside it. Subtracting that completed area from the target made the remaining area negative and returned a point to the left of the strip.
+- Used `areaSoFar > targetArea`, missing valid cuts that land exactly on an event boundary; the strip-containment test must use `areaSoFar + stripArea >= targetArea` before consuming the strip.
+- Initially stored event heights, active height, and strip widths as `int`. Coordinate subtraction and the sum of overlapping heights could overflow even when every input coordinate was a valid `int`.
+- The first fallback returned the arbitrary sentinel `-1`; for zero-total-area inputs, the last processed event coordinate is a meaningful valid fallback.
+
+What's correct:
+- Normalize the two diagonal corners, widen to `long` before subtracting coordinates, and emit `(startX, +height)` and `(endX, -height)` events. Overlaps count once per rectangle, so active heights simply add; this is not union-area coverage.
+- Sort all events by x. At the start of each strip, `areaSoFar` is exactly the area strictly left of `stripStartX`, and `activeHeight` is constant until `stripEndX`.
+- If `areaSoFar + stripWidth * activeHeight` reaches half the total, the exact cut is `stripStartX + (targetArea - areaSoFar) / activeHeight`. Otherwise consume the whole strip, then apply every event sharing its right boundary before measuring the next strip.
+- Starting at event index 0 intentionally creates a harmless zero-width first strip, then activates every rectangle beginning at the leftmost event coordinate. For positive total area the method returns from a real strip; `previousStripX` is only the zero-area fallback.
+- The sweep takes O(N log N) time to sort 2N events and O(N) event storage. Problem #54 is the same formulation as #22 and uses this implementation.
+- Verified all deterministic built-ins and 2,000 built-in randomized balance checks, plus 27,930 exhaustive rectangle lists, 100,000 independent randomized lists, exact-boundary and gap plateaus, full-`int` coordinate spans, aggregate heights above `Integer.MAX_VALUE`, reversed corners, and zero-area degenerates, with no failures.
 
 **#23 — Longest non-decreasing contiguous subarray (one pass + one-change prefix/suffix runs)**
 
@@ -584,7 +601,7 @@ What's correct:
 
 ### Tier 1 — Highest priority / recurring concrete formulations
 - ☐ Rectangle queries over point sets: insert/query points, detect rectangles, then compute maximum rectangle area (2025 report progression).
-- ☐ Area split by a vertical line across rectangles, sometimes with overlaps requiring union-area handling.
+- ☑ Area split by a vertical line across rectangles when overlapping contributions are counted per rectangle. The distinct union-area variation remains conceptual only.
 - ☐ Number of islands in a binary tree, including component-size or uniqueness follow-ups.
 
 ### Tier 2 — Strong Google-style preparation value
@@ -689,7 +706,7 @@ What's correct:
 - ☐ Rectangle Area.
 - ☐ Maximum Number of Visible Points.
 - ☐ Count squares formed by horizontal and vertical segments.
-- ☐ Vertical line splitting rectangle area equally.
+- ☑ Vertical line splitting rectangle area equally.
 - ☐ Point insertion + rectangle-existence query.
 - ☐ Maximum rectangle from stored points.
 - ☐ Merge two scrolling screenshots using maximum suffix-prefix overlap.
