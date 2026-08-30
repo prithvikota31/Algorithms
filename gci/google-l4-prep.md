@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 41 / 49.**
+**Revised: 42 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -120,7 +120,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 38 | ☐ | Sentence similarity (transitive) |
 | 39 | ☑ | Sequence reconstruction |
 | 40 | ☑ | Token translator |
-| 41 | ☐ | Build tree from parent-child pairs |
+| 41 | ☑ | Build tree from parent-child pairs |
 | 42 | ☑ | Merge N-ary trees with conflict rules |
 | 43 | ☐ | Delete N-ary tree leaves |
 | 44 | ☐ | Leaves grouped by removal round |
@@ -592,6 +592,15 @@ What's correct:
 - Map the source to itself as the reconstruction sentinel, walk from target through parents, then reverse the collected list to return source-to-target order.
 - Both APIs use O(V + E) space. Verified all 12 built-ins plus 74,460 exhaustive reachability checks and 74,460 shortest-path legality/optimality checks across every directed graph through four tokens, including unknown sources and duplicate mappings.
 
+**#41 — Build an N-ary tree from parent-child pairs (node map + child set)**
+
+What's correct:
+- A value-to-node map owns identity: every mention of a value resolves to the same `TreeNode`, so parent-child pairs can arrive in any order without buffering orphan nodes.
+- Each relationship connects the mapped parent object to the mapped child object. The root is the one mapped value that never appeared in the child position.
+- Under the documented contract of unique non-null values, one parent per child, one root, valid two-element rows, no duplicate relationships, and no cycles, the construction is complete and runs in expected O(N) time and O(N) space.
+- Invalid-input detection remains a conceptual follow-up: duplicate edges duplicate a child entry, multiple parents share one child object, a forest returns an arbitrary root, and a pure cycle returns null. The nested `TreeNode` is package-private despite being returned by a public method, which is acceptable for this standalone same-package exercise but not an exported library API.
+- Verified all built-ins plus 5,913 exhaustive rooted trees across 41,391 relationship-order variants and 50,000 randomized trees of up to 100 nodes: 91,392 valid cases passed structural checks for root identity, unique node identity, exact edges, reachability, and acyclicity.
+
 **#50 — F1 single-tyre race time (geometric-sequence simulation)**
 
 Mistakes made:
@@ -679,7 +688,7 @@ What's correct:
 - ☐ Sentence Similarity II / equivalence through transitive relationships.
 - ☐ Sequence Reconstruction.
 - ☐ Generic language translator using dependency/mapping relationships.
-- ☐ Build a tree from parent-child relationships.
+- ☑ Build a tree from parent-child relationships.
 - ☐ Merge two N-ary trees with field-specific conflict rules.
 - ☐ Recursively delete leaf nodes from a multi-tree.
 - ☐ Return leaves grouped by removal round.
