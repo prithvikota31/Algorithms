@@ -1,9 +1,9 @@
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 /*
  * ============================================================================
@@ -71,43 +71,49 @@ public class RecipesFromSupplies {
 
     public List<String> findAllRecipes(String[] recipes, List<List<String>> ingredients,
             String[] supplies) {
-        Map<String, List<String>> dependents = new HashMap<>();
-        Map<String, Integer> remaining = new HashMap<>();
+        //recipe , ingredients
+        //graph edge
+        //ingredient -> recipe
+        Map<String, List<String>> graph = new HashMap<>();
+        Map<String, Integer> inDegree = new HashMap<>();
+        //indegree ingreident/recipe -> count
 
-        for (int i = 0; i < recipes.length; i++) {
+        for(int i = 0; i < ingredients.size(); i++)
+        {
             String recipe = recipes[i];
-            remaining.put(recipe, ingredients.get(i).size());
+            for(String ingredient: ingredients.get(i))
+            {
+                graph.computeIfAbsent(ingredient, k -> new ArrayList<>()).add(recipe);
 
-            for (String ingredient : ingredients.get(i)) {
-                dependents.computeIfAbsent(ingredient, k -> new ArrayList<>()).add(recipe);
             }
+            inDegree.putIfAbsent(recipe, ingredients.get(i).size());
+
         }
 
-        Queue<String> queue = new ArrayDeque<>();
-        for (String supply : supplies) {
-            queue.offer(supply);
-        }
+        Deque<String> q = new ArrayDeque<>();
 
+        for(String supply: supplies)
+        {
+            q.offer(supply);
+        }
         List<String> result = new ArrayList<>();
-        while (!queue.isEmpty()) {
-            String availableItem = queue.poll();
-
-            if (!dependents.containsKey(availableItem)) {
-                continue;
-            }
-
-            for (String recipe : dependents.get(availableItem)) {
-                int stillNeeded = remaining.get(recipe) - 1;
-                remaining.put(recipe, stillNeeded);
-
-                if (stillNeeded == 0) {
-                    result.add(recipe);
-                    queue.offer(recipe);
+        while(!q.isEmpty())
+        {
+            String cur = q.poll();
+            //initial supplies should not be added to result;
+            for(String nei: graph.getOrDefault(cur, new ArrayList<>()))
+            {
+                inDegree.put(nei, inDegree.get(nei) - 1);
+                if(inDegree.get(nei) == 0)
+                {
+                    result.add(nei);
+                    q.offer(nei);
                 }
             }
         }
 
         return result;
+
     }
 
     public static void main(String[] args) {
