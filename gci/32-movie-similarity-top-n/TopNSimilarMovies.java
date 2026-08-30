@@ -1,11 +1,11 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
 
 /*
@@ -69,36 +69,38 @@ public class TopNSimilarMovies {
             return result;
         }
 
-        // Min-heap: the lowest-rated candidate so far stays on top, ready
-        // to be evicted the moment a better one pushes the heap past size N.
-        PriorityQueue<String> minHeap = new PriorityQueue<>(
-                (a, b) -> Double.compare(ratings.get(a), ratings.get(b)));
-
+        Deque<String> q = new ArrayDeque<>();
+        PriorityQueue<String> minHeap = 
+                    new PriorityQueue<>((a, b) -> Double.compare(ratings.get(a), ratings.get(b)));
+        
         Set<String> visited = new HashSet<>();
-        Queue<String> queue = new LinkedList<>();
-        queue.offer(start);
+        q.offer(start);
         visited.add(start);
-
-        while (!queue.isEmpty()) {
-            String current = queue.poll();
-
+        while(!q.isEmpty())
+        {
+            String current  = q.poll();
             minHeap.offer(current);
-            if (minHeap.size() > n) {
+            if(minHeap.size() > n)
+            {
                 minHeap.poll();
             }
 
-            for (String neighbor : adjacency.getOrDefault(current, List.of())) {
-                if (visited.add(neighbor)) {
-                    queue.offer(neighbor);
+            for(String nei: adjacency.getOrDefault(current, new ArrayList<>()))
+            {
+                if(!visited.contains(nei))
+                {
+                    visited.add(nei);
+                    q.offer(nei);
                 }
             }
         }
 
-        while (!minHeap.isEmpty()) {
+        while(!minHeap.isEmpty())
+        {
             result.add(minHeap.poll());
         }
-        Collections.reverse(result);
 
+        Collections.reverse(result);
         return result;
     }
 

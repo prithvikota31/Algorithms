@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 42 / 49.**
+**Revised: 46 / 49.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -112,18 +112,18 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 29 | ☑ | Logger rate limiter |
 | 30 | ☐ | Music shuffler with no repeat in K |
 | 31 | ☑ | Best café for friends |
-| 32 | ☐ | Movie similarity Top N |
+| 32 | ☑ | Movie similarity Top N |
 | 33 | ☑ | Teleporter shortest path |
 | 34 | ☐ | Currency arbitrage |
 | 35 | ☑ | Broadcast signal propagation |
-| 37 | ☐ | Recipes from supplies |
+| 37 | ☑ | Recipes from supplies |
 | 38 | ☐ | Sentence similarity (transitive) |
 | 39 | ☑ | Sequence reconstruction |
 | 40 | ☑ | Token translator |
 | 41 | ☑ | Build tree from parent-child pairs |
 | 42 | ☑ | Merge N-ary trees with conflict rules |
-| 43 | ☐ | Delete N-ary tree leaves |
-| 44 | ☐ | Leaves grouped by removal round |
+| 43 | ☑ | Delete N-ary tree leaves |
+| 44 | ☑ | Leaves grouped by removal round |
 | 45 | ☑ | Count connected 1-components |
 | 46 | ☑ | Largest connected 1-component |
 | 47 | ☑ | Best root for a binary tree |
@@ -532,6 +532,18 @@ What's correct:
 - Under the stated assumption that there are C cafés and C < F friends, the solution runs in O(C(V + E)) time and O(V + E) space, including the graph.
 - Verified all 3 built-in cases, a targeted café-at-friend case, and 20,000 randomized graphs against an independent Floyd-Warshall oracle, including 17,455 cases where a café was also a friend node.
 
+**#32 — Top N reachable movies by rating (graph traversal + min-heap)**
+
+Mistakes made:
+- The rewrite initially fetched neighbors from the ratings map instead of the adjacency map, causing a compile-time type error because a rating is a `Double`, not a list of movies.
+
+What's correct:
+- Traverse only from the starting movie with BFS and mark movies visited when enqueued, so cycles and duplicate edges terminate without duplicate candidates.
+- Keep a min-heap capped at N movies. Its root is the weakest retained rating, so removing the root whenever the heap exceeds N leaves exactly the best N reachable movies.
+- Draining the min-heap gives ascending ratings; reversing that list returns highest-rated first. The starting movie is included, equal-rating name order is unspecified, and every reachable adjacency node is assumed to have a rating.
+- The solution runs in O(V + E + V log N) time and O(V + N) auxiliary space over the reachable graph.
+- Verified all built-ins, 81,920 exhaustive directed-graph/start/N combinations through four movies, and 50,000 randomized graphs with cycles, disconnected components, duplicate edges, sink nodes, and oversized N: 131,920 valid comparisons with no failures.
+
 **#33 — Shortest path through teleporters (BFS + 0-1 BFS)**
 
 Mistakes made:
@@ -563,6 +575,15 @@ What's correct:
 - Mark a node visited before recursing. This terminates cycles and ensures every activated transmitter is counted or collected exactly once.
 - The follow-up uses the same graph and DFS but collects visited indices instead of only returning their count.
 - The solution runs in O(N^3) worst-case time and O(N^2) space. Verified all 12 built-in DFS/BFS cases, the overflow boundary, 20,000 randomized maximum-reach cases, and 20,000 randomized collection cases against independent geometric BFS oracles.
+
+**#37 — Recipes from supplies (topological availability BFS)**
+
+What's correct:
+- Treat each ingredient as a prerequisite edge into every recipe waiting for it. `remaining[recipe]` counts prerequisites not yet made available, while `dependents[item]` finds recipes unlocked by an available item.
+- Seed the queue with initial supplies. When a recipe's remaining count reaches zero, append it to the result and enqueue it as a newly available supply, which naturally produces a valid dependency order.
+- Missing ingredients and dependency cycles never reach remaining count zero, so their blocked recipes are excluded without special cycle handling.
+- Under the accepted contract, recipe names, ingredients within each recipe, and supplies are unique and non-null; every recipe has at least one ingredient. The solution runs in O(R + I) time and space for R recipes and I ingredient references.
+- Verified all five built-ins plus 5,184 exhaustive and 50,000 randomized chain, branch, cycle, missing-ingredient, disconnected, and shuffled-order cases: 55,188 comparisons with no failures against an independent repeated-fixpoint oracle.
 
 **#39 — Sequence reconstruction (unique topological ordering)**
 
@@ -600,6 +621,15 @@ What's correct:
 - Under the documented contract of unique non-null values, one parent per child, one root, valid two-element rows, no duplicate relationships, and no cycles, the construction is complete and runs in expected O(N) time and O(N) space.
 - Invalid-input detection remains a conceptual follow-up: duplicate edges duplicate a child entry, multiple parents share one child object, a forest returns an arbitrary root, and a pure cycle returns null. The nested `TreeNode` is package-private despite being returned by a public method, which is acceptable for this standalone same-package exercise but not an exported library API.
 - Verified all built-ins plus 5,913 exhaustive rooted trees across 41,391 relationship-order variants and 50,000 randomized trees of up to 100 nodes: 91,392 valid cases passed structural checks for root identity, unique node identity, exact edges, reachability, and acyclicity.
+
+**#43 / #44 — N-ary leaves grouped by simultaneous removal round (postorder DFS)**
+
+What's correct:
+- Problems #43 and #44 are the same operation viewed two ways: repeatedly remove all current leaves, or return nodes grouped by the round in which that removal occurs.
+- A leaf has zero-based removal round 0. A non-leaf disappears one round after its last surviving child, so `round(node) = 1 + max(round(child))`.
+- Postorder DFS computes every child round before its parent. The helper places each value directly into the bucket indexed by its round, avoiding repeated tree mutation and rescanning.
+- The input remains unchanged. The algorithm takes O(N) time and O(H) recursion space, excluding the O(N) returned groups, for N nodes and tree height H.
+- Verified all five built-ins plus 61,886 valid proper trees and 2,627,452 node comparisons against an independent iterative simultaneous-leaf-peeling oracle, including chains, stars, uneven trees, duplicate/extreme values, and input-mutation checks, with no failures.
 
 **#50 — F1 single-tyre race time (geometric-sequence simulation)**
 
@@ -673,7 +703,7 @@ What's correct:
 
 ### Tier 3 — Graph, tree, trie, and dependency variants
 - ☐ Café meeting point minimizing the maximum graph distance traveled by any friend.
-- ☐ Movie-similarity graph: return top N reachable movies by rating.
+- ☑ Movie-similarity graph: return top N reachable movies by rating.
 - ☐ Broken teleporter shortest path; follow-up: repaired teleporters creating 0/1 edge weights.
 - ☐ Currency-arbitrage cycle detection.
 - ☐ Broadcast-signal chaining.
@@ -684,14 +714,14 @@ What's correct:
 - ☐ Pacific Atlantic-style reverse reachability.
 - ☐ Shortest path after consuming/collecting required objects.
 - ☐ Find all dependency cycles in an issue/blocker relationship graph. **<span style="color:red">TODO (must learn first): don't know Kosaraju's algorithm (SCC detection) yet — study it before attempting this one.</span>**
-- ☐ Find recipes possible from supplies and recipe dependencies.
+- ☑ Find recipes possible from supplies and recipe dependencies.
 - ☐ Sentence Similarity II / equivalence through transitive relationships.
 - ☐ Sequence Reconstruction.
 - ☐ Generic language translator using dependency/mapping relationships.
 - ☑ Build a tree from parent-child relationships.
 - ☐ Merge two N-ary trees with field-specific conflict rules.
-- ☐ Recursively delete leaf nodes from a multi-tree.
-- ☐ Return leaves grouped by removal round.
+- ☑ Recursively delete leaf nodes from a multi-tree.
+- ☑ Return leaves grouped by removal round.
 - ☐ Count connected components of 1 nodes inside a tree.
 - ☐ Find largest connected 1 component in a tree.
 - ☐ Find the best root of an undirected degree-3 tree so it becomes a binary tree.
