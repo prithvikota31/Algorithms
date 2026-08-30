@@ -1,4 +1,6 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,12 +66,11 @@ import java.util.Set;
  */
 public class MusicShuffler {
 
-    private final List<String> songs;
-    private final int k;
-    private final Queue<String> recentSongs = new LinkedList<>();
-    private final Set<String> blockedSongs = new HashSet<>();
-    private final Random random;
-
+    private Random random;
+    private List<String> songs;
+    private int k;
+    private Deque<String> playedKSongsQueue = new ArrayDeque<>();
+    private Set<String> playedKSongsSet = new HashSet<>();
     public MusicShuffler(List<String> songs, int k) {
         this(songs, k, new Random());
     }
@@ -83,24 +84,28 @@ public class MusicShuffler {
         this.random = random;
     }
 
-    public String nextSong() {
-        List<String> available = new ArrayList<>();
-        for (String song : songs) {
-            if (!blockedSongs.contains(song)) {
-                available.add(song);
+    public String nextSong()
+    {
+        List<String> activeSong = new ArrayList<>();
+        for(String song: songs)
+        {
+            if(!playedKSongsSet.contains(song))
+            {
+                activeSong.add(song);
             }
         }
+        //random
+        int chosen = random.nextInt(activeSong.size()); // o to size - 1;
+        String chosenSong = activeSong.get(chosen);
+        playedKSongsQueue.offer(chosenSong);
+        playedKSongsSet.add(chosenSong);
 
-        String chosen = available.get(random.nextInt(available.size()));
-
-        recentSongs.offer(chosen);
-        blockedSongs.add(chosen);
-        if (recentSongs.size() > k) {
-            String expired = recentSongs.poll();
-            blockedSongs.remove(expired);
+        if(playedKSongsQueue.size() > k)
+        {
+            String removeFromPlayed = playedKSongsQueue.poll();
+            playedKSongsSet.remove(removeFromPlayed);
         }
-
-        return chosen;
+        return chosenSong;
     }
 
     /*
@@ -137,34 +142,42 @@ public class MusicShuffler {
         }
 
         public String nextSong() {
-            List<String> available = new ArrayList<>();
+            List<String> activeSongs = new ArrayList<>();
             double totalWeight = 0;
-            for (String song : songs) {
-                if (!blockedSongs.contains(song)) {
-                    available.add(song);
+            for(String song: songs)
+            {
+                if(!blockedSongs.contains(song))
+                {
                     totalWeight += weights.get(song);
+                    activeSongs.add(song);
                 }
             }
 
-            double target = random.nextDouble() * totalWeight;
+            double target = random.nextDouble(totalWeight);
+
+            //calculate cumulative 
             double cumulative = 0;
-            String chosen = available.get(available.size() - 1);
-            for (String song : available) {
-                cumulative += weights.get(song);
-                if (target < cumulative) {
-                    chosen = song;
+            int chosen = -1;
+            for(int i = 0; i < activeSongs.size(); i++)
+            {
+                cumulative += weights.get(activeSongs.get(i));
+                if(target < cumulative)
+                {
+                    chosen = i;
                     break;
                 }
             }
 
-            recentSongs.offer(chosen);
-            blockedSongs.add(chosen);
-            if (recentSongs.size() > k) {
-                String expired = recentSongs.poll();
-                blockedSongs.remove(expired);
+            String chosenSong = activeSongs.get(chosen);
+            recentSongs.offer(chosenSong);
+            blockedSongs.add(chosenSong);
+            if(recentSongs.size() > k)
+            {
+                String makeActive = recentSongs.poll();
+                blockedSongs.remove(makeActive);
             }
+            return chosenSong;
 
-            return chosen;
         }
     }
 

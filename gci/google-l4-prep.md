@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 47 / 50.**
+**Revised: 48 / 50.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -110,7 +110,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 27 | ☐ | Arithmetic adjacent-diff subarrays |
 | 28 | ☑ | Triples within max difference |
 | 29 | ☑ | Logger rate limiter |
-| 30 | ☐ | Music shuffler with no repeat in K |
+| 30 | ☑ | Music shuffler with no repeat in K |
 | 31 | ☑ | Best café for friends |
 | 32 | ☑ | Movie similarity Top N |
 | 33 | ☑ | Teleporter shortest path |
@@ -300,6 +300,18 @@ What's correct:
 - The required L4 solution takes O(1) expected time per event and O(M) space for M distinct messages, assuming timestamps arrive in nondecreasing order and subtraction fits `int`.
 - **The concurrency/thread-safe implementation is optional enrichment and is not required to complete or revise this problem for Google L4 preparation.**
 - Verified all base built-ins, 21 targeted boundary/interleaving checks, and 100,000 deterministic randomized events against an independent accepted-history oracle.
+
+**#30 — Music shuffler with a K-play cooldown (queue + set)**
+
+Mistakes made:
+- In the weighted follow-up, the first cumulative-weight scan did not stop after finding the target interval. Every later cumulative sum also exceeded the target, so `chosen` was overwritten and the last available song was always selected.
+
+What's correct:
+- The queue stores the last K played songs in expiration order, while the set mirrors that cooldown window for expected O(1) membership checks.
+- The base shuffler builds the currently unblocked songs and selects a uniform random index. After choosing, it blocks the song and evicts the oldest entry when the queue exceeds K.
+- The weighted follow-up sums only active weights, draws a uniform target in `[0,totalWeight)`, and selects the first song whose cumulative weight exceeds that target. Breaking immediately preserves each song's interval width and therefore its probability.
+- Under the accepted contract, the playlist contains unique non-null songs, `Random` is non-null, `0 <= K < playlist size`, callers do not mutate constructor inputs, and every weighted song has a positive finite weight whose active sum is finite.
+- Both variants take O(S) time per pick and O(S) space for S songs. The base passed 5,251,500 same-seed simulator calls and 38,712,579 assertions. The weighted version passed all sizes 1-20 and every valid K over a 2,100,000-pick matrix with 17,353,700 assertions, forced first/middle/last intervals, a 500,000-pick 1:3:6 distribution check, and a 100,000-pick maximum-cooldown run.
 
 **#15 — Interval overlap progression (boundary checks + sorting/sweep)**
 
@@ -703,7 +715,7 @@ What's correct:
 - ☐ Logger rate limiter / suppress duplicates within a time window.
 - ☐ Google Photos acknowledgements arriving out of order; return largest continuously acknowledged prefix.
 - ☐ Sequence-number stream: add values and return the smallest missing sequence number.
-- ☐ Random music shuffler where a song cannot repeat within the previous K plays.
+- ☑ Random music shuffler where a song cannot repeat within the previous K plays.
 - ☐ Top K chat users by number of messages.
 - ☐ Top K users by words spoken.
 - ☐ Top K frequent words in a document; follow-up streaming document.
