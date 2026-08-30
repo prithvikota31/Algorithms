@@ -76,39 +76,40 @@ import java.util.Map;
  */
 public class SentenceSimilarityTwo {
 
-    private final Map<String, String> parent = new HashMap<>();
-    private final Map<String, Integer> size = new HashMap<>();
-
+    Map<String, String> parent = new HashMap<>();
+    Map<String, Integer> size = new HashMap<>();
     public boolean areSentencesSimilarTwo(
             String[] sentence1,
             String[] sentence2,
             List<List<String>> similarPairs) {
 
-        if (sentence1.length != sentence2.length) {
+        parent.clear();
+        size.clear();
+
+        if(sentence1.length != sentence2.length)
+        {
             return false;
         }
 
-        // Build similarity components.
-        for (List<String> pair : similarPairs) {
+        for(List<String> pair: similarPairs)
+        {
             union(pair.get(0), pair.get(1));
         }
 
-        // Corresponding words must be identical
-        // or belong to the same connected component.
-        for (int i = 0; i < sentence1.length; i++) {
-
-            String word1 = sentence1[i];
-            String word2 = sentence2[i];
-
-            if (word1.equals(word2)) {
+        for(int i = 0; i < sentence1.length; i++)
+        {
+            String s1 = sentence1[i];
+            String s2 = sentence2[i];
+            if(s1.equals(s2))
+            {
                 continue;
             }
-
-            if (!parent.containsKey(word1) || !parent.containsKey(word2)) {
+            if(!parent.containsKey(s1) || !parent.containsKey(s2))
+            {
                 return false;
             }
-
-            if (!find(word1).equals(find(word2))) {
+            if(!find(s1).equals(find(s2)))
+            {
                 return false;
             }
         }
@@ -116,41 +117,45 @@ public class SentenceSimilarityTwo {
         return true;
     }
 
-    private void union(String word1, String word2) {
 
-        // A new word starts as its own component of size 1.
-        parent.putIfAbsent(word1, word1);
-        parent.putIfAbsent(word2, word2);
+    private void union(String root1, String root2)
+    {
+        parent.putIfAbsent(root1, root1);
+        parent.putIfAbsent(root2, root2);
 
-        size.putIfAbsent(word1, 1);
-        size.putIfAbsent(word2, 1);
+        size.putIfAbsent(root1, 1);
+        size.putIfAbsent(root2, 1);
+        String s1 = find(root1);
+        String s2 = find(root2);
 
-        String root1 = find(word1);
-        String root2 = find(word2);
-
-        if (root1.equals(root2)) {
+        if(find(s1).equals(find(s2)))
+        {
             return;
         }
 
-        // Attach the smaller component under the larger component.
-        if (size.get(root1) < size.get(root2)) {
-            parent.put(root1, root2);
-            size.put(root2, size.get(root2) + size.get(root1));
-        } else {
-            parent.put(root2, root1);
-            size.put(root1, size.get(root1) + size.get(root2));
+        if(size.get(s1) < size.get(s2))
+        {
+            parent.put(s1, s2);
+            size.put(s2, size.get(s1) + size.get(s2));
+        }
+        else
+        {
+            parent.put(s2, s1);
+            size.put(s1, size.get(s1) + size.get(s2));
         }
     }
 
-    private String find(String word) {
-
-        // Path compression.
-        if (!parent.get(word).equals(word)) {
-            parent.put(word, find(parent.get(word)));
+    private String find(String s)
+    {
+        if(parent.get(s).equals(s))
+        {
+            return s;
         }
 
-        return parent.get(word);
+        parent.put(s, find(parent.get(s)));
+        return parent.get(s);
     }
+
 
     public static void main(String[] args) {
 

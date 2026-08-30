@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 46 / 50.**
+**Revised: 47 / 50.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -117,7 +117,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 34 | ☐ | Currency arbitrage |
 | 35 | ☑ | Broadcast signal propagation |
 | 37 | ☑ | Recipes from supplies |
-| 38 | ☐ | Sentence similarity (transitive) |
+| 38 | ☑ | Sentence similarity (transitive) |
 | 39 | ☑ | Sequence reconstruction |
 | 40 | ☑ | Token translator |
 | 41 | ☑ | Build tree from parent-child pairs |
@@ -585,6 +585,20 @@ What's correct:
 - Under the accepted contract, recipe names, ingredients within each recipe, and supplies are unique and non-null; every recipe has at least one ingredient. The solution runs in O(R + I) time and space for R recipes and I ingredient references.
 - Verified all five built-ins plus 5,184 exhaustive and 50,000 randomized chain, branch, cycle, missing-ingredient, disconnected, and shuffled-order cases: 55,188 comparisons with no failures against an independent repeated-fixpoint oracle.
 
+**#38 — Transitive sentence similarity (union-find)**
+
+Mistakes made:
+- Initially compared `find(word1)` with the raw `word2` instead of comparing both component representatives, so even a directly similar pair could return false.
+- The first union rewrite computed roots but attached and sized the original words. When either word was not a root, that could split an existing component and break transitive similarity.
+- Union-find maps were instance state and initially survived between public method calls, allowing an earlier query's pairs to leak into a later independent query.
+
+What's correct:
+- Similarity pairs are undirected edges, and transitive similarity means two words belong to the same connected component. Union every pair once, then compare `find(word1)` and `find(word2)` at each aligned sentence position.
+- Identical aligned words match before consulting union-find, so an unseen word remains reflexively similar to itself. Different sentence lengths return false immediately.
+- Union by size attaches the smaller component root beneath the larger root, and path compression flattens each searched path. Clear the maps at the start of every public query so calls are independent.
+- The solution runs in O((P + N) alpha(W)) time and O(W) space for P pairs, N sentence positions, and W distinct paired words.
+- Verified all seven built-ins, every undirected graph through five words with all aligned comparisons, targeted duplicate/reversed/self pairs and multiword cases, and 100,000 randomized cases: 136,869 independent comparisons with no failures. Repeated-call reset behavior and a 1,000-word component-size chain also passed.
+
 **#39 — Sequence reconstruction (unique topological ordering)**
 
 Mistakes made:
@@ -715,7 +729,7 @@ What's correct:
 - ☐ Shortest path after consuming/collecting required objects.
 - ☐ Find all dependency cycles in an issue/blocker relationship graph. **<span style="color:red">TODO (must learn first): don't know Kosaraju's algorithm (SCC detection) yet — study it before attempting this one.</span>**
 - ☑ Find recipes possible from supplies and recipe dependencies.
-- ☐ Sentence Similarity II / equivalence through transitive relationships.
+- ☑ Sentence Similarity II / equivalence through transitive relationships.
 - ☐ Sequence Reconstruction.
 - ☐ Generic language translator using dependency/mapping relationships.
 - ☑ Build a tree from parent-child relationships.
