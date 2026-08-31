@@ -18,18 +18,21 @@ class Solution {
         return isValidBSTHelper(root, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
-    private boolean isValidBSTHelper(TreeNode root, long min, long max)
+    private boolean isValidBSTHelper(TreeNode node, long min, long max)
     {
-        if(root == null)    return true;
+        if(node == null)
+        {
+            return true;
+        }
 
-        if(root.val <= min || root.val >= max)
+        if(node.val <= min || node.val >= max)
         {
             return false;
         }
 
-        boolean left = isValidBSTHelper(root.left, min, Math.min(max, root.val));
-        boolean right = isValidBSTHelper(root.right, Math.max(min, root.val), max);
+        boolean leftCheck = isValidBSTHelper(node.left, min, node.val); //max is bounded
+        boolean rightCheck = isValidBSTHelper(node.right, node.val, max);
 
-        return right && left;
+        return leftCheck && rightCheck;
     }
 }
