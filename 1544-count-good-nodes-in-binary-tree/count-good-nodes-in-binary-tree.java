@@ -15,21 +15,30 @@
  */
 class Solution {
     public int goodNodes(TreeNode root) {
-        //take max in the path
-        if(root == null)    return 0;
-        return countGood(root, root.val);
+        return goodNodesHelper(root, Integer.MIN_VALUE);
     }
 
-    public int countGood(TreeNode node, int max)
+    private int goodNodesHelper(TreeNode node, int maxSoFar)
     {
-        if(node == null)    return 0;
+        if(node == null)
+        {
+            return 0;
+        }
         int count = 0;
-        if(node.val >= max) count++;
-        int left = countGood(node.left, Math.max(max, node.val));
-        count += left;
-        int right = countGood(node.right, Math.max(max, node.val));
-        count += right;
+        if(node.val >= maxSoFar)
+        {
+            count += 1;
+        }
+        int newMax = Math.max(node.val, maxSoFar);
+
+        count += goodNodesHelper(node.left, newMax);
+        count += goodNodesHelper(node.right, newMax);
 
         return count;
+    }
+
+    private boolean isLeaf(TreeNode node)
+    {
+        return node.left == null && node.right == null;
     }
 }
