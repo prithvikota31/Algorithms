@@ -79,7 +79,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 48 / 50.**
+**Revised: 49 / 50.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -107,7 +107,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 24 | ☑ | Remove adjacent character pairs |
 | 25 | ☑ | Subsequence dictionary match |
 | 26 | ☑ | Array jump — take or skip |
-| 27 | ☐ | Arithmetic adjacent-diff subarrays |
+| 27 | ☑ | Arithmetic adjacent-diff subarrays |
 | 28 | ☑ | Triples within max difference |
 | 29 | ☑ | Logger rate limiter |
 | 30 | ☑ | Music shuffler with no repeat in K |
@@ -510,6 +510,18 @@ What's correct:
 - Both APIs run in O(N) time and O(N) space; returning the selected indices also uses O(K) output space.
 - Verified `maxScore` with 4 targeted cases and 10,000 randomized arrays against an independent brute-force oracle. Verified `maxScoreIndices` with null, empty, ordinary, and overflow-boundary cases plus 20,000 randomized arrays, checking both path legality and optimal score against exhaustive search.
 
+**#27 — Arithmetic adjacent-difference subarrays (running streak)**
+
+Mistakes made:
+- The independent rewrite initially computed `arr[i] - arr[i - 1]` as `int`. Full-range values such as `Integer.MIN_VALUE` and `Integer.MAX_VALUE` wrapped to `-1` or `+1`, creating false valid pairs.
+
+What's correct:
+- A valid subarray chooses one direction, +1 or -1, and keeps it for every adjacent pair. A direction reversal ends the current run even though the new length-two pair is valid.
+- `streak` is the number of valid subarrays ending at the current index. Matching the previous direction increments it; a new valid direction resets it to 1; any other difference resets it to 0. Summing streak counts every valid subarray exactly once at its endpoint.
+- Compute each difference in `long` before subtraction. The total count is also `long`, since an N-element run contributes `N*(N-1)/2` valid subarrays.
+- The count API runs in O(N) time and O(1) auxiliary space.
+- Verified 2,541,417 targeted, exhaustive, and randomized ordinary arrays plus 10,009 explicit/random full-int boundary arrays against an independent cubic long-arithmetic oracle, with no failures. A 100,000-element +1 run returned 4,999,950,000.
+
 **#28 — Triples from three sorted arrays within D (minimum anchor + monotonic ranges)**
 
 Mistakes made:
@@ -704,8 +716,8 @@ What's correct:
 - ☐ Array jumping: from index i, take or skip; taking adds score and jumps according to `arr[i]`; maximize score.
 - ☐ Android unlock patterns generalized to an n × m point grid.
 - ☐ Hierarchical tasks with subtasks: compute parent completion time according to child completion-time rules.
-- ☐ Maximum-length arithmetic subarrays where consecutive difference is exactly +1 or -1.
-- ☐ Sum the contribution of all valid arithmetic subarrays.
+- ☑ Maximum-length arithmetic subarrays where consecutive difference is exactly +1 or -1.
+- ☑ Sum the contribution of all valid arithmetic subarrays.
 - ☐ Find triples from three sorted arrays where all pairwise absolute differences are at most D.
 - ☐ Find three numbers in one collection lying within distance D.
 - ☑ Product of the last K numbers in a stream.

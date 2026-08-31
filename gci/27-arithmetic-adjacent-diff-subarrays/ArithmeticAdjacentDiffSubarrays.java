@@ -49,39 +49,43 @@ import java.util.Arrays;
 public class ArithmeticAdjacentDiffSubarrays {
 
     public long countArithmeticSubarrays(int[] arr) {
-        if (arr == null || arr.length < 2) {
+        if(arr == null || arr.length == 0)
+        {
             return 0;
         }
 
+        //1, 2, 3, 2, 1
+        int n = arr.length;
+        int previousDifference = 0; // which means no run exists + or -1
         long totalCount = 0;
-
-        // Number of valid subarrays ending at the current index.
         long streak = 0;
-
-        // Direction of the current run: +1, -1, or 0 when no run exists.
-        int previousDifference = 0;
-
-        for (int i = 1; i < arr.length; i++) {
+        for(int i = 1; i < n; i++)
+        {
             long difference = (long) arr[i] - arr[i - 1];
-
-            if (difference != 1 && difference != -1) {
+            //make streak 0;
+            //streak just implies, with i as last character how many subarrays are possible
+            if(difference != 1 && difference != -1)
+            {
                 streak = 0;
                 previousDifference = 0;
-            } else if (difference == previousDifference) {
-                // Extend every valid subarray ending at i - 1,
-                // plus the new pair [i - 1, i].
+            }
+            else if(difference == previousDifference)
+            {
+                //1, 2, 3
                 streak++;
-            } else {
-                // Direction changed (or this is the first valid pair), so
-                // only the current pair is valid.
+            }
+            else
+            {
+                //start streak
                 streak = 1;
-                previousDifference = (int) difference;
+                previousDifference = (int)difference;
             }
 
             totalCount += streak;
         }
 
         return totalCount;
+
     }
 
     /*
@@ -124,6 +128,8 @@ public class ArithmeticAdjacentDiffSubarrays {
                 bestEndIndex = i;
             }
         }
+        //0, 1, 2, 3,
+        
 
         return bestStreak < 1 ? new int[0] : new int[] { bestEndIndex - bestStreak, bestEndIndex };
     }
