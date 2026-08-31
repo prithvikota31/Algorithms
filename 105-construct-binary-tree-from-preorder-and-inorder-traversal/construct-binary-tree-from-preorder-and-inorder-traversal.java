@@ -29,7 +29,7 @@ class Solution {
     private TreeNode buildHelper(int[] preorder, int preStart, int preEnd, int[] inorder,
                                 int inStart, int inEnd, Map<Integer, Integer> inorderMap)
     {
-        if(preStart > preEnd || inStart > inEnd)
+        if(preStart > preEnd)
         {
             return null;
         }
