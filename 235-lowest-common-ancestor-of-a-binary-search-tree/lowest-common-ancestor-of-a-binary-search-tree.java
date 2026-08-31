@@ -15,26 +15,19 @@ class Solution {
             return null;
         }
 
-        else if(root == p || root == q)
+        TreeNode cur = root;
+        if(cur.val < p.val && cur.val < q.val)
         {
-            return root;
+            return lowestCommonAncestor(root.right, p, q);
         }
-
-        TreeNode left = lowestCommonAncestor(root.left, p, q);
-        TreeNode right = lowestCommonAncestor(root.right, p, q);
-
-        if(left != null && right != null)
+        else if(cur.val > p.val && cur.val > q.val)
         {
-            return root;
-        }
-        else if(left != null)
-        {
-            return left;
+            return lowestCommonAncestor(root.left, p, q);
         }
         else
         {
-            return right;
+            return root;
         }
-       
+    
     }
 }
