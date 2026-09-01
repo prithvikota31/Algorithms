@@ -156,37 +156,46 @@ public class TopKFromStream {
     // addMessage O(log U), getTopK O(K), space O(U).
     // ==================================================================
     static class TopKUsersStream {
-
-        // user -> latest message count
-        Map<String, Integer> frequency = new HashMap<>();
-        //username, count;
-        TreeSet<UserCount> userSetInOrder = new TreeSet<>((a, b) -> {
-            if (a.count != b.count) {
-                return Integer.compare(b.count, a.count);
-            }
-            return a.user.compareTo(b.user);
-        });
-
+        
+        private Map<String, Integer> userMessageCountMap = new HashMap<>();
+        private TreeSet<String> userSetInDecOrder = 
+                        new TreeSet<>((a, b) ->
+                {
+                    if(!userMessageCountMap.get(a).equals(userMessageCountMap.get(b)))
+                    {
+                        return Integer.compare(userMessageCountMap.get(b),userMessageCountMap.get(a));
+                    }
+                    return a.compareTo(b);
+                });
         public void addMessage(String user) {
-            int oldCountOfUser = frequency.getOrDefault(user, 0);
-
-            if(oldCountOfUser > 0)
+            //if we use only minheap, finding an element with user take O(n) time
+            //lets use tree set logn time
+            int oldCount = userMessageCountMap.getOrDefault(user, 0);
+            if(oldCount > 0)
             {
-                userSetInOrder.remove(new UserCount(user, oldCountOfUser));
+                userSetInDecOrder.remove(user);
             }
-            frequency.put(user, oldCountOfUser + 1);
-            userSetInOrder.add(new UserCount(user, oldCountOfUser + 1));
+            
+
+            userMessageCountMap.put(user, oldCount + 1);
+
+            userSetInDecOrder.add(user);
+
         }
 
         public List<String> getTopK(int k) {
-            if (k <= 0) {
+            if(k <= 0)
+            {
                 throw new IllegalArgumentException("k should be positive");
             }
+
             List<String> result = new ArrayList<>();
-            for(UserCount user: userSetInOrder)
+            int count = 0;
+            for(String user: userSetInDecOrder)
             {
-                result.add(user.user);
-                if(result.size() == k)
+                result.add(user);
+                count++;
+                if(count == k)
                 {
                     break;
                 }
@@ -194,15 +203,6 @@ public class TopKFromStream {
             return result;
         }
 
-        private static class UserCount {
-            String user;
-            int count;
-
-            UserCount(String user, int count) {
-                this.user = user;
-                this.count = count;
-            }
-        }
     }
 
     // ------------------------------------------------------------------
