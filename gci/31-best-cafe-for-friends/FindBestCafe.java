@@ -105,25 +105,22 @@ public class FindBestCafe {
         Deque<Integer> q = new ArrayDeque<>();
         q.offer(cafe);
         distance[cafe] = 0;
-        if(friendMap[cafe] == 1)
-        {
-            tempFriendCount++;
-        }
         int maxFriendDistanceFromCafe = 0;
         while(!q.isEmpty())
         {
             int cur = q.poll();
+
+            if (friendMap[cur] == 1) {
+                tempFriendCount++;
+                maxFriendDistanceFromCafe =
+                        Math.max(maxFriendDistanceFromCafe, distance[cur]);
+            }
 
             for(int nei: graph.get(cur))
             {
                 if(distance[nei] == -1)
                 {
                     distance[nei] = 1 + distance[cur];
-                    if(friendMap[nei] == 1)
-                    {
-                        maxFriendDistanceFromCafe = Math.max(maxFriendDistanceFromCafe, distance[nei]);
-                        tempFriendCount++;
-                    }
                     q.offer(nei);
                 }
             }
