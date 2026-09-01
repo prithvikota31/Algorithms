@@ -66,13 +66,17 @@ import java.util.List;
 public class ProductOfNumbers {
 
     private final List<Long> prefixProducts;
+    private int totalCount;
 
     public ProductOfNumbers() {
         prefixProducts = new ArrayList<>();
         prefixProducts.add(1L);
+        totalCount = 0;
     }
 
     public void add(int value) {
+        totalCount++;
+
         if(value == 0)
         {
             prefixProducts.clear();
@@ -87,6 +91,11 @@ public class ProductOfNumbers {
     }
 
     public long getProduct(int k) {
+        if(k <= 0 || k > totalCount)
+        {
+            throw new IllegalArgumentException("k must be between 1 and the number of values added");
+        }
+
         // The leading 1 is an empty-prefix sentinel, so after the latest zero
         // (or from the empty start) we have prefixProducts.size() - 1 values.
         // If k exceeds that count, the requested window crosses a zero.
