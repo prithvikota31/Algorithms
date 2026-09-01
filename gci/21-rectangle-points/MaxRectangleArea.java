@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,34 +46,36 @@ import java.util.Set;
 public class MaxRectangleArea {
 
     private final Map<Integer, Set<Integer>> xToYs = new HashMap<>();
-    private final Map<String, List<Integer>> yPairToXs = new HashMap<>();
+    private final Map<String, Set<Integer>> yPairToXs = new HashMap<>();
     private long maxArea = 0;
 
     public void addPoint(int x, int y) {
-        Set<Integer> ysAtX = xToYs.computeIfAbsent(x, k -> new HashSet<>());
-        if (ysAtX.contains(y)) {
-            return;
-        }
-
-        if (!ysAtX.isEmpty()) {
-            for (int oldY : ysAtX) {
-                int y1 = Math.min(oldY, y);
-                int y2 = Math.max(oldY, y);
-                String key = encode(y1, y2);
-                long height = (long) y2 - y1;
-
-                if (yPairToXs.containsKey(key)) {
-                    for (int previousX : yPairToXs.get(key)) {
-                        long width = Math.abs((long) x - previousX);
+        if(xToYs.containsKey(x))
+        {
+            //form all ypairs and fill pair map
+            for(int oldY: xToYs.get(x))
+            {
+                if(oldY == y)
+                {
+                    continue;
+                }
+                int lowY = Math.min(oldY, y);
+                int highY = Math.max(oldY, y);
+                long width = (long)highY - lowY;
+                String yPair = encode(lowY, highY);
+                if(yPairToXs.containsKey(yPair))
+                {
+                    for(int oldX: yPairToXs.get(yPair))
+                    {
+                        long height = Math.abs((long)oldX - x);
                         maxArea = Math.max(maxArea, width * height);
                     }
                 }
 
-                yPairToXs.computeIfAbsent(key, k -> new ArrayList<>()).add(x);
+                yPairToXs.computeIfAbsent(yPair, k -> new HashSet<>()).add(x);
             }
         }
-
-        ysAtX.add(y);
+        xToYs.computeIfAbsent(x, k -> new HashSet<>()).add(y);
     }
 
     public long getMaxArea() {
