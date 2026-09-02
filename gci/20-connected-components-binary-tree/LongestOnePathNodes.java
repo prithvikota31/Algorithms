@@ -71,37 +71,36 @@ public class LongestOnePathNodes {
         bestRoot = null;
         bestPathLength = 0;
         bestSingleArmLength = new HashMap<>();
+        findLongestPathHelper(root);
 
-        //compute bestRot ad bestArmLength;
-        //along the path fill the map
-        computeBestRoot(root);
-        List<TreeNode> longestPathList = new ArrayList<>();
-
+        //nowe we have best root
+        //collect nodes left, root and right
+        List<TreeNode> result = new ArrayList<>();
         if(bestRoot == null)
         {
-            return longestPathList;
+            return result;
         }
+        List<TreeNode> leftArm = collectLongestPathFromNode(bestRoot.left, bestSingleArmLength);
+        Collections.reverse(leftArm);
+        result.addAll(leftArm);
+        result.add(bestRoot);
+        List<TreeNode> rightArm = collectLongestPathFromNode(bestRoot.right, bestSingleArmLength);
+        result.addAll(rightArm);
 
-        //build left path
-        //reverse
-        //build right path
-        build(bestRoot.left, longestPathList);
-        Collections.reverse(longestPathList);
-        longestPathList.add(bestRoot);
-        build(bestRoot.right, longestPathList);
+        return result;
 
-        return longestPathList;
     }
 
-    private void build(TreeNode node, List<TreeNode> longestPathList)
+    private List<TreeNode> collectLongestPathFromNode(TreeNode node, Map<TreeNode, Integer> bestSingleArmLength)
     {
-        //we have a map to maneuver
+        List<TreeNode> path = new ArrayList<>();
         while(node != null && bestSingleArmLength.get(node) != 0)
         {
-            longestPathList.add(node);
-            int leftArm = bestSingleArmLength.getOrDefault(node.left, 0);
-            int rightArm = bestSingleArmLength.getOrDefault(node.right, 0);
-            if(leftArm > rightArm)
+            path.add(node);
+            int left = bestSingleArmLength.getOrDefault(node.left, 0);
+            int right = bestSingleArmLength.getOrDefault(node.right, 0);
+
+            if(left > right)
             {
                 node = node.left;
             }
@@ -110,34 +109,38 @@ public class LongestOnePathNodes {
                 node = node.right;
             }
         }
+
+        return path;
     }
 
-    private int computeBestRoot(TreeNode node)
+    private int findLongestPathHelper(TreeNode node)
     {
         if(node == null)
         {
             return 0;
         }
+        int left = findLongestPathHelper(node.left);
+        int right = findLongestPathHelper(node.right);
 
-        int left = computeBestRoot(node.left);
-        int right = computeBestRoot(node.right);
-
-        int currentRootPathLen = 0;
-        if(node.val == 1)
+        if(node.val == 0)
         {
-            currentRootPathLen = 1 + left + right;
+            bestSingleArmLength.put(node, 0);
+            return 0;
         }
-
-        if(currentRootPathLen > bestPathLength)
+        else
         {
-            bestRoot = node;
-            bestPathLength = currentRootPathLen;
+            int curBestLength = 1 + left + right;
+            if(curBestLength > bestPathLength)
+            {
+                bestRoot = node;
+                bestPathLength = curBestLength;
+            }
+            int nodeArmLength = 1 + Math.max(left, right);
+            bestSingleArmLength.put(node,nodeArmLength);
+            return nodeArmLength;
         }
-
-        int curBestArmLength = (node.val == 0)? 0: 1 + Math.max(left, right);
-        bestSingleArmLength.put(node, curBestArmLength);
-        return curBestArmLength;
     }
+   
 
     public static void main(String[] args) {
         LongestOnePathNodes solution = new LongestOnePathNodes();
