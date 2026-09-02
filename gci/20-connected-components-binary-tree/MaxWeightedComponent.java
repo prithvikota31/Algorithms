@@ -62,17 +62,22 @@ public class MaxWeightedComponent {
         {
             return 0;
         }
-        //even if node.val is zero proceed to left and right as nodes below them may contain best values
-        int leftSum = dfs(node.left);
-        int rightSum = dfs(node.right);
 
-        int currentSum = 0;
-        if(node.val > 0)
+        int left = dfs(node.left);
+        int right = dfs(node.right);
+
+        if(node.val <= 0)
         {
-            currentSum = node.val + leftSum + rightSum;
+            return 0;
         }
-        maxComponentSum = Math.max(maxComponentSum, currentSum);
-        return currentSum;
+        else
+        {
+            int curSum = node.val + left + right;
+            maxComponentSum = Math.max(maxComponentSum, curSum);
+            return curSum;
+
+        }
+
 
     }
 
