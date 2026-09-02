@@ -63,19 +63,24 @@ public class LongestOnePath {
             return 0;
         }
 
-        int leftLength = dfs(node.left);
-        int rightLength = dfs(node.right);
+        //at every 1 node calculate longestpath,maximize it
+        int left = dfs(node.left);
+        int right = dfs(node.right);
 
-        int curlengthIncludingNode = 0;
-        if(node.val == 1)
+        if(node.val == 0)
         {
-            curlengthIncludingNode = 1 + leftLength + rightLength;
+            return 0;
+        }
+        else
+        {
+            int currentLength = 1 + left + right;
+            longestPath = Math.max(longestPath, currentLength);
+            return 1 + Math.max(left, right);
         }
 
-        //otherwise left it as 0;
-        longestPath = Math.max(longestPath, curlengthIncludingNode);
-        return node.val == 0? 0: 1 + Math.max(leftLength, rightLength);
     }
+
+
 
 
     public static void main(String[] args) {
