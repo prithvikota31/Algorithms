@@ -59,29 +59,34 @@ public class ConnectedOneComponents {
         return new int[] {componentCount, largestComponentSize};
     }
 
-    private int dfs(TreeNode root, int parent) //returns considering that as root
+    //this returns total connect 1 components including this root 1
+    //returns 0 if current node/root is zero
+    private int dfs(TreeNode node, int parent) //returns considering that as root
     {
-        if(root == null)
+        if(node == null)
         {
             return 0;
         }
+        //even if node value is 0, it has to go to left and right
+        int left = dfs(node.left, node.val);
+        int right = dfs(node.right, node.val);
 
-
-        if(root.val == 1 && parent == 0)
+        if(node.val == 1 && parent == 0)
         {
             componentCount++;
         }
 
-        int leftCount  = dfs(root.left, root.val);
-        int rightCount = dfs(root.right, root.val);
-
-        int curCount = 0;
-        if(root.val == 1)
+        if(node.val == 0)
         {
-            curCount = 1 + leftCount + rightCount;
+            return 0;
         }
-        largestComponentSize = Math.max(largestComponentSize, curCount);
-        return curCount;
+        else
+        {
+            int currentComponentSize = 1 + left + right;
+            largestComponentSize = Math.max(largestComponentSize, currentComponentSize);
+            return currentComponentSize;
+        }
+
     }
 
     /*
@@ -113,49 +118,59 @@ public class ConnectedOneComponents {
     private TreeNode bestRoot;
 
     public List<TreeNode> findLargestComponentNodes(TreeNode root) {
-        List<TreeNode> largestComponentNodes = new ArrayList<>();
-        //find largest component root
-        // and size
-        bestSize = 0;
+        List<TreeNode> result = new ArrayList<>();
         bestRoot = null;
-        dfsFindLargestComponent(root);
-        collect(largestComponentNodes, bestRoot);
-        return largestComponentNodes;
+        bestSize = 0;
+        //first find the best node
+        findLargestComponentNodesHelper(root);
+
+        collectNodes(bestRoot, result);
+        return result;
     }
 
-    private void collect(List<TreeNode> largestComponentNodes, TreeNode node)
+    private void collectNodes(TreeNode node, List<TreeNode> result)
     {
-        if(node == null || node.val == 0)
+        if(node == null)
         {
             return;
         }
-        largestComponentNodes.add(node);
-        collect(largestComponentNodes, node.left);
-        collect(largestComponentNodes, node.right);
+        if(node.val == 0)
+        {
+            return;
+        }
+
+        result.add(node);
+        collectNodes(node.left, result);
+        collectNodes(node.right, result);
     }
 
-    private int dfsFindLargestComponent(TreeNode node)
+    private int findLargestComponentNodesHelper(TreeNode node)
     {
         if(node == null)
         {
             return 0;
         }
 
-        int leftCount = dfsFindLargestComponent(node.left);
-        int rightCount = dfsFindLargestComponent(node.right);
+        int left = findLargestComponentNodesHelper(node.left);
+        int right = findLargestComponentNodesHelper(node.right);
 
-        int curCount = 0;
-        if(node.val == 1)
+        int curComponentSize = 0;
+        if(node.val == 0)
         {
-            curCount = 1 + leftCount + rightCount;
+            return 0;
         }
-        if(curCount > bestSize)
+        else
         {
-            bestSize = curCount;
-            bestRoot = node;
+            curComponentSize = 1 + left + right;
+            if(curComponentSize > bestSize)
+            {
+                bestRoot = node;
+                bestSize = curComponentSize;
+            }
+            return curComponentSize;
         }
-        return curCount;
     }
+
 
 
 
