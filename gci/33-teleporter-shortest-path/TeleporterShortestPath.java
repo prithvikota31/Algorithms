@@ -138,59 +138,63 @@ public class TeleporterShortestPath {
 
     public List<Integer> findMinRepairDaysPath(int numberOfTeleporters, List<List<Integer>> graph,
             Status[] status, int source, int destination) {
+        //first verify if status of src and dst is broken
+        List<Integer> result = new ArrayList<>();
         if(status[source] == Status.BROKEN || status[destination] == Status.BROKEN)
         {
-            return new ArrayList<>();
+            return result;
         }
+
+        //check is source equals destionation
         if(source == destination)
         {
-            return Arrays.asList(source);
+            result.add(source);
+            return result;
         }
 
-
+        int[] distance = new int[numberOfTeleporters];
+        int[] parent = new int[numberOfTeleporters];
+        Arrays.fill(distance, Integer.MAX_VALUE);
+        Arrays.fill(parent, -1);
+        parent[source] = source;
+        distance[source] = 0;
         Deque<Integer> q = new ArrayDeque<>();
         q.offer(source);
-        int[] dist = new int[numberOfTeleporters];
-        int[] parent = new int[numberOfTeleporters];
-        Arrays.fill(parent, -1);
-        Arrays.fill(dist, Integer.MAX_VALUE);
-        dist[source] = 0;
-        parent[source] = source;
         while(!q.isEmpty())
         {
             int cur = q.poll();
-
             if(cur == destination)
             {
                 break;
             }
-            //calculate cost to leave from current pos
-            int costToLeaveCur = status[cur] == Status.PARTIALLY_REPAIRED? 1 : 0;
+            int costToRepair = 0;
+            if(status[cur] == Status.PARTIALLY_REPAIRED)
+            {
+                costToRepair = 1;
+            }
+            
 
             for(int nei: graph.get(cur))
             {
-                if(status[nei] != Status.BROKEN)
+                if(status[nei] != Status.BROKEN && distance[cur] + costToRepair < distance[nei])
                 {
-                    if(dist[cur] + costToLeaveCur < dist[nei])
+                    parent[nei] = cur;
+                    distance[nei] = distance[cur] + costToRepair;
+                    if(costToRepair == 1)
                     {
-                        dist[nei] = dist[cur] + costToLeaveCur;
-                        parent[nei] = cur;
-                        if(costToLeaveCur == 0)
-                        {
-                            q.offerFirst(nei);
-                        }
-                        else
-                        {
-                            q.offerLast(nei);
-                        }
+                        //put behind the queue
+                        q.offerLast(nei);
+                    }
+                    else
+                    {
+                        q.offerFirst(nei);
                     }
                 }
             }
-
         }
-        List<Integer> result = new ArrayList<>();
 
-        if(dist[destination] == Integer.MAX_VALUE)
+        //add parents in the result from destination
+        if(parent[destination] == -1)
         {
             return result;
         }
@@ -203,7 +207,6 @@ public class TeleporterShortestPath {
         result.add(cur);
         Collections.reverse(result);
         return result;
-
     }
 
     public static void main(String[] args) {
