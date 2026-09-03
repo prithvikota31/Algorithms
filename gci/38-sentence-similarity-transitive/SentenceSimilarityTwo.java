@@ -128,7 +128,7 @@ public class SentenceSimilarityTwo {
         String s1 = find(root1);
         String s2 = find(root2);
 
-        if(find(s1).equals(find(s2)))
+        if(s1.equals(s2))
         {
             return;
         }
