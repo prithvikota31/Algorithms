@@ -9,12 +9,17 @@ class Trie {
 
         for(int i = 0; i < word.length(); i++)
         {
-            char ch = word.charAt(i);
-            if(!cur.containsKey(ch))
+            char currentCh = word.charAt(i);
+
+            if(cur.containsKey(currentCh))
             {
-                cur.setKey(ch);
+                cur = cur.getKey(currentCh);
             }
-            cur = cur.getNode(ch);
+            else
+            {
+                cur.setKey(currentCh);
+                cur = cur.getKey(currentCh);
+            }
         }
         cur.setEnd();
     }
@@ -24,28 +29,39 @@ class Trie {
 
         for(int i = 0; i < word.length(); i++)
         {
-            char ch = word.charAt(i);
-            if(!cur.containsKey(ch))
+            char currentCh = word.charAt(i);
+
+            if(cur.containsKey(currentCh))
+            {
+                cur = cur.getKey(currentCh);
+            }
+            else
             {
                 return false;
             }
-            cur = cur.getNode(ch);
         }
-        return cur.isEndWord();
+        
+        return cur.isEnd();
+
     }
     
-    public boolean startsWith(String prefix) {
+    public boolean startsWith(String word) {
         Node cur = root;
 
-        for(int i = 0; i < prefix.length(); i++)
+        for(int i = 0; i < word.length(); i++)
         {
-            char ch = prefix.charAt(i);
-            if(!cur.containsKey(ch))
+            char currentCh = word.charAt(i);
+
+            if(cur.containsKey(currentCh))
+            {
+                cur = cur.getKey(currentCh);
+            }
+            else
             {
                 return false;
             }
-            cur = cur.getNode(ch);
         }
+        
         return true;
     }
 }
@@ -54,7 +70,7 @@ class Node{
     Node[] links = new Node[26];
     boolean isEnd = false;
 
-    public Node getNode(char ch)
+    public Node getKey(char ch)
     {
         return links[ch - 'a'];
     }
@@ -66,7 +82,7 @@ class Node{
 
     public boolean containsKey(char ch)
     {
-        return links[ch - 'a'] != null;
+        return links[ch -'a'] != null;
     }
 
     public void setEnd()
@@ -74,11 +90,10 @@ class Node{
         isEnd = true;
     }
 
-    public boolean isEndWord()
+    public boolean isEnd()
     {
         return isEnd;
     }
-
 }
 
 /**
