@@ -1,25 +1,30 @@
 class Solution {
     public List<List<Integer>> combinationSum(int[] candidates, int target) {
         List<List<Integer>> ans = new ArrayList<>();
-
-        getCombinations(ans, new ArrayList<>(), 0, target, candidates);
+        List<Integer> temp = new ArrayList<>();
+        int n = candidates.length;
+        gatherLists(candidates, target, 0, ans, temp);
         return ans;
     }
-    private void getCombinations(List<List<Integer>> ans, List<Integer> trackingList, int start, int target, int[] candidates)
+
+    private void gatherLists(int[] candidates, int target, int ind,
+             List<List<Integer>> ans, List<Integer> temp)
     {
+        if(target < 0)
+        {
+            return;
+        }
         if(target == 0)
         {
-            ans.add(new ArrayList<>(trackingList));
+            ans.add(new ArrayList<>(temp));
             return;
         }
 
-        for(int i = start; i < candidates.length; i++)
+        for(int i = ind; i < candidates.length; i++)
         {
-            int num = candidates[i];
-            if( num > target)  continue;
-            trackingList.add(num);
-            getCombinations(ans, trackingList, i, target - num, candidates);
-            trackingList.remove(trackingList.size() - 1);
+            temp.add(candidates[i]);
+            gatherLists(candidates, target - candidates[i], i, ans, temp);
+            temp.remove(temp.size() - 1);
         }
     }
 }
