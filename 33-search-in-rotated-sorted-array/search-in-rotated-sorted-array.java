@@ -1,15 +1,18 @@
 class Solution {
     public int search(int[] nums, int target) {
-        //track sorted partition
-
         int low = 0;
         int high = nums.length - 1;
 
         while(low <= high)
         {
             int mid = low + (high - low) / 2;
-            if(target == nums[mid])  return mid;
-            if(nums[mid] < nums[high]) //right side sorted< or <=
+
+            if(nums[mid] == target)
+            {
+                return mid;
+            }
+
+            if(nums[mid] < nums[high]) //right is sorted
             {
                 if(target > nums[mid] && target <= nums[high])
                 {
@@ -20,7 +23,7 @@ class Solution {
                     high = mid - 1;
                 }
             }
-            else
+            else //left is sorted
             {
                 if(target >= nums[low] && target < nums[mid])
                 {
@@ -31,8 +34,8 @@ class Solution {
                     low = mid + 1;
                 }
             }
-            
         }
+
         return -1;
     }
 }
