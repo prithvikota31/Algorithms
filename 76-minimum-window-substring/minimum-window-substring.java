@@ -1,62 +1,52 @@
 class Solution {
     public String minWindow(String s, String t) {
-        int tLen = t.length();
+        //every character in t should be in s
+
         int sLen = s.length();
+        int tLen = t.length();
 
-        if(tLen > sLen)
-        {
-            return "";
-        }
-
-        //freq array of t
-        int[] freq = new int[128];
-        int checksNeeded = 0;
-        for(int i = 0; i < tLen; i++)
-        {
-            freq[t.charAt(i)]++;
-            checksNeeded++;
-        }
-        //freq array contains values > 0 and =0 
-        //>0 corresponds to t chars freq
+        //sLen> = tLen
+        if(sLen < tLen) return "";
 
         int start = 0;
-        int minLen = Integer.MAX_VALUE;;
-        int startIndex = 0;
+        int minLen = Integer.MAX_VALUE;
+        int bestStart = -1;
 
+        int[] tFreq = new int[128];
+        for(char c: t.toCharArray())
+        {
+            tFreq[c]++;
+        }
+
+        int checksNeeded = tLen;
         for(int end = 0; end < sLen; end++)
         {
-            int chEnd = s.charAt(end);
-            if(freq[chEnd] > 0)
+            char endCh = s.charAt(end);
+
+            if(tFreq[endCh] > 0)
             {
                 checksNeeded--;
             }
-            freq[chEnd]--;
+            tFreq[endCh]--;
 
-            while(checksNeeded == 0)
+            while(start <= end && checksNeeded == 0)
             {
-                //capture this length
                 if(end - start + 1 < minLen)
                 {
                     minLen = end - start + 1;
-                    startIndex = start;
+                    bestStart = start;
                 }
-                //we can try to move start 
-                int chStart = s.charAt(start);
-                freq[chStart]++;
-                if(freq[chStart] > 0)
+                //try moving the start
+                char startCh = s.charAt(start);
+                if(tFreq[startCh] >= 0)
                 {
                     checksNeeded++;
                 }
+                tFreq[startCh]++;
                 start++;
             }
         }
-        if(minLen == Integer.MAX_VALUE)
-        {
-            return "";
-        }
 
-        return s.substring(startIndex, startIndex + minLen);
-
-
+        return minLen == Integer.MAX_VALUE? "": s.substring(bestStart, bestStart + minLen);
     }
 }
