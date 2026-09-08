@@ -2,9 +2,9 @@
 
 > Ordering is by **observed recurrence and similarity** across the public corpus (2022–2025 Google reports), not exact occurrence counts. Distinct concrete formulations are kept **separate** even when the underlying technique is the same.
 
-**Plan:** Solve the **56 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
+**Plan:** Solve the **57 priority problems** first (Phase 1). Then, if time permits, work through the remaining problems (Phase 2).
 
-**Progress (Phase 1): 50 / 56 solved.**
+**Progress (Phase 1): 51 / 57 solved.**
 
 **Quality gate:** Run `./verify.ps1` from this directory before marking work complete. A checkbox records coverage; the [practice protocol](practice/README.md) measures independent recall, and the [three-year roadmap](../../three-year-engineering-roadmap.md) defines mastery and career evidence.
 
@@ -70,8 +70,9 @@
 | 54 | ☑ | Given rectangles, find the vertical line that splits their total area equally. → **[VerticalAreaSplit.java](22-rectangle-area-split/VerticalAreaSplit.java)** (same problem as #22: sweep x-events, keep the active height, solve for the cut inside the strip that crosses half the total area). |
 | 55 | ☑ | Maintain a set of 2D points and answer whether a rectangle can be formed from stored points. → **[RectangleExistsIncremental.java](21-rectangle-points/RectangleExistsIncremental.java)** (same problem as the #21 follow-up: a rectangle exists exactly when two x-columns share the same pair of y-values, so `addPoint` records each new y-pair against its column and flips an O(1) flag the moment a pair appears at a second x; duplicates are skipped so they cannot fake a pair). |
 | 56 | ☑ | Given a set of 2D points, find the maximum-area rectangle that can be formed. → **[MaxRectangleArea.java](21-rectangle-points/MaxRectangleArea.java)** (same problem as the #21 follow-up; two forms in one file: batch `MaxRectangleAreaBatch` treats every point pair as a diagonal and checks whether the other two corners `(x1,y2)`/`(x2,y1)` exist — O(N²) time, O(N) space — while the incremental class keeps `yPair -> x list` so `getMaxArea()` stays O(1). Areas use `long`: coordinates near ±10⁹ overflow `int`). **<span style="color:red">Rotated (non-axis-aligned) rectangles marked understand-only: the diagonal-corner trick no longer applies — it becomes a vector/geometry problem.</span>** |
+| 57 | ☑ | Given weighted domains, return each leaf domain with the sum of its own score and every registered ancestor suffix's score. → [solution](57-domain-leaf-scores/DomainLeafScores.java) (walk each domain's suffix chain, accumulate registered scores, and mark registered proper suffixes as non-leaves). |
 
-> Note: #54 and #22 describe the same core "split rectangle area with a vertical line" idea; they are kept separate here to preserve the original formulations. Numbering matches the originally selected 56 (the earlier duplicate router-reachability item and the router-activation-time item were dropped; the two point-set rectangle problems are #55–#56).
+> Note: #54 and #22 describe the same core "split rectangle area with a vertical line" idea; they are kept separate here to preserve the original formulations. Problems #1–#56 retain the original numbering (the earlier duplicate router-reachability item and the router-activation-time item were dropped); #57 was appended for domain leaf-score aggregation.
 
 ---
 
@@ -79,7 +80,7 @@
 
 Separate from the solve checkbox above: a problem is **revised** only when it is re-solved from scratch without looking at the existing file. Only solved priority problems are listed below; original problem numbers are preserved.
 
-**Revised: 49 / 50.**
+**Revised: 50 / 51.**
 
 | # | Revised | Problem |
 |---|---------|---------|
@@ -133,6 +134,7 @@ Separate from the solve checkbox above: a problem is **revised** only when it is
 | 54 | ☑ | Vertical area split |
 | 55 | ☑ | Rectangle exists (incremental) |
 | 56 | ☑ | Max rectangle area |
+| 57 | ☑ | Domain leaf scores from ancestor suffixes |
 
 ### Revision notes
 
@@ -768,7 +770,7 @@ What's correct:
 - ☐ File-system tree startup is slow; redesign preprocessing versus incremental updates.
 - ☐ URL/path reachability through a hierarchical tree.
 - ☐ From a URL/path node, find maximum distance to any reachable leaf.
-- ☐ Domain/path weighted hierarchy: accumulate prefix contributions through a trie.
+- ☑ Domain/path weighted hierarchy: accumulate registered ancestor-suffix contributions and return only leaves. → [solution](57-domain-leaf-scores/DomainLeafScores.java)
 - ☐ Dictionary prefix search.
 - ☐ Maximum common prefix across any pair of files.
 - ☐ Print filesystem folder structure from file paths.
