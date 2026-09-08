@@ -1,42 +1,45 @@
 class Solution {
     public List<List<String>> partition(String s) {
-        List<List<String>>  result = new ArrayList<>();
-
-        backtrack(result, 0, s, new ArrayList<>());
-        return result;
+        List<List<String>> ans = new ArrayList<>();
+        getAllPartitions(s, ans, 0, new ArrayList<>());
+        return ans;
     }
 
-    private void backtrack(List<List<String>>  result, int ind, String s, List<String> tracking)
+    private void getAllPartitions(String s, List<List<String>> ans, int ind, List<String> trackingList)
     {
         if(ind == s.length())
         {
-            result.add(new ArrayList<>(tracking));
+            ans.add(new ArrayList<>(trackingList));
             return;
         }
-
         for(int i = ind; i < s.length(); i++)
         {
             if(isPalindrome(s, ind, i))
             {
-                tracking.add(s.substring(ind, i + 1));
-                backtrack(result, i + 1, s, tracking);
-                tracking.remove(tracking.size() - 1);
+                trackingList.add(s.substring(ind, i + 1));
+                getAllPartitions(s, ans, i + 1, trackingList);
+                trackingList.remove(trackingList.size() - 1);
             }
         }
     }
 
-
-    private boolean isPalindrome(String s, int i, int j)
+    private boolean isPalindrome(String s, int i , int j)
     {
         while(i <= j)
         {
-            if(s.charAt(i) != s.charAt(j))
+            if(s.charAt(i) == s.charAt(j))
+            {
+                i++;
+                j--;
+            }
+            else
             {
                 return false;
             }
-            i++;
-            j--;
         }
+
         return true;
     }
+
+
 }

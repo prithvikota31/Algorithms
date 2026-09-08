@@ -1,11 +1,8 @@
 class Solution {
     public List<String> letterCombinations(String digits) {
-
-        if (digits == null || digits.length() == 0) {
-            return new ArrayList<>();
-        }
-        
+        List<String> ans = new ArrayList<>();
         HashMap<Character, String> map = new HashMap<>();
+
 
         map.put('2', "abc");
         map.put('3', "def");
@@ -16,29 +13,31 @@ class Solution {
         map.put('8', "tuv");
         map.put('9', "wxyz");
 
-        List<String> ans = new ArrayList<>();
-        backtrack(map, 0, digits, ans, new StringBuilder());
+        StringBuilder sb = new StringBuilder();
 
-        return ans;
+        gatherCombinations(digits, map, 0, sb, ans);
+
+        return ans; 
     }
 
-    private void backtrack(HashMap<Character, String> map, int ind, String digits, List<String> ans, StringBuilder sb)
+    private void gatherCombinations(String digits, HashMap<Character, String> map,
+                                                         int ind,  StringBuilder sb, List<String> ans)
     {
         if(ind == digits.length())
         {
-            ans.add(sb.toString());
+            ans.add(new String(sb));
             return;
         }
-
         char digit = digits.charAt(ind);
-        String letters = map.get(digit);
-        for(int i = 0; i < letters.length(); i++)
+
+        String possibleLetters = map.get(digit);
+
+        for(int i = 0; i < possibleLetters.length(); i++)
         {
-            sb.append(letters.charAt(i));
-            backtrack(map, ind + 1, digits, ans, sb);
+            sb.append(possibleLetters.charAt(i));
+            gatherCombinations(digits, map, ind + 1, sb, ans);
             sb.deleteCharAt(sb.length() - 1);
         }
     }
-
 
 }

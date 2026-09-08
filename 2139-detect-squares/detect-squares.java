@@ -1,42 +1,56 @@
 class DetectSquares {
-    Map<String, Integer> map;
-    List<int[]> points;
+    Map<String, Integer> pointMap = new HashMap<>();
     public DetectSquares() {
-        points = new ArrayList<>();
-        map = new HashMap<>(); // map represents, point string format to count of duplciates
+        
     }
     
     public void add(int[] point) {
-        points.add(point);
-        String s = point[0] + "," + point[1];
-        map.put(s, map.getOrDefault(s, 0) + 1);
+        String pointStr = encode(point[0], point[1]);
+        pointMap.put(pointStr, pointMap.getOrDefault(pointStr, 0) + 1);
     }
     
     public int count(int[] point) {
-        
-        int x = point[0];
-        int y = point[1];
-
-        int result = 0;
-        for(int[] p: points)
+        int x1 = point[0];
+        int y1 = point[1];
+       
+        int count = 0;
+        for(String p: pointMap.keySet())
         {
-            //assume p is for diagnol point and confirm its validity
-            int nx = p[0];
-            int ny = p[1];
-            if((Math.abs(x - nx) != Math.abs(y - ny)) || x == nx || y == ny)
+            int[] p2 = decode(p);
+            int x2 = p2[0];
+            int y2 = p2[1];
+
+            //trying to find points such that p2 is diagonal to p1
+            if(x1 == x2 || y1 == y2 || Math.abs(x1 - x2) != Math.abs(y1 - y2))
+            {
+                continue;
+            } 
+            String p3 = encode(x1, y2); 
+            String p4 = encode(x2, y1);
+            if(!pointMap.containsKey(p3) || !pointMap.containsKey(p4))
             {
                 continue;
             }
 
-            //check for (x, ny) and (nx, y)
-            //normally have to loop in, but create a hashmap for the same
-            //(x, ny count)
-            String xAndny = x + "," + ny;
-            String nxAndy = nx + ","  + y;
+            int c2 = pointMap.get(p);
+            int c3 = pointMap.get(p3);
+            int c4 = pointMap.get(p4);
 
-            result += (map.getOrDefault(xAndny, 0)) * (map.getOrDefault(nxAndy, 0));
+            count += (c2 * c3 * c4);
+
         }
-        return result;
+        return count;
+    }
+
+    private String encode(int x, int y)
+    {
+        return x + "," + y;
+    }
+
+    private int[] decode(String p)
+    {
+        String[] pXY = p.split(",");
+        return new int[]{Integer.parseInt(pXY[0]), Integer.parseInt(pXY[1])};
     }
 }
 

@@ -3,14 +3,14 @@ class Solution {
         int m = matrix.length;
         int n = matrix[0].length;
 
-        boolean firstRowZero = false;
-        boolean firstColZero = false;
+        boolean rowZero = false;
+        boolean colZero = false;
 
         for(int i = 0; i < n; i++)
         {
             if(matrix[0][i] == 0)
             {
-                firstRowZero = true;
+                rowZero = true;
                 break;
             }
         }
@@ -19,7 +19,7 @@ class Solution {
         {
             if(matrix[i][0] == 0)
             {
-                firstColZero = true;
+                colZero = true;
                 break;
             }
         }
@@ -30,12 +30,14 @@ class Solution {
             {
                 if(matrix[i][j] == 0)
                 {
+                    //ith row and jth column = 0
                     matrix[i][0] = 0;
                     matrix[0][j] = 0;
                 }
             }
         }
-        //1 to m && 1 to n are done
+
+
         for(int i = 1; i < m; i++)
         {
             for(int j = 1; j < n; j++)
@@ -47,22 +49,22 @@ class Solution {
             }
         }
 
-        if(firstRowZero)
+        if(rowZero)
         {
-            for(int i = 0; i < n; i++)
+            for(int j = 0; j < n; j++)
             {
-                matrix[0][i] = 0;
+                matrix[0][j] = 0;
             }
         }
 
-        
-        if(firstColZero)
+        if(colZero)
         {
             for(int i = 0; i < m; i++)
             {
                 matrix[i][0] = 0;
             }
         }
-    
+
+
     }
 }

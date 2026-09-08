@@ -1,18 +1,15 @@
 class Solution {
     public boolean mergeTriplets(int[][] triplets, int[] target) {
-        boolean first = false;
-        boolean second = false;
-        boolean third = false;
+        boolean first = false, second = false, third = false;
 
-        for(int i = 0; i < triplets.length; i++)
+        for(int[] triplet: triplets)
         {
-            if(triplets[i][0] <= target[0] && triplets[i][1] <= target[1] &&
-                                            triplets[i][2] <= target[2])
+            if(triplet[0] <= target[0] && triplet[1] <= target[1] &&
+                triplet[2] <= target[2])
             {
-                if(target[0] == triplets[i][0]) first = true;
-                if(target[1] == triplets[i][1]) second = true;
-                if(target[2] == triplets[i][2]) third = true;
-
+                if(triplet[0] == target[0]) first = true;
+                if(triplet[1] == target[1]) second = true;
+                if(triplet[2] == target[2]) third = true;
             }
         }
 

@@ -13,19 +13,18 @@ class Solution {
     }
 
     public int robHelper(int[] nums, int start, int end) {
+        if (start == end) return nums[start];
         int n = nums.length;
+
         int[] dp = new int[n];
 
         dp[start] = nums[start];
-        if(end - start + 1 > 1)
-        {
-            dp[start + 1] = Math.max(nums[start], nums[start + 1]);
-        }
-        
+
+        dp[start + 1] = Math.max(nums[start], nums[start + 1]);
 
         for(int i = start + 2; i <= end; i++)
         {
-            dp[i] = Math.max(dp[i - 1], nums[i] + dp[i - 2]);
+            dp[i] = Math.max(dp[i-2] + nums[i], dp[i-1]);
         }
 
         return dp[end];

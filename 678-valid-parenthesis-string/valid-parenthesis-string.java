@@ -1,39 +1,35 @@
 class Solution {
     public boolean checkValidString(String s) {
-        int minOpen = 0;
-        int maxOpen = 0;
+        int l = s.length();
+        int min = 0;
+        int max = 0;
+        //range of unmtached ( min and max
 
-        for(int i = 0; i < s.length(); i++)
+        for(int i = 0; i < l; i++)
         {
-            if(s.charAt(i) == '(')
+            char ch = s.charAt(i);
+            if(ch == '(')
             {
-                minOpen++;
-                maxOpen++;
+                min++;
+                max++;
             }
-            else if(s.charAt(i) == ')')
+            else if(ch == ')')
             {
-                minOpen--;
-                maxOpen--;
+                min--;
+                max--;
             }
-            else 
+            else
             {
-                //*
-                minOpen--;
-                maxOpen++;
-            }
-
-            if(maxOpen < 0)
-            {
-                return false;
+                min--;
+                max++;
             }
 
-            if(minOpen < 0)
+            if(max < 0) return false;
+            if(min < 0)
             {
-                minOpen = 0;
+                min = 0;
             }
-
         }
-
-        return minOpen == 0;
+        return min==0;
     }
 }

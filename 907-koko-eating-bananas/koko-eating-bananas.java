@@ -1,39 +1,51 @@
 class Solution {
     public int minEatingSpeed(int[] piles, int h) {
-
-        int low = 1;
-        int high = 0;
-
-        // maximum possible useful speed
-        for (int pile : piles) {
+        //h > piles length
+        int high = Integer.MIN_VALUE;
+        for(int pile: piles)
+        {
             high = Math.max(high, pile);
         }
+        int ans = high;
 
-        int answer = high;
-
-        while (low <= high) {
-
+        int low = 1;
+        while(low <= high)
+        {
             int mid = low + (high - low) / 2;
 
-            long totalHours = 0;
+            //check with mid if all piles are done
+            boolean ableToFinish = canFinish(piles, h, mid);
 
-            // calculate total hours needed at speed = mid
-            for (int pile : piles) {
-                totalHours += (pile + mid - 1) / mid;
-            }
-
-            // speed too slow
-            if (totalHours > h) {
-                low = mid + 1;
-            }
-            // valid speed, try smaller speed
-            else {
-                answer = mid; 
-                //answer = Math.min(answer, mid);
+            if(ableToFinish) //lets lower speed
+            {
+                ans = mid;
                 high = mid - 1;
+            }
+            else
+            {
+                low = mid + 1;
             }
         }
 
-        return answer;
+        return ans;
+    }
+
+    private boolean canFinish(int[] piles, int h, int speed)
+    {
+        long totalTime = 0;
+
+        for(int pile: piles)
+        {
+            totalTime += (pile + speed - 1) / speed;
+        }
+
+        if((long)totalTime <= (long)h)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

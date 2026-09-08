@@ -1,7 +1,7 @@
 class Solution {
     public List<List<String>> solveNQueens(int n) {
         char[][] board = new char[n][n];
-        //create empty board
+
         for(int i = 0; i < n; i++)
         {
             Arrays.fill(board[i], '.');
@@ -10,51 +10,44 @@ class Solution {
         Set<Integer> rows = new HashSet<>();
         Set<Integer> d1 = new HashSet<>();
         Set<Integer> d2 = new HashSet<>();
-
-        //do backtrack each col is filled and proceeded to next column
-        backtrack(0, rows, d1, d2, board, ans);
+        getAllPossibilities(board, 0, ans, rows, d1, d2);
         return ans;
-
-
     }
-
-    private void backtrack(int col, Set<Integer> rows, Set<Integer> d1, Set<Integer> d2,
-                            char[][] board, List<List<String>> ans)
+    private void getAllPossibilities(char[][] board, int col, List<List<String>> ans,
+                                     Set<Integer> rows, Set<Integer> d1, Set<Integer> d2)
     {
-        if(col == board.length) // it successful fiulled col 0 -> n -1
+        if(col == board[0].length)
         {
-            ans.add(createResultBoard(board));
+            ans.add(createBoard(board));
             return;
         }
 
-        for(int i = 0; i < board.length; i++) // for current col try all possibilites
+        for(int row = 0; row < board.length; row++)
         {
-            int row = i;
-            if(rows.contains(row) || d1.contains(row + col) || d2.contains(row - col))
+            //row should not contain
+            //diagnorals d1 ad d2 should not contain
+            if(!rows.contains(row) && !d1.contains(row + col) && !d2.contains(row - col))
             {
-                continue;
+                rows.add(row);
+                d1.add(row + col);
+                d2.add(row - col);
+                board[row][col] = 'Q';
+                getAllPossibilities(board, col + 1, ans, rows, d1, d2);
+                board[row][col] = '.';
+                rows.remove(row);
+                d1.remove(row + col);
+                d2.remove(row - col);
             }
-
-            board[row][col] = 'Q';
-            rows.add(row);
-            d1.add(row + col);
-            d2.add(row - col);
-            backtrack(col + 1, rows, d1, d2, board, ans);
-            rows.remove(row);
-            d1.remove(row + col);
-            d2.remove(row - col);
-            board[row][col] = '.';    
         }
     }
 
-    private List<String> createResultBoard(char[][] board)
+    private List<String> createBoard(char[][] board)
     {
-        //board has char Arrays
-        List<String> result = new ArrayList<>();
+        List<String> output = new ArrayList<>();
         for(int i = 0; i < board.length; i++)
         {
-            result.add(new String(board[i]));
+            output.add(new String(board[i]));
         }
-        return result;
+        return output;
     }
 }
