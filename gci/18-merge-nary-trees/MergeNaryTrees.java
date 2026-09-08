@@ -69,7 +69,7 @@ public class MergeNaryTrees {
 
         if(!root1.name.equals(root2.name))
         {
-            return null;
+            throw new IllegalArgumentException("Root names must match");
         }
         //mergeTrees
         Node mergedNode = new Node(root1.name, root1.value + root2.value);
@@ -90,12 +90,12 @@ public class MergeNaryTrees {
             {
                 Node childMergedNode = mergeTrees(root2Child, map.get(root2Child.name));
                 mergedNode.children.add(childMergedNode);
+                map.remove(root2Child.name); // leave only unmatched root1 children
             }
             else
             {
                 mergedNode.children.add(root2Child);
             }
-            map.remove(root2Child.name); //so rest of them can be added as children
         }
 
         for(Node root1Child: map.values())
