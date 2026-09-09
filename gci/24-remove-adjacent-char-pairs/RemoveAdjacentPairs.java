@@ -63,7 +63,16 @@ public class RemoveAdjacentPairs {
 
     private boolean isOppositeCase(char c1, char c2)
     {
-        return Math.abs('a' - 'A') == Math.abs(c1 - c2);
+        boolean isC1Valid = (c1 >= 'a' && c1 <= 'z') || (c1 >= 'A' && c1 <= 'Z');
+        boolean isC2Valid = (c2 >= 'a' && c2 <= 'z') || (c2 >= 'A' && c2 <= 'Z');
+
+        if(!isC1Valid || !isC2Valid)
+        {
+            return false;
+        }
+
+        return Math.abs(c1 - c2) == Math.abs('A' - 'a');
+
     }
 
 
