@@ -49,7 +49,7 @@ import java.util.Arrays;
 public class ArithmeticAdjacentDiffSubarrays {
 
     public long countArithmeticSubarrays(int[] arr) {
-        if(arr == null || arr.length == 0)
+        if(arr == null || arr.length <= 1)
         {
             return 0;
         }
