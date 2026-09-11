@@ -132,21 +132,20 @@ public class MaximumSafetyPath {
                 int nextRow = currentRow + delRow[direction];
                 int nextCol = currentCol + delCol[direction];
 
-                boolean canMove = nextRow >= 0 && nextRow < n
+                if (nextRow >= 0 && nextRow < n
                     && nextCol >= 0 && nextCol < m
-                        && grid[nextRow][nextCol] != 'W'
-                        && grid[nextRow][nextCol] != 'C';
-                if (!canMove) {
-                    continue;
-                }
+                        && grid[nextRow][nextCol] != 'C'
+                        && grid[nextRow][nextCol] != 'W') {
+                    int nextPathSafety = Math.min(
+                            currentSafety,
+                            safety[nextRow][nextCol]);
 
-                int nextPathSafety = Math.min(
-                    currentSafety,
-                    safety[nextRow][nextCol]);
-
-                if (nextPathSafety > bestSafety[nextRow][nextCol]) {
-                    bestSafety[nextRow][nextCol] = nextPathSafety;
-                    maxHeap.offer(new int[] {nextPathSafety, nextRow, nextCol});
+                    if (nextPathSafety > bestSafety[nextRow][nextCol]) {
+                        bestSafety[nextRow][nextCol] = nextPathSafety;
+                        maxHeap.offer(new int[] {
+                            nextPathSafety, nextRow, nextCol
+                        });
+                    }
                 }
             }
         }
