@@ -1,52 +1,54 @@
 class Solution {
-
     public int lengthOfLIS(int[] nums) {
+        int n = nums.length;
+        List<Integer> temp = new ArrayList<>();
 
-        int[] tails = new int[nums.length];
 
-        tails[0] = nums[0];
-
-        int lisEndIndex = 0;
-
-        for(int i = 1; i < nums.length; i++) {
-
-            // Current number can extend LIS
-            if(nums[i] > tails[lisEndIndex]) {
-
-                tails[++lisEndIndex] = nums[i];
-                continue;
+        for(int i = 0; i < n; i++)
+        {
+            int indexPosInTemp = greaterOrEqualValIndex(temp, nums[i]);
+            if(indexPosInTemp == -1)
+            {
+                temp.add(nums[i]);
             }
-
-            // Find first element >= nums[i]
-            int replaceIndex =
-                lowerBound(tails, 0, lisEndIndex, nums[i]);
-
-            // Replace with smaller tail
-            tails[replaceIndex] = nums[i];
+            else
+            {
+                temp.set(indexPosInTemp, nums[i]);
+            }
         }
 
-        return lisEndIndex + 1;
+        return temp.size();
     }
 
-    public int lowerBound(
-        int[] nums,
-        int left,
-        int right,
-        int target
-    ) {
 
-        while(left <= right) {
+    // 1, 4, 5 , 8 , 10
 
-            int mid = left + (right - left) / 2;
+    private int greaterOrEqualValIndex(List<Integer> temp, int target)
+    {
+        int index = -1;
 
-            if(nums[mid] >= target) {
-                right = mid - 1;
+        if(temp.size() == 0)
+        {
+            return index;
+        }
+
+        int low = 0;
+        int high = temp.size() - 1;
+        while(low <= high)
+        {
+            int mid = low + (high - low) / 2;
+
+            if(temp.get(mid) >= target)
+            {
+                index = mid;
+                high = mid - 1;
             }
-            else {
-                left = mid + 1;
+            else
+            {
+                low = mid + 1;
             }
         }
 
-        return left;
+        return index;
     }
 }
