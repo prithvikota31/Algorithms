@@ -1,46 +1,43 @@
 class Solution {
     public int ladderLength(String beginWord, String endWord, List<String> wordList) {
-        Set<String> wordDict = new HashSet<>(wordList);
+        Set<String> wordSet = new HashSet<>(wordList);
 
-        if(!wordDict.contains(endWord))
+        if(!wordSet.contains(endWord))
         {
             return 0;
         }
-        Deque<Node> q = new ArrayDeque<>();
-        q.offer(new Node(beginWord, 1));
-        wordDict.remove(beginWord);
 
+        Deque<Pair> q = new ArrayDeque<>();
+        q.offer(new Pair(1, beginWord));
+        wordSet.remove(beginWord);
 
         while(!q.isEmpty())
         {
-            Node cur = q.poll();
-            if(endWord.equals(cur.word))
+            Pair cur = q.poll();
+            int cDist = cur.distance;
+            String cWord = cur.word;
+            if(cWord.equals(endWord))
             {
-                return cur.distance;
+                return cDist;
             }
 
-            char[] curChars = cur.word.toCharArray();
-            //replace each letter from a - z
-            for(int i = 0; i < curChars.length; i++)
+            //try every char with a to z
+            char[] cWordArray = cWord.toCharArray();
+            for(int i = 0; i < cWordArray.length; i++)
             {
-                char original = curChars[i];
+                char initChar = cWordArray[i];
                 for(char c = 'a'; c <= 'z'; c++)
                 {
-                    if(c == original)
-                    {
-                        continue;
-                    }
-                    curChars[i] = c;
+                    cWordArray[i] = c;
 
-                    String nextStr = new String(curChars);
-                    if(wordDict.contains(nextStr))
+                    String nextPossibleWord = new String(cWordArray);
+                    if(wordSet.contains(nextPossibleWord))
                     {
-                        q.offer(new Node(nextStr, cur.distance + 1));
-                        wordDict.remove(nextStr);
+                        q.offer(new Pair(cDist + 1, nextPossibleWord));
+                        wordSet.remove(nextPossibleWord);
                     }
                 }
-
-                curChars[i] = original;
+                cWordArray[i] = initChar;
             }
         }
 
@@ -48,13 +45,15 @@ class Solution {
     }
 }
 
-class Node {
-    String word;
+class Pair
+{
     int distance;
+    String word;
 
-    public Node(String word, int distance)
+    public Pair(int d, String w)
     {
-        this.word = word;
-        this.distance = distance;
+        word = w;
+        distance = d;
     }
+
 }
