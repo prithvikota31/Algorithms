@@ -96,11 +96,6 @@ public class SequenceReconstruction {
                 int u = sequence.get(j);
                 int v = sequence.get(j + 1);
 
-                if(!graph.containsKey(u) || !graph.containsKey(v))
-                {
-                    return false;        
-                }
-
                 boolean updateInDegree = graph.get(u).add(v);
                 if(updateInDegree)
                 {

@@ -1,64 +1,61 @@
 class Solution {
-    private List<Integer> size, parent;
+    int[] parent;
+    int[] size;
+    
     public int countComponents(int n, int[][] edges) {
-        size = new ArrayList<>();
-        parent = new ArrayList<>();
-        for(int i = 0; i <= n; i++)
+        int connected = n;
+        parent = new int[n];
+        for(int i = 0; i < n; i++)
         {
-            size.add(1);
-            parent.add(i);
+            parent[i] = i;
         }
+        size = new int[n];
+        Arrays.fill(size, 1);
 
-        int numConnected = n; //start with n
-
-
-        for(int i = 0; i < edges.length; i++)
+        for(int[] edge: edges)
         {
-            if(unionBySize(edges[i][0], edges[i][1]))
+            if(union(edge[0], edge[1]))
             {
-                numConnected--;
+                connected--;
             }
         }
+        return connected;
 
-        return numConnected;
     }
 
-
-    private int findUParent(int node)
+    private int find(int node)
     {
-        if(parent.get(node) == node)
+        if(parent[node] == node)
         {
             return node;
         }
 
-        int ulp = findUParent(parent.get(node));
-        parent.set(node, ulp);
-        return parent.get(node);
+        parent[node] = find(parent[node]);
+        return parent[node];
     }
 
-    private boolean unionBySize(int u, int v)
+    private boolean union(int u , int v)
     {
-        int ulPu = findUParent(u);
-        int ulPv = findUParent(v);
+        int ulPu = find(u);
+        int ulPv = find(v);
+
         if(ulPu == ulPv)
         {
             return false;
         }
 
-        if(size.get(ulPu) <= size.get(ulPv))
+        if(size[ulPu] >= size[ulPv])
         {
-            parent.set(ulPu, ulPv);
-            size.set(ulPv, size.get(ulPu) + size.get(ulPv));
+            //parent of v is u
+            parent[ulPv] = ulPu;
+            size[ulPu] = size[ulPu] + size[ulPv];
         }
         else
         {
-            parent.set(ulPv, ulPu);
-            size.set(ulPu, size.get(ulPu) + size.get(ulPv));
+            //parent of u is v
+            parent[ulPu] = ulPv;
+            size[ulPv] = size[ulPu] + size[ulPv];
         }
-
         return true;
     }
-
-
-
 }

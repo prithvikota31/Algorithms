@@ -1,50 +1,22 @@
 class Solution {
     public int coinChange(int[] coins, int amount) {
-        int m = coins.length;
-        int n = amount + 1;
-        int[][] dp = new int[m][n];
-        int INF = (int) 1e9;
+        //dp[i] represents min coins to represnet amount i
 
-        for(int i = 0; i < m; i++)
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp, amount + 1); //best possible max amount which is ut of bounds
+        dp[0] = 0; // 0 amount 0 coins
+
+        for(int i = 1; i <= amount; i++)
         {
-            Arrays.fill(dp[i], INF);
-        }
-
-        //amount 0 needs no coins, first column 0
-        //fill first row, with only one coin
-
-        for(int i = 0; i < m; i++)
-        {
-            dp[i][0] = 0;
-        }
-
-        for(int totalAmount = 1; totalAmount <= amount; totalAmount++)
-        {
-            if(totalAmount % coins[0] == 0)
+            for(int j = 0; j < coins.length; j++)
             {
-                dp[0][totalAmount] = totalAmount / coins[0];
-            }
-        }
-
-
-        for(int i = 1; i < coins.length; i++)
-        {
-            for(int totalAmount = 1; totalAmount <= amount; totalAmount++)
-            {
-                //dp[i][totalAmount]
-                //1 + dp[i][totalAmount - coins[i]]
-                //dp[i - 1][totalAmount]
-                int take = INF; //take ith coin
-                if(totalAmount >= coins[i])
+                if(coins[j] <= i)
                 {
-                    take = 1 + dp[i][totalAmount - coins[i]];
+                    dp[i] = Math.min(dp[i], 1 + dp[i - coins[j]]);
                 }
-                int notTake = dp[i - 1][totalAmount];
-
-                dp[i][totalAmount] = Math.min(take, notTake);
             }
         }
 
-        return dp[m- 1][n -1] == INF? -1: dp[m - 1][n - 1];
+        return dp[amount] >= amount + 1? -1: dp[amount];
     }
 }

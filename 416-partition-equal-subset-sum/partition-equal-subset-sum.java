@@ -1,52 +1,36 @@
 class Solution {
     public boolean canPartition(int[] nums) {
-        int totalSum = 0;
-        for(int num: nums)
-        {
-            totalSum += num;
+        int sum = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            sum += nums[i];
         }
 
-        if(totalSum % 2 != 0)   return false;
+        if (sum % 2 != 0) {
+            return false;
+        }
 
-        return targetSum(nums, totalSum / 2);
+        int target = sum / 2;
+
+        return targetSum(nums, target);
     }
 
-    private boolean targetSum(int[] nums, int target)
-    {
-        boolean[][] dp = new boolean[nums.length][target + 1];
+    private boolean targetSum(int[] nums, int target) {
+        // dp[i] represents whether sum i is possible
+        int n = nums.length;
+        boolean[] dp = new boolean[target + 1];
 
-        int m = dp.length;
-        int n = dp[0].length;
+        dp[0] = true;
 
-        for(int i = 0; i < m; i++)
-        {
-            dp[i][0] = true;
-        }
+        // Process each number once
+        for (int j = 0; j < n; j++) {
 
-        //0th row mark only target column
-
-        if(target >= nums[0])
-        {
-            dp[0][nums[0]] = true;
-        }
-
-        for(int i = 1; i < m; i++)
-        {
-            for(int j = 1; j < n; j++)
-            {
-                boolean notInclude = dp[i - 1][j];
-
-                boolean include = false;
-                if(j >= nums[i])
-                {
-                    include = dp[i - 1][j - nums[i]];
-                }
-
-                dp[i][j] = include || notInclude;
+            // Go backward so nums[j] is not reused in the same iteration
+            for (int i = target; i >= nums[j]; i--) {
+                dp[i] = dp[i] || dp[i - nums[j]];
             }
         }
 
-        return dp[m - 1][n - 1];
-
+        return dp[target];
     }
 }

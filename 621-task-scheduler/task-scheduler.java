@@ -1,42 +1,42 @@
 class Solution {
     public int leastInterval(char[] tasks, int n) {
-        int[] freq = new int[26];
-
+        Map<Character, Integer> taskFreq = new HashMap<>();
+        //char -> count
         for(char task: tasks)
         {
-            freq[task - 'A']++;
+            taskFreq.put(task, taskFreq.getOrDefault(task, 0) + 1);
         }
 
-        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> Integer.compare(b, a));
+        //add all values into maxheap, we will try to finish maxfreq tasks first as they tend to create more gaps
 
-        for(int count: freq)
+        PriorityQueue<Integer> maxHeapTaskFreq = new PriorityQueue<>((a, b) -> Integer.compare(b, a));
+        for(int val: taskFreq.values())
         {
-            if(count != 0)
-            {
-                maxHeap.offer(count);
-            }
+            maxHeapTaskFreq.offer(val);
         }
 
-        Queue<int[]> q = new LinkedList<>();
+        //int[] - (taskCount, time after which it can be done)
+        Deque<int[]> tasksWaiting = new ArrayDeque<>();
         int time = 0;
-        while(!maxHeap.isEmpty() || !q.isEmpty())
+        while(!maxHeapTaskFreq.isEmpty() || !tasksWaiting.isEmpty())
         {
             time++;
-            if(!maxHeap.isEmpty())
+            //pick a task
+            if(!maxHeapTaskFreq.isEmpty())
             {
-                int curTaskCount = maxHeap.poll();
-                //decrement
-                curTaskCount = curTaskCount - 1;
+                int curTaskCount = maxHeapTaskFreq.poll();
+                curTaskCount--; //reduce count and put in waitingQ
                 if(curTaskCount > 0)
-                    q.offer(new int[]{curTaskCount, time + n});
+                {
+                    tasksWaiting.offer(new int[]{curTaskCount, time + n});
+                }
             }
 
-            while(!q.isEmpty() && time >= q.peek()[1])
+            while(!tasksWaiting.isEmpty() && tasksWaiting.peekFirst()[1] <= time)
             {
-                maxHeap.offer(q.poll()[0]);
+                maxHeapTaskFreq.offer(tasksWaiting.pollFirst()[0]);
             }
         }
-
         return time;
     }
 }

@@ -28,20 +28,20 @@ public class MaxSimultaneousOverlap {
         int n = intervals.length;
         if(n <= 1)  return n;
 
-        //lets user heap
         Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
         PriorityQueue<Integer> endTimesMinHeap = new PriorityQueue<>();
+        int maximumOverlap = 0;
 
         for(int[] interval: intervals)
         {
-            if(!endTimesMinHeap.isEmpty() && endTimesMinHeap.peek() < interval[0])
+            while(!endTimesMinHeap.isEmpty() && endTimesMinHeap.peek() < interval[0])
             {
-                //one of previous meeting ended, so we can occupty that place
                 endTimesMinHeap.poll();
             }
             endTimesMinHeap.offer(interval[1]);
+            maximumOverlap = Math.max(maximumOverlap, endTimesMinHeap.size());
         }
-        return endTimesMinHeap.size();
+        return maximumOverlap;
     }
 
     // ------------------------------------------------------------------------
@@ -69,6 +69,7 @@ public class MaxSimultaneousOverlap {
         check("nested",        3, new int[][]{{1, 10}, {2, 9}, {3, 8}});
         check("all-identical", 3, new int[][]{{2, 5}, {2, 5}, {2, 5}});
         check("point-interval",1, new int[][]{{5, 5}});
+        check("early-peak",    3, new int[][]{{1, 2}, {1, 2}, {1, 2}, {10, 11}});
         check("empty",         0, new int[][]{});
 
         System.out.println("----");
