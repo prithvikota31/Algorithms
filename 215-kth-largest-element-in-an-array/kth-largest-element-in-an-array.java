@@ -1,8 +1,8 @@
 class Solution {
     public int findKthLargest(int[] nums, int k) {
-        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        //maintain minheap of size k
 
-        //main heap size k, and top element is kth larget
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
 
         for(int num: nums)
         {
