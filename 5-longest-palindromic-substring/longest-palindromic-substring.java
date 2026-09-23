@@ -1,34 +1,34 @@
 class Solution {
-    int maxLen = 1;
-    int bestStart = 0;
-    int bestEnd = 0;
+
+    private int startFinal = -1;
+    private int endFinal = -1;
+    private int maxLength = -1;
     public String longestPalindrome(String s) {
-     //at every index, expand odd length and even length
-
-
         for(int i = 0; i < s.length(); i++)
         {
-            expand(s, i, i);
-            expand(s, i, i + 1);
+            expand(s, i, i);//odd length
+            expand(s, i, i + 1);//even length
         }
 
-        return s.substring(bestStart, bestEnd + 1);
+        return s.substring(startFinal, endFinal);
     }
 
-    private void expand(String s, int left, int right)
+    private void expand(String s, int start, int end)
     {
-        while(left >= 0 && right <= s.length() - 1 && s.charAt(left) == s.charAt(right))
+        while(start >= 0 && end <= s.length() - 1 && s.charAt(start) == s.charAt(end))
         {
-            left--;
-            right++;
+            start--;
+            end++;
+        }
+        //before breaking the loop, start and end just came out of the palindrome
+        //atual range start + 1, end - 1
+        int length = end - start - 1;
+        if(length > maxLength)
+        {
+            maxLength = length;
+            startFinal = start + 1;
+            endFinal = end;
         }
 
-        int len = right - left - 1;
-        if(len > maxLen)
-        {
-            maxLen = len;
-            bestStart = left + 1;
-            bestEnd = right - 1;
-        }
     }
 }
