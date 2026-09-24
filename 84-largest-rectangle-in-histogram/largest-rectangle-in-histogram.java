@@ -1,37 +1,36 @@
 class Solution {
     public int largestRectangleArea(int[] heights) {
-        Deque<Integer> stack = new ArrayDeque<>(); //indices
-        //we maintin a striclty increasing stack because when we encounter a lesser number
-        // we calculate maxarea and the element below it is left side min
+        Deque<Integer> stack = new ArrayDeque<>();
         int maxArea = 0;
-        stack.offerLast(-1);
+        //maintain a monotonically increasing stack indices, when we encounter less valu, calculate area with the stack top height
         for(int i = 0; i < heights.length; i++)
         {
-            while(stack.peekLast() != -1 && heights[stack.peekLast()] > heights[i])
+            while(!stack.isEmpty() && heights[stack.peek()] >= heights[i])
             {
-                //now caculate
-                int rightSideMin = i;
-                int curVal = heights[stack.pollLast()];
-                int leftSideMin = stack.peekLast();
-                maxArea = Math.max(maxArea, curVal * (rightSideMin - leftSideMin - 1));
+                int rightIndex = i;
+                int curHeight = heights[stack.pop()];
+                int leftIndex = stack.isEmpty()? -1: stack.peek();
+                int area = curHeight * (rightIndex - leftIndex - 1);
+                maxArea = Math.max(maxArea, area);
             }
-            stack.offerLast(i);
+
+            stack.push(i);
         }
 
-        while(stack.peekLast() != -1)
+        //there might be some indexes left, which do not find right min
+        //for them
+        //int rightIndex = heights.length;
+
+        while(!stack.isEmpty())
         {
-            int rightSideMin = heights.length;
-            int curVal = heights[stack.pollLast()];
-            int leftSideMin = stack.peekLast();
-            
-
-            maxArea = Math.max(maxArea, curVal * (rightSideMin - leftSideMin - 1));
-
+            int rightIndex = heights.length;
+            int curHeight = heights[stack.pop()];
+            int leftIndex = stack.isEmpty()? -1: stack.peek();
+            int area = curHeight * (rightIndex - leftIndex - 1);
+            maxArea = Math.max(maxArea, area);
         }
-
-
-
 
         return maxArea;
+
     }
 }
