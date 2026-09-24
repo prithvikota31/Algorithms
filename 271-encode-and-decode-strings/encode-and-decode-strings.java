@@ -4,10 +4,11 @@ public class Codec {
     public String encode(List<String> strs) {
         StringBuilder sb = new StringBuilder();
 
+        //format 4#code
         for(String str: strs)
         {
             sb.append(str.length());
-            sb.append('#');
+            sb.append("#");
             sb.append(str);
         }
 
@@ -15,31 +16,27 @@ public class Codec {
     }
 
     // Decodes a single string to a list of strings.
-    //5#abcde3#xyz
     public List<String> decode(String s) {
+        //4#code5#apple
         List<String> result = new ArrayList<>();
         int i = 0;
         while(i < s.length())
         {
-            int j = i;
+            //find first '#'
+            int hashIndex = s.indexOf("#", i);
 
-            while(s.charAt(j) != '#')
-            {
-                j++;
-            }
-            int strLength = Integer.parseInt(s.substring(i, j)); // this gives 5;
-            int strStart = j + 1;
-            result.add(s.substring(strStart, strStart + strLength));
+            int strLen = Integer.parseInt(s.substring(i, hashIndex)); // 4
 
-            i = strStart + strLength;
+            //string start and end indexs
+            //eg: 0 + 1 -> 0 + 4 => 1 => 5
+            int start = hashIndex + 1;
+            int end = start + strLen; //end not inclusive
+
+            result.add(s.substring(start, end));
+            i = end;
         }
 
         return result;
-        
-
-
-
-
     }
 }
 
