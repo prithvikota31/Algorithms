@@ -1,24 +1,24 @@
 class Solution {
     public int[] productExceptSelf(int[] nums) {
+        //1 2 3 4
+        //first calculate prefix product for each pos
+        //then calculate suffix product and multiply with ans
+
         int n = nums.length;
-
         int[] ans = new int[n];
-        //first left product
-        ans[0] = 1; //since no left elements
 
-        for(int i = 1; i < n; i++)
+        int prefix = 1;
+        for(int i = 0; i < nums.length; i++)
         {
-            ans[i] = nums[i - 1] * ans[i - 1];
+            ans[i] = prefix;
+            prefix *= nums[i];
         }
 
-        //now capture right prodict
-
-        //ans[n - 1], leave as it is
-        int rightProduct = nums[n - 1];
-        for(int i = n - 2; i >= 0; i--)
+        int suffix = 1;
+        for(int i = n - 1; i >= 0; i--)
         {
-            ans[i] = ans[i] * rightProduct;
-            rightProduct = rightProduct * nums[i];
+            ans[i] *= suffix;
+            suffix *= nums[i];
         }
 
         return ans;
