@@ -1,33 +1,33 @@
 class Solution {
     public boolean isValid(String s) {
-        int n = s.length();
-        if(n % 2 != 0)  return false;
-
         Deque<Character> stack = new ArrayDeque<>();
 
-        for(int i = 0; i < s.length(); i++)
+        int n = s.length();
+
+        for(int i = 0; i < n; i++)
         {
             char ch = s.charAt(i);
 
-            if(ch == '(' || ch == '{' || ch == '[')
+            if(ch == '(' || ch == '[' || ch == '{')
             {
-                stack.offerLast(ch);
+                stack.push(ch);
+                continue;
             }
-            else
-            {
-                if(stack.isEmpty())    return false;
-                char cur = stack.pollLast();
-                if((ch == ')' && cur == '(') || (ch == ']' && cur == '[') || (ch == '}' && cur == '{'))
-                {
-                    continue;
-                }
-                else
-                {
-                    return false;
-                }
-            }
+
+            //we ecnounted closing brace
+
+            if(stack.isEmpty()) return false;
+
+            char top = stack.pop();
+
+            if(top == '(' && ch == ')') continue;
+            if(top == '[' && ch == ']') continue;
+            if(top == '{' && ch == '}') continue;
+
+            return false;
         }
 
         return stack.isEmpty();
+
     }
 }
