@@ -1,36 +1,45 @@
 class Solution {
     public boolean checkInclusion(String s1, String s2) {
-        int m = s1.length();
-        int n = s2.length();
-
-        if(m > n)   return false;
+        int l1 = s1.length();
+        int l2 = s2.length();
+        //s2 >= s1
+        //s1 
+        if(l1 > l2) return false;
 
         int[] freq = new int[26];
-        int checksNeeded = 0;
-        for(int i = 0; i < m; i++)
+
+        for(int i = 0; i < s1.length(); i++)
         {
             freq[s1.charAt(i) - 'a']++;
-            checksNeeded++;
         }
 
-        int start = 0;
-        for(int end = 0; end < s2.length(); end++)
+        int checksNeeded = s1.length();
+
+        int left = 0;
+
+        for(int right = 0; right < s2.length(); right++)
         {
-            int ch = s2.charAt(end) - 'a';
-            freq[ch]--;
-            if(freq[ch] >= 0)
+            //expand right
+            //if len > s1.length()
+            //shrink it
+
+            char rightCh = s2.charAt(right);
+            if(freq[rightCh - 'a'] > 0)
             {
-                checksNeeded--;
+                checksNeeded--;           
             }
-            if(end - start + 1 > m)
+            freq[rightCh - 'a']--;
+
+            if(right - left + 1 > s1.length())
             {
-                //move start
-                freq[s2.charAt(start) - 'a']++;
-                if(freq[s2.charAt(start) - 'a'] > 0)
+                //shrink left
+                char leftCh = s2.charAt(left);
+                if(freq[leftCh - 'a'] >= 0)
                 {
                     checksNeeded++;
                 }
-                start++;
+                freq[leftCh - 'a']++;
+                left++;
             }
 
             if(checksNeeded == 0)
@@ -38,6 +47,7 @@ class Solution {
                 return true;
             }
         }
+
         return false;
     }
 }
