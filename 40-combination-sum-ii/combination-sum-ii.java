@@ -1,63 +1,65 @@
 class Solution {
-
     public List<List<Integer>> combinationSum2(int[] candidates, int target) {
-
         Arrays.sort(candidates);
 
         List<List<Integer>> result = new ArrayList<>();
+        List<Integer> temp = new ArrayList<>();
 
-        findCombinations(candidates,
-                         target,
-                         0,
-                         new ArrayList<>(),
-                         result);
+        findCombinations(
+            result,
+            candidates,
+            target,
+            temp,
+            candidates.length - 1
+        );
 
         return result;
     }
 
-    public void findCombinations(int[] candidates,
-                                 int target,
-                                 int ind,
-                                 List<Integer> curr,
-                                 List<List<Integer>> result)
-    {
-        // base case
-        if(target == 0)
-        {
-            result.add(new ArrayList<>(curr));
+    private void findCombinations(
+            List<List<Integer>> result,
+            int[] candidates,
+            int target,
+            List<Integer> temp,
+            int index) {
+
+        if (target == 0) {
+            result.add(new ArrayList<>(temp));
             return;
         }
 
-        if(ind >= candidates.length || target < 0)
-        {
+        if (target < 0 || index < 0) {
             return;
         }
 
-        // ---------------- PICK ----------------
+        // TAKE current element
+        temp.add(candidates[index]);
 
-        curr.add(candidates[ind]);
+        findCombinations(
+            result,
+            candidates,
+            target - candidates[index],
+            temp,
+            index - 1
+        );
 
-        findCombinations(candidates,
-                         target - candidates[ind],
-                         ind + 1,
-                         curr,
-                         result);
+        temp.remove(temp.size() - 1);
 
-        curr.remove(curr.size() - 1);
+        // NOT TAKE current value
+        // Skip all duplicates of candidates[index]
+        int nextIndex = index - 1;
 
-        // ------------ NOT PICK ----------------
-
-        // skip duplicates
-        while(ind + 1 < candidates.length &&
-              candidates[ind] == candidates[ind + 1])
-        {
-            ind++;
+        while (nextIndex >= 0 &&
+               candidates[nextIndex] == candidates[index]) {
+            nextIndex--;
         }
 
-        findCombinations(candidates,
-                         target,
-                         ind + 1,
-                         curr,
-                         result);
+        findCombinations(
+            result,
+            candidates,
+            target,
+            temp,
+            nextIndex
+        );
     }
 }
