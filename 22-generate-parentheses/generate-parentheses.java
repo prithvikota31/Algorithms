@@ -1,31 +1,36 @@
 class Solution {
     public List<String> generateParenthesis(int n) {
         List<String> ans = new ArrayList<>();
-        gatherCombinations(n, 0, 0, ans, new StringBuilder());
-        return ans;
 
+        StringBuilder sb = new StringBuilder();
+
+        helper(n, ans, sb, 0, 0);
+
+        return ans;  
     }
 
-    private void gatherCombinations(int n, int open, int close, List<String> ans, StringBuilder sb)
+    public void helper(int n, List<String> ans, StringBuilder sb, int open, int close)
     {
-        if(open + close == 2 * n)
+        if(sb.length() == n * 2)
         {
-            ans.add(new String(sb));
+            ans.add(sb.toString());
             return;
         }
 
         if(open < n)
         {
-            sb.append('(');
-            gatherCombinations(n, open + 1, close, ans, sb);
+            sb.append("(");
+            helper(n, ans, sb, open + 1, close);
             sb.deleteCharAt(sb.length() - 1);
         }
 
         if(close < open)
         {
-            sb.append(')');
-            gatherCombinations(n, open, close + 1, ans, sb);
+            sb.append(")");
+            helper(n, ans, sb, open, close + 1);
             sb.deleteCharAt(sb.length() - 1);
         }
+
+
     }
 }
