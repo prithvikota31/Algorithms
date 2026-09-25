@@ -1,14 +1,16 @@
 class Solution {
     public boolean exist(char[][] board, String word) {
-
+        int m = board.length;
+        int n = board[0].length;
         int[] delRow = {0, 1, 0, -1};
         int[] delCol = {1, 0, -1, 0};
+        boolean[][] visited = new boolean[m][n];
 
-        for(int i = 0; i < board.length; i++)
+        for(int i = 0; i < m; i++)
         {
-            for(int j = 0; j < board[0].length; j++)
+            for(int j = 0; j < n; j++)
             {
-                if(find(board, word, 0, i, j, delRow, delCol))
+                if(dfs(i, j, delRow, delCol, word, 0, visited, board))
                 {
                     return true;
                 }
@@ -18,40 +20,41 @@ class Solution {
         return false;
     }
 
-    public boolean find(char[][] board, String word, int index, int row, int col, int[] delRow, int[] delCol)
+
+    private boolean dfs(int row, int col,
+                 int[] delRow, int[] delCol, String word, int index, boolean[][] visited, char[][] board)
+
     {
-        if(board[row][col] != word.charAt(index))
+
+        char ch = word.charAt(index);
+        if(ch != board[row][col])
         {
             return false;
         }
-
         if(index == word.length() - 1)
         {
             return true;
         }
 
+        visited[row][col] = true;
 
-        char curChar = board[row][col];
-        board[row][col] = '*';
-
-        for(int i = 0; i < 4; i++)
+        for(int i = 0; i < delRow.length; i++)
         {
             int nRow = row + delRow[i];
             int nCol = col + delCol[i];
-
-            if(nRow >= 0 && nRow < board.length && nCol >= 0 && nCol < board[0].length)
+            if(nRow >= 0 && nRow < board.length && nCol >= 0 && nCol < board[0].length 
+            && !visited[nRow][nCol])
             {
-                if(find(board, word, index + 1, nRow, nCol, delRow, delCol))
+                boolean found = dfs(nRow, nCol, delRow, delCol, word, index + 1, visited, board);
+                if(found)
                 {
-                    board[row][col] = curChar; // restore before returning
-
+                    visited[row][col] = false;
                     return true;
                 }
             }
         }
-        board[row][col] = curChar;
 
+        visited[row][col] = false;
         return false;
-
     }
 }
